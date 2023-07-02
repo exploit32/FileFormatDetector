@@ -5,11 +5,7 @@ namespace ElfFormat
 {
     public class ElfFormatDetector : IBinaryFormatDetector
     {
-        public static readonly Signature Signature = new Signature()
-        {
-            Value = new byte[] { 0x7F, (byte)'E', (byte)'L', (byte)'F' },
-            Offset = 0,
-        };
+        public static readonly Signature Signature = new Signature(new byte[] { 0x7F, (byte)'E', (byte)'L', (byte)'F' });
 
         public bool HasSignature => true;
 

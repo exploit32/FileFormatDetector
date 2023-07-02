@@ -10,14 +10,16 @@ namespace FileFormatDetector
 {
     internal class FormatDetector
     {
-        private readonly IBinaryFormatDetector[] _formats;
+        private readonly IBinaryFormatDetector[] _binaryFormats;
+        private readonly ITextFormatDetector[] _textFormats;
 
         public AppConfiguration Configuration { get; }
 
-        public FormatDetector(AppConfiguration configuration, IBinaryFormatDetector[] formats)
+        public FormatDetector(AppConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats)
         {
             Configuration = configuration;
-            _formats = formats ?? throw new ArgumentNullException(nameof(formats));
+            _binaryFormats = binaryFormats ?? throw new ArgumentNullException(nameof(binaryFormats));
+            _textFormats = textFormats ?? throw new ArgumentNullException(nameof(textFormats));
         }
 
         public async Task<IEnumerable<RecognizedFile>> ScanFiles(CancellationToken cancellationToken)
@@ -60,43 +62,22 @@ namespace FileFormatDetector
 
             try
             {
-
                 if (!File.Exists(path))
                     return null;
 
-                FileInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Length < headerLength)
-                    return null;
-
-                byte[] buffer = new byte[headerLength];
+                //FileInfo fileInfo = new FileInfo(path);
+                //if (fileInfo.Length < headerLength)
+                //    return null;
 
                 var detected = false;
 
-                //using (var file = File.OpenRead(path))
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    int bytesRead = file.Read(buffer, 0, buffer.Length);
+                    summary = TryDetectBinaryFormat(file, headerLength);
 
-                    if (bytesRead < headerLength)
-                        return null;
-
-                    foreach (var format in _formats)
+                    if (summary == null)
                     {
-                        var isSignatureFound = format.CheckSignature(buffer);
-
-                        if (isSignatureFound)
-                        {
-                            file.Seek(0, SeekOrigin.Begin);
-                            summary = format.ReadFormat(file);
-                        }
-
-                        detected |= summary != null;
-
-                        if (detected)
-                        {
-                            //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
-                            break;
-                        }
+                        summary = TryDetectTextFormat(file);
                     }
                 }
             }
@@ -110,11 +91,61 @@ namespace FileFormatDetector
             return summary != null ? new RecognizedFile(path, summary) : null;
         }
 
-        private bool HasFormatWithSignature() => _formats.Any(f => f.HasSignature);
+        private FormatSummary? TryDetectBinaryFormat(Stream stream, int headerLength)
+        {
+            FormatSummary? summary = null;
+
+            byte[] buffer = new byte[headerLength];
+
+            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+            stream.Seek(0, SeekOrigin.Begin);
+
+            if (bytesRead < headerLength)
+                return null;
+
+            foreach (var format in _binaryFormats)
+            {
+                var isSignatureFound = format.CheckSignature(buffer);
+
+                if (isSignatureFound)
+                {                    
+                    summary = format.ReadFormat(stream);
+
+                    if (summary != null)
+                    {
+                        //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
+                        break;
+                    }
+                }
+            }
+
+            return summary;
+        }
+
+        private FormatSummary? TryDetectTextFormat(Stream stream)
+        {
+            FormatSummary? summary = null;
+
+            foreach (var format in _textFormats)
+            {
+                summary = format.ReadFormat(stream, 4096);
+
+                if (summary != null)
+                {
+                    //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
+                    break;
+                }
+            }
+
+            return summary;
+        }
+
+        private bool HasFormatWithSignature() => _binaryFormats.Any(f => f.HasSignature);
 
         private int GetMinReadLength()
         {
-            return _formats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature);
+            return _binaryFormats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature);
         }
     }
 }

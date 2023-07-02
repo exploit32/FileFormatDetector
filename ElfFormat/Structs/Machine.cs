@@ -177,7 +177,7 @@ namespace ElfFormat.Structs
         KMX16 = 212, //KM211 KMX16 16-bit processor
         KMX8 = 213, //KM211 KMX8 8-bit processor
         KVARC = 214, //KM211 KVARC processor
-        CDP = 215, //Paneve CDP architecture family
+        CDP = 215, //Paneve CDP architecture family 
         COGE = 216, //Cognitive Smart Memory Processor
         COOL = 217, //Bluechip Systems CoolEngine
         NORC = 218, //Nanoradio Optimized RISC
@@ -188,5 +188,6 @@ namespace ElfFormat.Structs
         MOXIE = 223, //Moxie processor family
         AMDGPU = 224, //AMD GPU architecture
         RISCV = 243, //RISC-V
+        ALPHA_EXP = 36902 //Used by NetBSD/alpha; obsolete
     }
 }

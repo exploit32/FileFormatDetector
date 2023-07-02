@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace FormatApi
 {
-    public interface ITextFotmatDetector
+    public interface ITextFormatDetector
     {
-        FormatSummary? ReadFormat(Stream stream);
+        bool HasSignature { get; }
+
+        FormatSummary? ReadFormat(Stream stream, long? maxBytesToRead);
     }
 }

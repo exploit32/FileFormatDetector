@@ -13,9 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BomTextFilesFormat\BomTextFilesFormat.csproj" />
     <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
+    <ProjectReference Include="..\NoBomTextFilesFormat\NoBomTextFilesFormat.csproj" />
     <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
   </ItemGroup>
 

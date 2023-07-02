@@ -14,14 +14,14 @@ namespace FormatApi
 
         public Signature(byte[] value, int offset)
         {
+            if (value == null) throw new ArgumentNullException(nameof(value));
+            if (value.Length == 0) throw new ArgumentException("Signature cannot be empty", nameof(value));
+            if (offset < 0) throw new ArgumentOutOfRangeException(nameof(offset));
+
             Value = value;
             Offset = offset;
         }
 
         public Signature(byte[] value) : this(value, 0) { }
-
-        public Signature()
-        {
-        }        
     }
 }

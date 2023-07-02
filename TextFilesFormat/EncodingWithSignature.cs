@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BomTextFilesFormat
+namespace TextFilesFormat
 {
     internal class EncodingWithSignature
     {
@@ -13,10 +13,16 @@ namespace BomTextFilesFormat
 
         public int CodePage { get; }
 
-        public EncodingWithSignature(Signature signature, int codePage)
+        public string EncodingName { get; }
+
+        public string EncodingFullName { get; }
+
+        public EncodingWithSignature(Signature signature, int codePage, string encodingName, string encodingFullName)
         {
             Signature = signature;
             CodePage = codePage;
+            EncodingName = encodingName;
+            EncodingFullName = encodingFullName;
         }
     }
 }

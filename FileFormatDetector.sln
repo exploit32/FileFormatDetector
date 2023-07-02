@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tools", "Tools\Tools.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MachOFormat", "MachOFormat\MachOFormat.csproj", "{2D675CB0-2B5A-4E67-BE8A-BDFAAFB38FE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BomTextFilesFormat", "BomTextFilesFormat\BomTextFilesFormat.csproj", "{3FD5A9D1-9F55-44C9-B28C-35F312D8B554}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextFilesFormat", "TextFilesFormat\TextFilesFormat.csproj", "{3FD5A9D1-9F55-44C9-B28C-35F312D8B554}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

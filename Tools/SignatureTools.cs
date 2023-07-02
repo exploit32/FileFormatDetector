@@ -26,10 +26,15 @@ namespace Tools
 
             for (int i = 0; i < signatures.Length; i++)
             {
-                success |= CheckSignature(fileStart, signatures[i]);
+                var signature = signatures[i];
 
-                if (success)
-                    break;
+                if (fileStart.Length > signature.Offset + signature.Value.Length)
+                {
+                    success |= CheckSignature(fileStart, signature);
+
+                    if (success)
+                        break;
+                }
             }
 
             return success;

@@ -1,4 +1,5 @@
-﻿using ElfFormat;
+﻿using BomTextFilesFormat;
+using ElfFormat;
 using FormatApi;
 using MachOFormat;
 using Microsoft.Extensions.Configuration;
@@ -30,9 +31,11 @@ namespace FileFormatDetector
                 args.Cancel = true;
             };
 
-            IBinaryFormatDetector[] formats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
+            IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
 
-            FormatDetector detector = new FormatDetector(detectorConfiguration, formats);
+            ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new BomTextFilesDetector() };
+
+            FormatDetector detector = new FormatDetector(detectorConfiguration, binaryFormats, textFormats);
 
             var recognizedFiles = await detector.ScanFiles(cancellationTokenSource.Token);
 

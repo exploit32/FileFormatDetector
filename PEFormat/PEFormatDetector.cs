@@ -6,12 +6,7 @@ namespace PEFormat
 {
     public class PEFormatDetector : IBinaryFormatDetector
     {
-        public static readonly Signature Signature = new Signature()
-        {
-            Value = new byte[] { (byte)'M', (byte)'Z' },
-            Offset = 0,
-        };
-
+        public static readonly Signature Signature = new Signature(new byte[] { (byte)'M', (byte)'Z' });
         public bool HasSignature => true;
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;

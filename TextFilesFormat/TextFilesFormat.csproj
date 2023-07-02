@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
+    <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 
 </Project>
