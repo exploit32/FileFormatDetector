@@ -65,12 +65,6 @@ namespace FileFormatDetector
                 if (!File.Exists(path))
                     return null;
 
-                //FileInfo fileInfo = new FileInfo(path);
-                //if (fileInfo.Length < headerLength)
-                //    return null;
-
-                var detected = false;
-
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
                     summary = TryDetectBinaryFormat(file, headerLength);
@@ -79,6 +73,9 @@ namespace FileFormatDetector
                     {
                         summary = TryDetectTextFormat(file);
                     }
+
+                    if (summary == null)
+                        summary = new UnknownFormatSummary();
                 }
             }
             catch (UnauthorizedAccessException) { }

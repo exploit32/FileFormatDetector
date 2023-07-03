@@ -19,6 +19,7 @@
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
     <ProjectReference Include="..\NoBomTextFilesFormat\NoBomTextFilesFormat.csproj" />
     <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
+    <ProjectReference Include="..\TextFilesFormat\TextFilesFormat.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using BomTextFilesFormat;
+﻿using TextFilesFormat;
 using ElfFormat;
 using FormatApi;
 using MachOFormat;
@@ -33,7 +33,7 @@ namespace FileFormatDetector
 
             IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
 
-            ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new BomTextFilesDetector() };
+            ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
 
             FormatDetector detector = new FormatDetector(detectorConfiguration, binaryFormats, textFormats);
 
