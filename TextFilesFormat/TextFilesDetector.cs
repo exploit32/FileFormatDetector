@@ -11,8 +11,6 @@ namespace TextFilesFormat
 {
     public class TextFilesDetector : ITextFormatDetector
     {
-        private const int MaxSizeToLoadInMemory = 16 * 1024 * 1024;
-
         private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
             DetectableEncoding.Utf1,
@@ -63,26 +61,9 @@ namespace TextFilesFormat
                 }
                 else
                 {
-                    long fileSize = stream.Length;
+                    stream.Seek(0, SeekOrigin.Begin);
 
-                    Stream streamToUse = stream;
-
-                    if (maxBytesToRead.HasValue && maxBytesToRead < MaxSizeToLoadInMemory)
-                    {
-                        byte[] memoryBuffer = new byte[(int)maxBytesToRead.Value];
-                        Array.Copy(buffer, memoryBuffer, preambleLength);
-                        int additionalLength = stream.Read(memoryBuffer, preambleLength, (int)maxBytesToRead.Value - preambleLength);
-
-                        MemoryStream memory = new MemoryStream(memoryBuffer, 0, additionalLength + preambleLength);
-
-                        streamToUse = memory;
-                    }
-                    else
-                    {
-                        stream.Seek(0, SeekOrigin.Begin);
-                    }
-
-                    summary = TryDetectEncoding(streamToUse, fileSize);
+                    summary = TryDetectEncoding(stream, maxBytesToRead);
                 }
 
             }
@@ -110,13 +91,13 @@ namespace TextFilesFormat
             return null;
         }
 
-        private TextFormatSummary? TryDetectEncoding(Stream stream, long fileSize)
+        private TextFormatSummary? TryDetectEncoding(Stream stream, long? maxBytesToRead)
         {
             TextFormatSummary? summary = null;
 
             NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector(true);
 
-            var detectedEncoding = nonBomEncodingDetector.TryDetermineEncoding(stream, fileSize);
+            var detectedEncoding = nonBomEncodingDetector.TryDetermineEncoding(stream, maxBytesToRead);
 
             if (detectedEncoding != null)
             {
