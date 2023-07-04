@@ -21,7 +21,7 @@ namespace TextFilesFormat
         public static DetectableEncoding Scsu => new DetectableEncoding(new Signature(new byte[] { 0x0E, 0xFE, 0xFF }), 0, "scsu", "Standard Compression Scheme for Unicode");
         public static DetectableEncoding Bocu1 => new DetectableEncoding(new Signature(new byte[] { 0xFB, 0xEE, 0x28 }), 0, "bocu-1", "Binary Ordered Compression for Unicode");
         public static DetectableEncoding Gb18030 => new DetectableEncoding(new Signature(new byte[] { 0x84, 0x31, 0x95, 0x33 }), 54936, "gb18030", "Chinese National Standard GB 18030-2005: Information Technology—Chinese coded character set");
-        public static DetectableEncoding ISO8859 => new DetectableEncoding(0, "ISO-8859", "ISO/IEC 8859, 8-bit extended ASCII");
+        public static DetectableEncoding Windows125x => new DetectableEncoding(1251, "Windows-125x", "Windows-1251 is an 8-bit character encoding, designed to cover languages that use the Cyrillic script such as Russian, Ukrainian, Belarusian, Bulgarian, Serbian Cyrillic, Macedonian and other languages.");
         public static DetectableEncoding ASCII => new DetectableEncoding(0, "ASCII", "Basic 7-bit encoding");
 
         /// <summary>

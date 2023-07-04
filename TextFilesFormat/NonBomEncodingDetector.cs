@@ -27,15 +27,16 @@ namespace TextFilesFormat
              long readLength = maxBytesToRead.HasValue ? Math.Min(stream.Length, maxBytesToRead.Value) : stream.Length;
 
             Utf8Checker utf8Checker = new Utf8Checker();
+            Utf16Checker utf16Checker = new Utf16Checker();
+            Utf32Checker utf32Checker = new Utf32Checker();
             EvenOddNullsCalculator evenOddNullsCalculator = new EvenOddNullsCalculator();
             SequentialNullsCalculator sequentialNullsCalculator = new SequentialNullsCalculator();
-            Utf32Checker utf32Checker = new Utf32Checker();
             BytesRangeCalculator bytesRangeCalculator = new BytesRangeCalculator();
 
-            bool mayBeAscii = true;
             bool mayBeUtf8 = true;
             bool mayBeUtf16 = stream.Length % 2 == 0;
             bool mayBeUtf32 = stream.Length % 4 == 0;
+            bool mayBeAsciiOrWindows125x = true;
 
             while(stream.Position < readLength)
             {
@@ -45,51 +46,65 @@ namespace TextFilesFormat
 
                 ReadOnlySpan<byte> bytes = buffer.AsSpan(0, bytesRead);
 
-                if (mayBeAscii)
-                    mayBeAscii = bytesRangeCalculator.AllBytesLessThan128(bytes);
+                if (mayBeAsciiOrWindows125x)
+                    mayBeAsciiOrWindows125x = !bytesRangeCalculator.CheckControlChars(bytes);
 
                 if (mayBeUtf8)
-                    mayBeUtf8 = utf8Checker.ProcessBlock(bytes);
+                    mayBeUtf8 = utf8Checker.CheckValidSurrogates(bytes);
 
                 if (mayBeUtf16)
+                {
                     evenOddNullsCalculator.ProcessBlock(bytes);
+                    mayBeUtf16 = utf16Checker.CheckValidSurrogates(bytes);
+                }
 
                 if (mayBeUtf32)
-                    utf32Checker.ProcessBlock(bytes);
+                    mayBeUtf32 = utf32Checker.CheckValidRange(bytes);
 
                 sequentialNullsCalculator.ProcessBlock(bytes);
             }
 
-            if (evenOddNullsCalculator.ContainsNulls)
-            {
-                //Possible: Utf-16, Utf-32
-                if (mayBeUtf32 && utf32Checker.HasNullTriples && sequentialNullsCalculator.MaxSequentialNulls <= 3)
-                {
-                    //Possible: Utf-32
-                    if (utf32Checker.LittleEndianSymbols > utf32Checker.BigEndianSymbols)
-                        return DetectableEncoding.Utf32LE;
-                    else
-                        return DetectableEncoding.Utf32BE;
-                }
 
-                if (mayBeUtf16 && sequentialNullsCalculator.MaxSequentialNulls <= 1)
+            //Possible: Utf-16, Utf-32
+            if (mayBeUtf32 && sequentialNullsCalculator.MaxSequentialNulls <= 3)
+            {
+                //Possible: Utf-32
+                if (utf32Checker.ValidLittleEndianRange)
+                    return DetectableEncoding.Utf32LE;
+                else if (utf32Checker.ValidBigEndianRange)
+                    return DetectableEncoding.Utf32BE;
+            }
+
+            if (mayBeUtf16 && sequentialNullsCalculator.MaxSequentialNulls <= 1)
+            {
+                if (utf16Checker.BigEndianSurrogatesValid && !utf16Checker.LittleEndianSurrogatesValid)
+                    return DetectableEncoding.Utf16BE;
+                else if (utf16Checker.LittleEndianSurrogatesValid && !utf16Checker.BigEndianSurrogatesValid)
+                    return DetectableEncoding.Utf16LE;
+                else
                 {
-                    if (evenOddNullsCalculator.EvenNulls > evenOddNullsCalculator.OddNulls)
+                    if (utf16Checker.FoundBigEndianSurrogates && !utf16Checker.FoundLittleEndianSurrogates)
                         return DetectableEncoding.Utf16BE;
-                    else
+                    else if (utf16Checker.FoundLittleEndianSurrogates && !utf16Checker.FoundBigEndianSurrogates)
                         return DetectableEncoding.Utf16LE;
+                    else
+                    {
+                        if (evenOddNullsCalculator.EvenNulls > evenOddNullsCalculator.OddNulls)
+                            return DetectableEncoding.Utf16BE;
+                        else
+                            return DetectableEncoding.Utf16LE;
+                    }
                 }
             }
-            else
-            {
-                //Utf8, ASCII, ANSI
-                if (mayBeAscii)
-                    return DetectableEncoding.ASCII;
-                else if (mayBeUtf8)
-                    return DetectableEncoding.Utf8;
-                else
-                    return DetectableEncoding.ISO8859;
-            }
+
+            //Utf8, ASCII, ANSI
+            if (!bytesRangeCalculator.HasAsciiControlChars)
+                return DetectableEncoding.ASCII;
+            else if (mayBeUtf8)
+                return DetectableEncoding.Utf8;
+            else if (!bytesRangeCalculator.HasWindows125xControlChars)
+                return DetectableEncoding.Windows125x;
+
 
             return null;
         }

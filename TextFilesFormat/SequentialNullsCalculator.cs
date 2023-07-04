@@ -12,6 +12,8 @@ namespace TextFilesFormat
 
         public long MaxSequentialNulls { get; private set; } = 0;
 
+        public bool ContainsNulls => MaxSequentialNulls > 0;
+
         public void ProcessBlock(ReadOnlySpan<byte> data)
         {
             int length = data.Length;
@@ -24,6 +26,10 @@ namespace TextFilesFormat
 
                     if (_sequentialNulls > MaxSequentialNulls)
                         MaxSequentialNulls = _sequentialNulls;
+                }
+                else
+                {
+                    _sequentialNulls = 0;
                 }
             }
         }

@@ -12,8 +12,6 @@ namespace TextFilesFormat
 
         public long OddNulls { get; private set; }
 
-        public bool ContainsNulls => EvenNulls + OddNulls > 0;
-
         public void ProcessBlock(ReadOnlySpan<byte> data)
         {
            int length = data.Length;

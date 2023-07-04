@@ -8,26 +8,46 @@ namespace TextFilesFormat
 {
     internal class Utf32Checker
     {
-        public long LittleEndianSymbols { get; private set; }
+        public bool ValidLittleEndianRange { get; private set; } = true;
 
-        public long BigEndianSymbols { get; private set; }
+        public bool ValidBigEndianRange { get; private set; } = true;
 
-        public bool HasNullTriples => LittleEndianSymbols + BigEndianSymbols > 0;
-
-        public void ProcessBlock(ReadOnlySpan<byte> buffer)
+        public bool CheckValidRange(ReadOnlySpan<byte> buffer)
         {
             if (buffer.Length % 4 != 0)
-                throw new ArgumentException("Buffer size is expected to ba a multiple of 4");
+                throw new ArgumentException("Buffer size is expected to be a multiple of 4");
 
+            if (ValidBigEndianRange)
+                ValidBigEndianRange = CheckValidBigEndianBytes(buffer);
+
+            if (ValidLittleEndianRange)
+                ValidLittleEndianRange = CheckValidLittleEndianBytes(buffer);
+
+            return ValidLittleEndianRange || ValidBigEndianRange;
+        }
+
+        private bool CheckValidBigEndianBytes(ReadOnlySpan<byte> buffer)
+        {
             int length = buffer.Length;
-            for (int i = 0; i < length; i += 4)
+            for (int i = 0; i < length - 3; i += 4)
             {
-                if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0 && buffer[3] != 0)
-                    BigEndianSymbols++;
-
-                if (buffer[0] != 0 && buffer[1] == 0 && buffer[2] == 0 && buffer[3] == 0)
-                    LittleEndianSymbols++;
+                if (buffer[i] != 0 || buffer[i + 1] > 10)
+                    return false;
             }
+
+            return true;
+        }
+
+        private bool CheckValidLittleEndianBytes(ReadOnlySpan<byte> buffer)
+        {
+            int length = buffer.Length;
+            for (int i = 0; i < length - 3; i += 4)
+            {
+                if (buffer[i + 3] != 0 || buffer[i + 2] > 10)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

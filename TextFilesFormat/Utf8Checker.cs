@@ -18,7 +18,7 @@ namespace TextFilesFormat
             _moreChars = 0;
         }
 
-        public bool ProcessBlock(ReadOnlySpan<byte> buffer)
+        public bool CheckValidSurrogates(ReadOnlySpan<byte> buffer)
         {
             // UTF8 Valid sequences
             // 0xxxxxxx  ASCII
