@@ -42,12 +42,12 @@ namespace TextFilesFormat
             {
                 byte[] buffer = new byte[MaxPreambleLength.Value];
 
-                int preambleLength = stream.Read(buffer, 0, MaxPreambleLength.Value);
+                int bytesRead = stream.Read(buffer, 0, MaxPreambleLength.Value);
 
-                if (preambleLength < MinPreambleLength.Value)
+                if (bytesRead < MinPreambleLength.Value)
                     return null;
 
-                DetectableEncoding? detectedEncoding = CheckSignatures(buffer.AsSpan(0, preambleLength), EncodingsWithSignature);
+                DetectableEncoding? detectedEncoding = CheckSignatures(buffer.AsSpan(0, bytesRead), EncodingsWithSignature);
 
                 if (detectedEncoding != null)
                 {
@@ -63,7 +63,7 @@ namespace TextFilesFormat
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = TryDetectEncoding(stream, maxBytesToRead);
+                    summary = TryDetectEncodingWithoutBom(stream, maxBytesToRead);
                 }
 
             }
@@ -91,13 +91,13 @@ namespace TextFilesFormat
             return null;
         }
 
-        private TextFormatSummary? TryDetectEncoding(Stream stream, long? maxBytesToRead)
+        private TextFormatSummary? TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead)
         {
             TextFormatSummary? summary = null;
 
-            NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector(true);
+            NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector();
 
-            var detectedEncoding = nonBomEncodingDetector.TryDetermineEncoding(stream, maxBytesToRead);
+            var detectedEncoding = nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead);
 
             if (detectedEncoding != null)
             {

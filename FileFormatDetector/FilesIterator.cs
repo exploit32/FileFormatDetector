@@ -34,8 +34,6 @@ namespace FileFormatDetector
                     {
                         try
                         {
-
-
                             var subdirs = Directory.GetDirectories(path);
 
                             foreach (var subdir in subdirs)

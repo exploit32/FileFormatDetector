@@ -17,8 +17,11 @@ namespace TextFilesFormat
 
         private bool _foundBigEndianSurrogates = false;
 
-        public bool LittleEndianSurrogatesValid { get; private set; } = true;
+        private byte[] _seenEvenBytes = new byte[256];
 
+        private byte[] _seenOddBytes = new byte[256];
+
+        public bool LittleEndianSurrogatesValid { get; private set; } = true;
 
         public bool BigEndianSurrogatesValid { get; private set; } = true;
 
@@ -26,7 +29,24 @@ namespace TextFilesFormat
 
         public bool FoundBigEndianSurrogates => _foundBigEndianSurrogates;
 
-        public bool CheckValidSurrogates(ReadOnlySpan<byte> buffer)
+        public bool HasNullSymbols { get; private set; } = false;
+
+
+        public (int uniqueEvenBytes, int uniqueOddBytes) GetDistinctBytes()
+        {
+            int uniqueEvenBytes = 0;
+            int uniqueOddBytes = 0;
+
+            for (int i = 0; i < _seenEvenBytes.Length; i++)
+            {
+                uniqueEvenBytes += _seenEvenBytes[i];
+                uniqueOddBytes += _seenOddBytes[i];
+            }
+
+            return (uniqueEvenBytes, uniqueOddBytes);
+        }
+
+        public bool CheckValidRange(ReadOnlySpan<byte> buffer)
         {
             if (buffer.Length % 2 != 0)
                 throw new ArgumentException("Buffer size is expected to be a multiple of 2");
@@ -37,10 +57,34 @@ namespace TextFilesFormat
             if (BigEndianSurrogatesValid)
                 BigEndianSurrogatesValid = CheckSurrogates(buffer, 0, ref _moreCharsBe, ref _foundBigEndianSurrogates);
 
-            return LittleEndianSurrogatesValid | BigEndianSurrogatesValid;
+            if (!HasNullSymbols)
+                HasNullSymbols = CheckNullSymbols(buffer);
+
+            bool utf16isPossible = (LittleEndianSurrogatesValid || BigEndianSurrogatesValid) && !HasNullSymbols;
+
+            if (utf16isPossible)
+                UpdateBytesDistribution(buffer);
+
+            return utf16isPossible;
         }
 
-        public bool CheckSurrogates(ReadOnlySpan<byte> buffer, int start, ref int moreChars, ref bool foundSurrogates)
+        private void UpdateBytesDistribution(ReadOnlySpan<byte> buffer)
+        {
+            if (buffer.Length % 2 != 0)
+                throw new ArgumentException("Buffer size is expected to be a multiple of 2");
+
+            for (int i = 0; i < buffer.Length; i += 2)
+            {
+                _seenEvenBytes[buffer[i]] = 1;
+            }
+
+            for (int i = 1; i < buffer.Length; i += 2)
+            {
+                _seenOddBytes[buffer[i]] = 1;
+            }
+        }
+
+        private bool CheckSurrogates(ReadOnlySpan<byte> buffer, int start, ref int moreChars, ref bool foundSurrogates)
         {
             int size = buffer.Length;
 
@@ -82,6 +126,18 @@ namespace TextFilesFormat
             }
 
             return true;
+        }
+
+        private bool CheckNullSymbols(ReadOnlySpan<byte> buffer)
+        {
+            int length = buffer.Length;
+            for (int i = 0; i < length - 1; i += 2)
+            {
+                if (buffer[i] == 0 && buffer[i + 1] == 0)
+                    return true;
+            }
+
+            return false;
         }
     }
 }

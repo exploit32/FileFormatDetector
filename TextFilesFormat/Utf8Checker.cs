@@ -11,14 +11,19 @@ namespace TextFilesFormat
     {
         private int _moreChars = 0;
 
-        private bool _nullSuggestsBinary = true;
+        public bool SurrogatesValid { get; private set; } = true;
 
-        public void Reset()
+        public bool FoundSurrogates { get; private set; } = false;
+
+        public bool CheckSurrogates(ReadOnlySpan<byte> buffer)
         {
-            _moreChars = 0;
+            if (SurrogatesValid)
+                SurrogatesValid = CheckValidSurrogates(buffer);
+
+            return SurrogatesValid;
         }
 
-        public bool CheckValidSurrogates(ReadOnlySpan<byte> buffer)
+        private bool CheckValidSurrogates(ReadOnlySpan<byte> buffer)
         {
             // UTF8 Valid sequences
             // 0xxxxxxx  ASCII
@@ -45,6 +50,7 @@ namespace TextFilesFormat
                 if (ch < 128 || ch > 191)
                     return false;
 
+                FoundSurrogates = true;
                 --_moreChars;
             }
 
@@ -52,7 +58,7 @@ namespace TextFilesFormat
             {
                 byte ch = buffer[pos++];
 
-                if (ch == 0 && _nullSuggestsBinary)
+                if (ch == 0)
                 {
                     return false;
                 }
@@ -90,6 +96,7 @@ namespace TextFilesFormat
                     if (ch < 128 || ch > 191)
                         return false;
 
+                    FoundSurrogates = true;
                     --_moreChars;
                 }
             }

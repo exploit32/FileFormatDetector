@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -8,16 +8,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
+    <ProjectReference Include="..\FileFormatDetector\FileFormatDetector.csproj" />
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
     <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
     <ProjectReference Include="..\TextFilesFormat\TextFilesFormat.csproj" />
+    <ProjectReference Include="..\Tools\Tools.csproj" />
   </ItemGroup>
 
 </Project>

@@ -9,29 +9,23 @@ namespace TextFilesFormat
 {
     internal class NonBomEncodingDetector
     {
-        private bool _nullSuggestsBinary = true;
-
         private const int DefaultChunkSize = 4096;
 
-        public NonBomEncodingDetector(bool nullSuggestsBinary)
+        public DetectableEncoding? TryDetectEncoding(Stream stream, long? maxBytesToRead)
         {
-            _nullSuggestsBinary = nullSuggestsBinary;
-        }
+            if (maxBytesToRead.HasValue && maxBytesToRead % 4 != 0)
+                throw new ArgumentException("Block size should be multiple of 4");
 
-        public DetectableEncoding? TryDetermineEncoding(Stream stream, long? maxBytesToRead)
-        {
             int bufferSize = maxBytesToRead.HasValue ? (int)Math.Min(maxBytesToRead.Value, DefaultChunkSize) : DefaultChunkSize;
 
             byte[] buffer = new byte[bufferSize];
 
-             long readLength = maxBytesToRead.HasValue ? Math.Min(stream.Length, maxBytesToRead.Value) : stream.Length;
+            long readLength = maxBytesToRead.HasValue ? Math.Min(stream.Length, maxBytesToRead.Value) : stream.Length;
 
             Utf8Checker utf8Checker = new Utf8Checker();
             Utf16Checker utf16Checker = new Utf16Checker();
             Utf32Checker utf32Checker = new Utf32Checker();
-            EvenOddNullsCalculator evenOddNullsCalculator = new EvenOddNullsCalculator();
-            SequentialNullsCalculator sequentialNullsCalculator = new SequentialNullsCalculator();
-            BytesRangeCalculator bytesRangeCalculator = new BytesRangeCalculator();
+            AsciiChecker asciiChecker = new AsciiChecker();
 
             bool mayBeUtf8 = true;
             bool mayBeUtf16 = stream.Length % 2 == 0;
@@ -41,42 +35,47 @@ namespace TextFilesFormat
             while(stream.Position < readLength)
             {
                 int bytesToRead = (int)Math.Min(readLength - stream.Position, bufferSize);
-
                 int bytesRead = stream.Read(buffer, 0, bytesToRead);
 
                 ReadOnlySpan<byte> bytes = buffer.AsSpan(0, bytesRead);
 
                 if (mayBeAsciiOrWindows125x)
-                    mayBeAsciiOrWindows125x = !bytesRangeCalculator.CheckControlChars(bytes);
+                    mayBeAsciiOrWindows125x = asciiChecker.CheckValidRange(bytes);
 
                 if (mayBeUtf8)
-                    mayBeUtf8 = utf8Checker.CheckValidSurrogates(bytes);
+                    mayBeUtf8 = utf8Checker.CheckSurrogates(bytes);
 
                 if (mayBeUtf16)
-                {
-                    evenOddNullsCalculator.ProcessBlock(bytes);
-                    mayBeUtf16 = utf16Checker.CheckValidSurrogates(bytes);
-                }
+                    mayBeUtf16 = utf16Checker.CheckValidRange(bytes);
 
                 if (mayBeUtf32)
                     mayBeUtf32 = utf32Checker.CheckValidRange(bytes);
-
-                sequentialNullsCalculator.ProcessBlock(bytes);
             }
 
+            //Assuming ASCII encoding if all bytes are less than 0x7F and there is no control chars lower than 0x20 except tab, carriage return, line feed
+            if (asciiChecker.MayBeAscii)
+                return DetectableEncoding.ASCII;
 
-            //Possible: Utf-16, Utf-32
-            if (mayBeUtf32 && sequentialNullsCalculator.MaxSequentialNulls <= 3)
+            //Assuming Utf8 if there is no nulls and utf8 surrogates were found
+            if (mayBeUtf8 && utf8Checker.FoundSurrogates)
+                return DetectableEncoding.Utf8;
+
+            //Assuming Windown 1251 if there is no nulls and chars lower than 0x20 except tab, carriage return, line feed
+            if (asciiChecker.MayBeWindows1251)
+                return DetectableEncoding.Windows125x;
+
+            if (mayBeUtf32)
             {
-                //Possible: Utf-32
+                //No NULL symbols, valid symbols value range =<10FFFF
                 if (utf32Checker.ValidLittleEndianRange)
                     return DetectableEncoding.Utf32LE;
                 else if (utf32Checker.ValidBigEndianRange)
                     return DetectableEncoding.Utf32BE;
             }
 
-            if (mayBeUtf16 && sequentialNullsCalculator.MaxSequentialNulls <= 1)
+            if (mayBeUtf16)
             {
+                //No Null symbols, no surrogate pairs value range violations
                 if (utf16Checker.BigEndianSurrogatesValid && !utf16Checker.LittleEndianSurrogatesValid)
                     return DetectableEncoding.Utf16BE;
                 else if (utf16Checker.LittleEndianSurrogatesValid && !utf16Checker.BigEndianSurrogatesValid)
@@ -89,22 +88,19 @@ namespace TextFilesFormat
                         return DetectableEncoding.Utf16LE;
                     else
                     {
-                        if (evenOddNullsCalculator.EvenNulls > evenOddNullsCalculator.OddNulls)
-                            return DetectableEncoding.Utf16BE;
-                        else
+                        (int uniqueEvenBytes, int uniqueOddBytes) = utf16Checker.GetDistinctBytes();
+
+                        if (uniqueEvenBytes > uniqueOddBytes)
                             return DetectableEncoding.Utf16LE;
+                        else
+                            return DetectableEncoding.Utf16BE;
                     }
                 }
             }
 
-            //Utf8, ASCII, ANSI
-            if (!bytesRangeCalculator.HasAsciiControlChars)
-                return DetectableEncoding.ASCII;
-            else if (mayBeUtf8)
+            //Assuming Utf8 if there is no nulls and all utf8 surrogates are valid
+            if (mayBeUtf8)
                 return DetectableEncoding.Utf8;
-            else if (!bytesRangeCalculator.HasWindows125xControlChars)
-                return DetectableEncoding.Windows125x;
-
 
             return null;
         }

@@ -67,7 +67,7 @@ namespace FileFormatDetector
 
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    summary = TryDetectBinaryFormat(file, headerLength);
+                    //summary = TryDetectBinaryFormat(file, headerLength);
 
                     if (summary == null)
                     {

@@ -8,7 +8,7 @@ using TextFilesFormat;
 
 namespace TextFilesFormat
 {
-    internal class DetectableEncoding
+    internal class DetectableEncoding: IEquatable<DetectableEncoding>
     {
         public static DetectableEncoding Utf8 => new DetectableEncoding(new Signature(new byte[] { 0xEF, 0xBB, 0xBF }), Encoding.UTF8.CodePage, "utf-8", "Unicode (UTF-8)");
         public static DetectableEncoding Utf16LE => new DetectableEncoding(new Signature(new byte[] { 0xFF, 0xFE }), Encoding.Unicode.CodePage, "utf-16LE", "Unicode (UTF-16 Little-Endian)");
@@ -22,7 +22,7 @@ namespace TextFilesFormat
         public static DetectableEncoding Bocu1 => new DetectableEncoding(new Signature(new byte[] { 0xFB, 0xEE, 0x28 }), 0, "bocu-1", "Binary Ordered Compression for Unicode");
         public static DetectableEncoding Gb18030 => new DetectableEncoding(new Signature(new byte[] { 0x84, 0x31, 0x95, 0x33 }), 54936, "gb18030", "Chinese National Standard GB 18030-2005: Information Technology—Chinese coded character set");
         public static DetectableEncoding Windows125x => new DetectableEncoding(1251, "Windows-125x", "Windows-1251 is an 8-bit character encoding, designed to cover languages that use the Cyrillic script such as Russian, Ukrainian, Belarusian, Bulgarian, Serbian Cyrillic, Macedonian and other languages.");
-        public static DetectableEncoding ASCII => new DetectableEncoding(0, "ASCII", "Basic 7-bit encoding");
+        public static DetectableEncoding ASCII => new DetectableEncoding(Encoding.ASCII.CodePage, "ASCII", "Basic 7-bit encoding");
 
         /// <summary>
         /// Get the encoding codepage number
@@ -45,7 +45,7 @@ namespace TextFilesFormat
         /// <summary>
         /// BOM (Byte order mark) sequence
         /// </summary>
-        public Signature BomSignature { get; }
+        public Signature? BomSignature { get; }
 
         /// <summary>
         /// Flag indicates that BOM mark exists for this encoding
@@ -63,5 +63,31 @@ namespace TextFilesFormat
         public DetectableEncoding(int codePage, string name, string displayName) : this(null, codePage, name, displayName)
         {            
         }
+
+        public override bool Equals(object? obj) => this.Equals(obj as DetectableEncoding);
+
+        public bool Equals(DetectableEncoding? other)
+        {
+            if (other is null)
+                return false;
+
+            if (Object.ReferenceEquals(this, other))
+                return true;
+
+            if (this.GetType() != other.GetType())
+                return false;
+
+            return (CodePage == other.CodePage)
+                && (Name == other.Name)
+                && (DisplayName == other.DisplayName)
+                && (Equals(BomSignature, other.BomSignature));
+        }
+
+        public override string ToString()
+        {
+            return $"{Name}: {DisplayName}";
+        }
+
+        public override int GetHashCode() => HashCode.Combine(CodePage, Name, DisplayName, BomSignature);
     }
 }
