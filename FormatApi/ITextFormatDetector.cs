@@ -8,8 +8,6 @@ namespace FormatApi
 {
     public interface ITextFormatDetector
     {
-        bool HasSignature { get; }
-
-        FormatSummary? ReadFormat(Stream stream, long? maxBytesToRead);
+        Task<FormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead);
     }
 }

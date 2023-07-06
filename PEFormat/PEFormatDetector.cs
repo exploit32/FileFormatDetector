@@ -7,6 +7,7 @@ namespace PEFormat
     public class PEFormatDetector : IBinaryFormatDetector
     {
         public static readonly Signature Signature = new Signature(new byte[] { (byte)'M', (byte)'Z' });
+
         public bool HasSignature => true;
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
@@ -27,33 +28,23 @@ namespace PEFormat
 
             try
             {
-                //PEReader peReader = new PEReader(stream, PEStreamOptions.PrefetchMetadata);
-
-                //formatSummary = new PEFormatSummary()
-                //{
-                //    Architecture = peReader.PEHeaders.CoffHeader.Machine.ToString(),
-                //    BitDepth = bitDepth,
-                //    Endianness = GetEndianess(peReader.PEHeaders.CoffHeader.Machine),
-                //    HasClrHeader = peReader.HasMetadata,
-                //};
-
-                //bool hasMetadata = peReader.HasMetadata;
-
                 EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
+
                 PEFormatReader peReader = new PEFormatReader(reader);
+
                 DosHeader dosHeader = peReader.ReadDosHeader();
                 COFFHeader coffHeader = peReader.ReadCOFFHeader(dosHeader);
                 OptionalHeader? optionalHeader = peReader.ReadOptionalHeader(coffHeader);
 
-                int bitDepth = GetBittnessByOptionalHeader(optionalHeader);
+                int bits = GetBitsByOptionalHeader(optionalHeader);
 
-                if (bitDepth == 0)
-                    bitDepth = coffHeader.GetBitsByMachineType();
+                if (bits == 0)
+                    bits = coffHeader.GetBitsByMachineType();
 
                 formatSummary = new PEFormatSummary()
                 {
                     Architecture = coffHeader.Machine.ToString(),
-                    Bits = bitDepth,
+                    Bits = bits,
                     Endianness = GetEndianess(coffHeader.Machine),
                     HasClrHeader = HasClrMetadata(optionalHeader),
                 };
@@ -84,7 +75,7 @@ namespace PEFormat
             return clrDirectory.Size != 0 && clrDirectory.RVA != 0;
         }
 
-        private int GetBittnessByOptionalHeader(OptionalHeader? optionalHeader)
+        private int GetBitsByOptionalHeader(OptionalHeader? optionalHeader)
         {
             OptionalHeader.PEFormat? magic = optionalHeader?.Magic;
             

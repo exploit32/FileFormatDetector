@@ -26,50 +26,24 @@ namespace TextFilesFormat
             DetectableEncoding.Gb18030            
         }
         .Where(e => e.HasBomSignature)
-        .OrderByDescending(e => e.BomSignature.Value.Length)
+        .OrderByDescending(e => e.BomSignature!.Value.Length)
         .ToArray();
 
-        private Lazy<int> MinPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature.Value.Length + e.BomSignature.Offset));
-        private Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature.Value.Length + e.BomSignature.Offset));
+        private static Lazy<int> MinPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
+        private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
-        public bool HasSignature => true;
 
-        public FormatSummary? ReadFormat(Stream stream, long? maxBytesToRead)
+        public async Task<FormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead)
         {
-            FormatSummary? summary = null;
+            if (stream.Length == 0)
+                return null;
 
-            try
+            FormatSummary? summary = await TryDetectEncodingWithBom(stream);
+
+            if (summary == null)
             {
-                byte[] buffer = new byte[MaxPreambleLength.Value];
-
-                int bytesRead = stream.Read(buffer, 0, MaxPreambleLength.Value);
-
-                if (bytesRead < MinPreambleLength.Value)
-                    return null;
-
-                DetectableEncoding? detectedEncoding = CheckSignatures(buffer.AsSpan(0, bytesRead), EncodingsWithSignature);
-
-                if (detectedEncoding != null)
-                {
-                    summary = new TextFormatSummary()
-                    {
-                        EncodingName = detectedEncoding.Name,
-                        EncodingFullName = detectedEncoding.DisplayName,
-                        CodePage = detectedEncoding.CodePage,
-                        HasBOM = true,
-                    };
-                }
-                else
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    summary = TryDetectEncodingWithoutBom(stream, maxBytesToRead);
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
+                stream.Seek(0, SeekOrigin.Begin);
+                summary = await TryDetectEncodingWithoutBom(stream, maxBytesToRead);
             }
 
             return summary;
@@ -81,7 +55,7 @@ namespace TextFilesFormat
             {
                 var encoding = encodings[i];
 
-                if (fileStart.Length >= encoding.BomSignature.Offset + encoding.BomSignature.Value.Length)
+                if (fileStart.Length >= encoding.BomSignature!.Offset + encoding.BomSignature.Value.Length)
                 {
                     if (SignatureTools.CheckSignature(fileStart, encoding.BomSignature))
                         return encoding;
@@ -91,13 +65,40 @@ namespace TextFilesFormat
             return null;
         }
 
-        private TextFormatSummary? TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead)
+        private async Task<TextFormatSummary?> TryDetectEncodingWithBom(Stream stream)
+        {
+            TextFormatSummary? summary = null;
+
+            if (stream.Length < MinPreambleLength.Value)
+                return null;
+
+            byte[] buffer = new byte[MaxPreambleLength.Value];
+
+            int bytesRead = await stream.ReadAsync(buffer, 0, MaxPreambleLength.Value);
+
+            DetectableEncoding? detectedEncoding = CheckSignatures(buffer.AsSpan(0, bytesRead), EncodingsWithSignature);
+
+            if (detectedEncoding != null)
+            {
+                summary = new TextFormatSummary()
+                {
+                    EncodingName = detectedEncoding.Name,
+                    EncodingFullName = detectedEncoding.DisplayName,
+                    CodePage = detectedEncoding.CodePage,
+                    HasBOM = true,
+                };
+            }
+
+            return summary;
+        }
+
+        private async Task<TextFormatSummary?> TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead)
         {
             TextFormatSummary? summary = null;
 
             NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector();
 
-            var detectedEncoding = nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead);
+            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead);
 
             if (detectedEncoding != null)
             {
@@ -111,7 +112,6 @@ namespace TextFilesFormat
             }
 
             return summary;
-
         }
     }
 }

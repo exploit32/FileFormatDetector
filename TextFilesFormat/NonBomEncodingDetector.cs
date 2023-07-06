@@ -11,7 +11,7 @@ namespace TextFilesFormat
     {
         private const int DefaultChunkSize = 4096;
 
-        public DetectableEncoding? TryDetectEncoding(Stream stream, long? maxBytesToRead)
+        public async Task<DetectableEncoding?> TryDetectEncoding(Stream stream, long? maxBytesToRead)
         {
             if (maxBytesToRead.HasValue && maxBytesToRead % 4 != 0)
                 throw new ArgumentException("Block size should be multiple of 4");
@@ -31,26 +31,28 @@ namespace TextFilesFormat
             bool mayBeUtf16 = stream.Length % 2 == 0;
             bool mayBeUtf32 = stream.Length % 4 == 0;
             bool mayBeAsciiOrWindows125x = true;
+            int bytesRead = 0;
 
-            while(stream.Position < readLength)
+            do
             {
                 int bytesToRead = (int)Math.Min(readLength - stream.Position, bufferSize);
-                int bytesRead = stream.Read(buffer, 0, bytesToRead);
+                bytesRead = await stream.ReadAsync(buffer, 0, bytesToRead);
 
-                ReadOnlySpan<byte> bytes = buffer.AsSpan(0, bytesRead);
+                Memory<byte> bytes = buffer.AsMemory(0, bytesRead);
 
                 if (mayBeAsciiOrWindows125x)
-                    mayBeAsciiOrWindows125x = asciiChecker.CheckValidRange(bytes);
+                    mayBeAsciiOrWindows125x = asciiChecker.CheckValidRange(bytes.Span);
 
                 if (mayBeUtf8)
-                    mayBeUtf8 = utf8Checker.CheckSurrogates(bytes);
+                    mayBeUtf8 = utf8Checker.CheckSurrogates(bytes.Span);
 
                 if (mayBeUtf16)
-                    mayBeUtf16 = utf16Checker.CheckValidRange(bytes);
+                    mayBeUtf16 = utf16Checker.CheckValidRange(bytes.Span);
 
                 if (mayBeUtf32)
-                    mayBeUtf32 = utf32Checker.CheckValidRange(bytes);
-            }
+                    mayBeUtf32 = utf32Checker.CheckValidRange(bytes.Span);
+
+            } while (stream.Position < readLength && bytesRead > 0);
 
             //Assuming ASCII encoding if all bytes are less than 0x7F and there is no control chars lower than 0x20 except tab, carriage return, line feed
             if (asciiChecker.MayBeAscii)

@@ -38,7 +38,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(bytes))
             {
-                detectedEncoding = detector.TryDetectEncoding(stream, null);
+                detectedEncoding = detector.TryDetectEncoding(stream, null).Result;
             }
 
             return detectedEncoding;
@@ -64,7 +64,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(bytes))
             {
-                detectedEncoding = detector.ReadFormat(stream, null);
+                detectedEncoding = detector.ReadFormat(stream, null).Result;
             }
 
             return detectedEncoding;
@@ -83,7 +83,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(newBuffer))
             {
-                detectedEncoding = detector.ReadFormat(stream, null);
+                detectedEncoding = detector.ReadFormat(stream, null).Result;
             }
 
             return detectedEncoding;

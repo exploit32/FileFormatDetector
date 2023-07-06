@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,9 +39,9 @@ namespace FileFormatDetector
 
             try
             {
-                Parallel.ForEach(filesIterator, parallelOptions, f =>
+                Parallel.ForEach(filesIterator, parallelOptions, async f =>
                 {
-                    var recognizedFile = DetectFormat(f, minReadLength);
+                    var recognizedFile = await DetectFormat(f, minReadLength);
 
                     if (recognizedFile != null)
                         recognizedFiles.Add(recognizedFile);
@@ -54,7 +55,7 @@ namespace FileFormatDetector
             return recognizedFiles;
         }
 
-        private RecognizedFile? DetectFormat(string path, int headerLength)
+        private async Task<RecognizedFile?> DetectFormat(string path, int headerLength)
         {
             //Console.WriteLine("Processing file {0}", path);
 
@@ -67,11 +68,11 @@ namespace FileFormatDetector
 
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    //summary = TryDetectBinaryFormat(file, headerLength);
+                    summary = TryDetectBinaryFormat(file, path, headerLength);
 
                     if (summary == null)
                     {
-                        summary = TryDetectTextFormat(file);
+                        summary = await TryDetectTextFormat(file, path);
                     }
 
                     if (summary == null)
@@ -88,7 +89,7 @@ namespace FileFormatDetector
             return summary != null ? new RecognizedFile(path, summary) : null;
         }
 
-        private FormatSummary? TryDetectBinaryFormat(Stream stream, int headerLength)
+        private FormatSummary? TryDetectBinaryFormat(Stream stream, string path, int headerLength)
         {
             FormatSummary? summary = null;
 
@@ -103,11 +104,39 @@ namespace FileFormatDetector
 
             foreach (var format in _binaryFormats)
             {
-                var isSignatureFound = format.CheckSignature(buffer);
+                try
+                {
+                    var isSignatureFound = format.CheckSignature(buffer);
 
-                if (isSignatureFound)
-                {                    
-                    summary = format.ReadFormat(stream);
+                    if (isSignatureFound)
+                    {
+                        summary = format.ReadFormat(stream);
+
+                        if (summary != null)
+                        {
+                            //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
+                            break;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
+                }
+            }
+
+            return summary;
+        }
+
+        private async Task<FormatSummary?> TryDetectTextFormat(Stream stream, string path)
+        {
+            FormatSummary? summary = null;
+
+            foreach (var format in _textFormats)
+            {
+                try
+                {
+                    summary = await format.ReadFormat(stream, 4096);
 
                     if (summary != null)
                     {
@@ -115,23 +144,9 @@ namespace FileFormatDetector
                         break;
                     }
                 }
-            }
-
-            return summary;
-        }
-
-        private FormatSummary? TryDetectTextFormat(Stream stream)
-        {
-            FormatSummary? summary = null;
-
-            foreach (var format in _textFormats)
-            {
-                summary = format.ReadFormat(stream, 4096);
-
-                if (summary != null)
+                catch (Exception ex)
                 {
-                    //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
-                    break;
+                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
                 }
             }
 

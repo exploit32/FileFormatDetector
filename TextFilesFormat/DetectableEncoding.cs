@@ -52,7 +52,7 @@ namespace TextFilesFormat
         /// </summary>
         public bool HasBomSignature => BomSignature != null;
 
-        public DetectableEncoding(Signature bomSignature, int codePage, string name, string displayName)
+        public DetectableEncoding(Signature? bomSignature, int codePage, string name, string displayName)
         {
             BomSignature = bomSignature;
             CodePage = codePage;
