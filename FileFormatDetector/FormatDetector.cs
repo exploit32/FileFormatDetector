@@ -13,14 +13,16 @@ namespace FileFormatDetector
     {
         private readonly IBinaryFormatDetector[] _binaryFormats;
         private readonly ITextFormatDetector[] _textFormats;
+        private readonly ITextBasedFormatDetector[] _textBasedFormats;
 
         public AppConfiguration Configuration { get; }
 
-        public FormatDetector(AppConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats)
+        public FormatDetector(AppConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats, ITextBasedFormatDetector[] textBasedFormats)
         {
             Configuration = configuration;
             _binaryFormats = binaryFormats ?? throw new ArgumentNullException(nameof(binaryFormats));
             _textFormats = textFormats ?? throw new ArgumentNullException(nameof(textFormats));
+            _textBasedFormats = textBasedFormats ?? throw new ArgumentNullException(nameof(textBasedFormats));
         }
 
         public async Task<IEnumerable<RecognizedFile>> ScanFiles(CancellationToken cancellationToken)
@@ -72,7 +74,16 @@ namespace FileFormatDetector
 
                     if (summary == null)
                     {
-                        summary = await TryDetectTextFormat(file, path);
+                        TextFormatSummary? textFormatSummary = await TryDetectTextFormat(file, path);
+
+                        if (textFormatSummary != null)
+                        {
+                            summary = await TryDetectTextBasedFormat(file, path, textFormatSummary);
+                        }
+                        else
+                        {
+                            summary = textFormatSummary;
+                        }
                     }
 
                     if (summary == null)
@@ -128,15 +139,44 @@ namespace FileFormatDetector
             return summary;
         }
 
-        private async Task<FormatSummary?> TryDetectTextFormat(Stream stream, string path)
+        private async Task<TextFormatSummary?> TryDetectTextFormat(Stream stream, string path)
         {
-            FormatSummary? summary = null;
+            TextFormatSummary? summary = null;
 
             foreach (var format in _textFormats)
             {
                 try
                 {
+                    stream.Seek(0, SeekOrigin.Begin);
+
                     summary = await format.ReadFormat(stream, 4096);
+
+                    if (summary != null)
+                    {
+                        //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
+                        break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
+                }
+            }
+
+            return summary;
+        }
+
+        private async Task<FormatSummary?> TryDetectTextBasedFormat(Stream stream, string path, TextFormatSummary textFormatSummary)
+        {
+            FormatSummary? summary = null;
+
+            foreach (var format in _textBasedFormats)
+            {
+                try
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    summary = await format.ReadFormat(stream, textFormatSummary, 4096);
 
                     if (summary != null)
                     {

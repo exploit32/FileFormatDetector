@@ -4,6 +4,7 @@ using FormatApi;
 using MachOFormat;
 using Microsoft.Extensions.Configuration;
 using PEFormat;
+using XmlFormat;
 
 namespace FileFormatDetector
 {
@@ -35,7 +36,9 @@ namespace FileFormatDetector
 
             ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
 
-            FormatDetector detector = new FormatDetector(detectorConfiguration, binaryFormats, textFormats);
+            ITextBasedFormatDetector[] textBasedFormatDetectors = new ITextBasedFormatDetector[] { new XmlFormatDetector() };
+
+            FormatDetector detector = new FormatDetector(detectorConfiguration, binaryFormats, textFormats, textBasedFormatDetectors);
 
             var recognizedFiles = await detector.ScanFiles(cancellationTokenSource.Token);
 

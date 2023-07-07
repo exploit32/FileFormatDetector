@@ -33,12 +33,12 @@ namespace TextFilesFormat
         private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
 
-        public async Task<FormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead)
+        public async Task<TextFormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead)
         {
             if (stream.Length == 0)
                 return null;
 
-            FormatSummary? summary = await TryDetectEncodingWithBom(stream);
+            TextFormatSummary? summary = await TryDetectEncodingWithBom(stream);
 
             if (summary == null)
             {
