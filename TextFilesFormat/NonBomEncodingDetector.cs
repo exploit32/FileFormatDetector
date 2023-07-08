@@ -11,6 +11,14 @@ namespace TextFilesFormat
     {
         private const int DefaultChunkSize = 4096;
 
+        public bool SkipAsciiCheck { get; set; } = false;
+
+        public bool SkipUtf8Check { get; set; } = false;
+
+        public bool SkipUtf16Check { get; set; } = false;
+
+        public bool SkipUtf32Check { get; set; } = false;
+
         public async Task<DetectableEncoding?> TryDetectEncoding(Stream stream, long? maxBytesToRead)
         {
             if (maxBytesToRead.HasValue && maxBytesToRead % 4 != 0)
@@ -27,11 +35,12 @@ namespace TextFilesFormat
             Utf32Checker utf32Checker = new Utf32Checker();
             AsciiChecker asciiChecker = new AsciiChecker();
 
-            bool mayBeUtf8 = true;
-            bool mayBeUtf16 = stream.Length % 2 == 0;
-            bool mayBeUtf32 = stream.Length % 4 == 0;
-            bool mayBeAsciiOrWindows125x = true;
-            int bytesRead = 0;
+            bool mayBeUtf8 = !SkipUtf8Check;
+            bool mayBeUtf16 = stream.Length % 2 == 0 && !SkipUtf16Check;
+            bool mayBeUtf32 = stream.Length % 4 == 0 && !SkipUtf32Check;
+            bool mayBeAsciiOrWindows125x = !SkipAsciiCheck;
+            
+            int bytesRead;
 
             do
             {
@@ -52,7 +61,7 @@ namespace TextFilesFormat
                 if (mayBeUtf32)
                     mayBeUtf32 = utf32Checker.CheckValidRange(bytes.Span);
 
-            } while (stream.Position < readLength && bytesRead > 0);
+            } while (stream.Position < readLength && bytesRead > 0 && (mayBeAsciiOrWindows125x || mayBeUtf8 || mayBeUtf16 || mayBeUtf32));
 
             //Assuming ASCII encoding if all bytes are less than 0x7F and there is no control chars lower than 0x20 except tab, carriage return, line feed
             if (asciiChecker.MayBeAscii)

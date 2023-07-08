@@ -9,6 +9,7 @@ namespace XmlFormat
 {
     internal class XmlValidator
     {
+        private const int BufferSize = 4096;
         public async Task<bool> ReadFile(Stream stream, Encoding encoding, long? maxBytesToRead)
         {
             bool xmlValid = true;
@@ -21,12 +22,15 @@ namespace XmlFormat
                 CloseInput = false
             };
 
-            FileStreamOptions options = new FileStreamOptions()
+            Stream streamToUse = stream;
+            
+            if (maxBytesToRead.HasValue)
             {
+                LengthLimitingReadOnlyStreamWrapper wrapper = new LengthLimitingReadOnlyStreamWrapper(stream, maxBytesToRead.Value);
+                streamToUse = wrapper;
+            }
 
-            };
-
-            using (StreamReader reader = new StreamReader(stream, encoding, leaveOpen: true, bufferSize: 4096))
+            using (StreamReader reader = new StreamReader(streamToUse, encoding, leaveOpen: true, bufferSize: 4096))
             using (XmlReader xmlReader = XmlReader.Create(reader, settings))
             {
                 try

@@ -1,0 +1,3 @@
+[submodule "Tests/Samples/binary-samples"]
+	path = Tests/Samples/binary-samples
+	url = https://github.com/JonathanSalwan/binary-samples.git

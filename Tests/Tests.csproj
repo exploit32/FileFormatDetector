@@ -10,6 +10,84 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Samples\binary-samples\elf-FreeBSD-x86_64-echo" />
+    <None Remove="Samples\binary-samples\elf-Haiku-GCC2-ls" />
+    <None Remove="Samples\binary-samples\elf-Haiku-GCC7-WebPositive" />
+    <None Remove="Samples\binary-samples\elf-HPUX-ia64-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-Alpha-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-ARM64-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-ARMv7-ls" />
+    <None Remove="Samples\binary-samples\elf-Linux-hppa-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-ia64-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-lib-x64.so" />
+    <None Remove="Samples\binary-samples\elf-Linux-lib-x86.so" />
+    <None Remove="Samples\binary-samples\elf-Linux-Mips4-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-PowerPC-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-s390-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-SparcV8-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-SuperH4-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-x64-bash" />
+    <None Remove="Samples\binary-samples\elf-Linux-x86-bash" />
+    <None Remove="Samples\binary-samples\elf-NetBSD-x86_64-echo" />
+    <None Remove="Samples\binary-samples\elf-OpenBSD-x86_64-sh" />
+    <None Remove="Samples\binary-samples\elf-solaris-sparc-ls" />
+    <None Remove="Samples\binary-samples\elf-solaris-x86-ls" />
+    <None Remove="Samples\binary-samples\libSystem.B.dylib" />
+    <None Remove="Samples\binary-samples\MachO-iOS-arm1176JZFS-bash" />
+    <None Remove="Samples\binary-samples\MachO-iOS-armv7-armv7s-arm64-Helloworld" />
+    <None Remove="Samples\binary-samples\MachO-iOS-armv7s-Helloworld" />
+    <None Remove="Samples\binary-samples\MachO-OSX-ppc-and-i386-bash" />
+    <None Remove="Samples\binary-samples\MachO-OSX-ppc-openssl-1.0.1h" />
+    <None Remove="Samples\binary-samples\MachO-OSX-x64-ls" />
+    <None Remove="Samples\binary-samples\MachO-OSX-x86-ls" />
+    <None Remove="Samples\binary-samples\MIT_LICENSE" />
+    <None Remove="Samples\binary-samples\pe-cygwin-ls.exe" />
+    <None Remove="Samples\binary-samples\pe-mingw32-strip.exe" />
+    <None Remove="Samples\binary-samples\pe-Windows-ARMv7-Thumb2LE-HelloWorld" />
+    <None Remove="Samples\binary-samples\pe-Windows-x64-cmd" />
+    <None Remove="Samples\binary-samples\pe-Windows-x86-cmd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\binary-samples\elf-FreeBSD-x86_64-echo" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC2-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC7-WebPositive" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-HPUX-ia64-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Alpha-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARM64-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARMv7-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-hppa-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ia64-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x64.so" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x86.so" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Mips4-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-PowerPC-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-s390-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SparcV8-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SuperH4-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x64-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x86-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-NetBSD-x86_64-echo" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-OpenBSD-x86_64-sh" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-sparc-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-x86-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\libSystem.B.dylib" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-arm1176JZFS-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7-armv7s-arm64-Helloworld" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7s-Helloworld" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-and-i386-bash" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-openssl-1.0.1h" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x64-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x86-ls" />
+    <EmbeddedResource Include="Samples\binary-samples\MIT_LICENSE" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-cygwin-ls.exe" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-mingw32-strip.exe" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-ARMv7-Thumb2LE-HelloWorld" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x64-cmd" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x86-cmd" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="xunit" Version="2.4.2" />
