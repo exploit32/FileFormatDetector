@@ -14,6 +14,6 @@
         /// <summary>
         /// Array of FatArch strustures that describes individual architecture
         /// </summary>
-        public FatArch[] Archs { get; init; }
+        public FatArch[] Archs { get; init; } = Array.Empty<FatArch>();
     }
 }

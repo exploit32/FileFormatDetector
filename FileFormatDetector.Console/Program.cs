@@ -8,7 +8,7 @@ namespace FileFormatDetector.Console
     {
         private const string PluginsDirectory = "Plugins";
 
-        public static IConfiguration Configuration { get; set; }
+        public static IConfiguration? Configuration { get; set; }
 
         static async Task<int> Main(string[] args)
         {

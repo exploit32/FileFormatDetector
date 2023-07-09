@@ -83,7 +83,7 @@ namespace MachOFormat
 
         public MachO ReadMachO()
         {
-            MachO result = null;
+            MachO result;
 
             var magic = ReadMagic();            
 

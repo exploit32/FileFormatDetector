@@ -22,9 +22,9 @@ namespace FormatApi
 
         public override string FormatName => "Text";
 
-        public string EncodingName { get; init; }
+        public string EncodingName { get; init; } = string.Empty;
 
-        public string EncodingFullName { get; init; }
+        public string EncodingFullName { get; init; } = string.Empty;
 
         public int CodePage { get; init; }
 

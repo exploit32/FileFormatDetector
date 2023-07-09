@@ -49,7 +49,7 @@ namespace MachOFormat
         {
             return new MachOFormatSummary()
             {
-                Bits = machO.Magic.Bits,
+                Bits = machO.Magic!.Bits,
                 Endianness = machO.Magic.Endianness,
                 IsFat = machO.Magic.IsFat,
                 Architecture = machO.Architecture,

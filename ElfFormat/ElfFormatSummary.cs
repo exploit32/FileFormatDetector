@@ -20,13 +20,13 @@ namespace ElfFormat
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public string Architecture { get; init; }
+        public string Architecture { get; init; } = String.Empty;
 
         public int Bits { get; init; }
 
         public Endianness Endianness { get; init; }
 
-        public string Interpreter { get; init; }
+        public string Interpreter { get; init; } = String.Empty;
 
         public override string FormatName => "ELF";
 

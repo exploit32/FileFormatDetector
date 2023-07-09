@@ -177,6 +177,6 @@ namespace PEFormat.Structs
         /// </summary>
         public uint NumberOfRvaAndSizes { get; init; }
 
-        public DataDirectory[] DataDirectories { get; set; }
+        public DataDirectory[] DataDirectories { get; set; } = Array.Empty<DataDirectory>();
     }
 }

@@ -5,7 +5,7 @@
         /// <summary>
         /// 0x7F followed by ELF(45 4c 46) in ASCII; these four bytes constitute the magic number
         /// </summary>
-        public byte[] Magic { get; init; }
+        public byte[]? Magic { get; init; }
 
         /// <summary>
         /// This byte is set to either 1 or 2 to signify 32- or 64-bit format, respectively.

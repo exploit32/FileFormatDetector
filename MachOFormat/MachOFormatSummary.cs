@@ -27,7 +27,7 @@ namespace MachOFormat
 
         public int Bits { get; init; }
 
-        public string Architecture { get; init; }
+        public string Architecture { get; init; } = String.Empty;
 
         public Endianness Endianness { get; init; }
 
@@ -35,7 +35,7 @@ namespace MachOFormat
 
         public bool IsFat { get; init; }
 
-        public MachOFormatSummary[] InnerApps { get; init; }
+        public MachOFormatSummary[] InnerApps { get; init; } = Array.Empty<MachOFormatSummary>();
 
         public override bool Equals(object? obj) => this.Equals(obj as MachOFormatSummary);
 

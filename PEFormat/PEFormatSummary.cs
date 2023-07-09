@@ -6,7 +6,7 @@ namespace PEFormat
     {
         private static string[] Keys = new[] { nameof(Architecture), nameof(Bits), nameof(HasClrHeader), nameof(Endianness) };
 
-        public string Architecture { get; init; }
+        public string Architecture { get; init; } = String.Empty;
 
         public int Bits { get; init; }
 

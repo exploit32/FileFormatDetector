@@ -8,7 +8,7 @@ namespace FileFormatDetector.Core
 {
     public class AppConfiguration
     {
-        public string Paths { get; set; }
+        public string Paths { get; set; } = string.Empty;
 
         public int Threads { get; set; }
 

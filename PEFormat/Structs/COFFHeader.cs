@@ -11,7 +11,7 @@ namespace PEFormat.Structs
         /// <summary>
         /// The Signature of the Assembly.
         /// </summary>
-        public byte[] Signature { get; init; }
+        public byte[]? Signature { get; init; }
 
         /// <summary>
         /// The target machine to run the assembly on.

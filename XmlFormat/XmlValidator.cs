@@ -30,7 +30,7 @@ namespace XmlFormat
                 streamToUse = wrapper;
             }
 
-            using (StreamReader reader = new StreamReader(streamToUse, encoding, leaveOpen: true, bufferSize: 4096))
+            using (StreamReader reader = new StreamReader(streamToUse, encoding, leaveOpen: true, bufferSize: BufferSize))
             using (XmlReader xmlReader = XmlReader.Create(reader, settings))
             {
                 try
@@ -40,7 +40,7 @@ namespace XmlFormat
                         //Console.WriteLine(xmlReader.Value);
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     //Console.WriteLine(ex.ToString());
                     xmlValid = false;

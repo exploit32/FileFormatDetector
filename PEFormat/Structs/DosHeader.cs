@@ -8,7 +8,7 @@ namespace PEFormat.Structs
 {
     internal class DosHeader
     {
-        public byte[] MagicNumber { get; init; }
+        public byte[]? MagicNumber { get; init; }
 
         public uint PEHeaderOffset { get; init; }
     }

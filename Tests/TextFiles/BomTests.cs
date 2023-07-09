@@ -157,7 +157,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf1.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf1.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -171,7 +171,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf7.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf7.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -185,7 +185,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.UtfEbcdict.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.UtfEbcdict.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -199,7 +199,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Gb18030.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Gb18030.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -214,7 +214,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Bocu1.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Bocu1.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -228,7 +228,7 @@ namespace Tests.TextFiles
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Scsu.BomSignature.Value);
+            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Scsu.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
