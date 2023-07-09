@@ -15,7 +15,7 @@
 		<ItemGroup>
 			<PluginBinaries Include="$(OutDir)*.dll;$(OutDir)*.pdb" />
 		</ItemGroup>
-		<Copy SourceFiles="@(PluginBinaries)" DestinationFolder="$(SolutionDir)FileFormatDetector.Console/bin/$(Configuration)/net7.0/Plugins/$(ProjectName)" SkipUnchangedFiles="true" />
+		<Copy SourceFiles="@(PluginBinaries)" DestinationFolder="$(ProjectDir)../FileFormatDetector.Console/bin/$(Configuration)/net7.0/Plugins/$(ProjectName)" SkipUnchangedFiles="true" />
 	</Target>
 
 </Project>

@@ -42,3 +42,9 @@ dotnet build
 ```bash
 dotnet test
 ```
+
+# How to run benchmarks?
+
+```bash
+dotnet run --configuration Release --project Benchmarks
+```
