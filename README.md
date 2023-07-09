@@ -1,5 +1,7 @@
 # FileFormatDetector
 
+![Build status](https://github.com/exploit32/FileFormatDetector/actions/workflows/dotnet.yml/badge.svg)
+
 Tool for file formats detection. Each format is a separate plugin.
 
 App can detect:
