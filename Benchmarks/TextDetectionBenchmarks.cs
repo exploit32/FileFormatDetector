@@ -23,8 +23,8 @@ For example, lowercase i would be represented in the ASCII encoding by binary 11
 
         private const int BufferSize = 10 * 1024 * 1024;
 
-        //[Benchmark]
-        //[ArgumentsSource(nameof(EncodingsTestData))]
+        [Benchmark]
+        [ArgumentsSource(nameof(EncodingsTestData))]
         public async Task<FormatSummary?> DetectEncoding(byte[] buffer, string encoding)
         {
             TextFilesDetector detector = new TextFilesDetector();

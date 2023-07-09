@@ -51,7 +51,7 @@ namespace FileFormatDetector.Console
 
         public void PrintDistinctCount(IEnumerable<RecognizedFile> files)
         {
-            var distinctFormats = files.GroupBy(f => f.FormatSummary);
+            var distinctFormats = files.GroupBy(f => f.FormatSummary).OrderByDescending(f => f.Count());
 
             foreach (var formatGroup in distinctFormats)
             {

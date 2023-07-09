@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
-    <ProjectReference Include="..\FileFormatDetector\FileFormatDetector.Console.csproj" />
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
     <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
