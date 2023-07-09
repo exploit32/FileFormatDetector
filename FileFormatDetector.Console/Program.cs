@@ -6,9 +6,11 @@ namespace FileFormatDetector.Console
 {
     internal class Program
     {
+        private const string PluginsDirectory = "Plugins";
+
         public static IConfiguration Configuration { get; set; }
 
-        static async Task Main(string[] args)
+        static async Task<int> Main(string[] args)
         {
             var builder = new ConfigurationBuilder()
             .AddCommandLine(args);
@@ -28,15 +30,15 @@ namespace FileFormatDetector.Console
                 args.Cancel = true;
             };
 
-            FormatPluginsLoader loader = new FormatPluginsLoader("Plugins");
+            FormatPluginsLoader loader = new FormatPluginsLoader(PluginsDirectory);
 
             loader.LoadPlugins();
 
-            //IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
-
-            //ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
-
-            //ITextBasedFormatDetector[] textBasedFormatDetectors = new ITextBasedFormatDetector[] { new XmlFormatDetector() };
+            if (!loader.AnyPluginsLoaded)
+            {
+                System.Console.WriteLine($"No format pluging were found. Build solution to put them to {PluginsDirectory} directory");
+                return (int)ExitCodes.NoPlugins;
+            }
 
             FormatDetector detector = new FormatDetector(detectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
 
@@ -47,6 +49,14 @@ namespace FileFormatDetector.Console
             printer.PrintRecognizedFiles(recognizedFiles);
 
             printer.PrintDistinctCount(recognizedFiles);
+
+            return (int)ExitCodes.OK;
+        }
+
+        enum ExitCodes
+        {
+            OK = 0,
+            NoPlugins = 1,
         }
     }
 }

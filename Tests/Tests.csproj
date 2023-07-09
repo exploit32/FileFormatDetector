@@ -103,12 +103,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
-    <ProjectReference Include="..\FileFormatDetector\FileFormatDetector.Console.csproj" />
+    <ProjectReference Include="..\FileFormatDetector.Core\FileFormatDetector.Core.csproj" />
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
     <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
     <ProjectReference Include="..\TextFilesFormat\TextFilesFormat.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
+    <ProjectReference Include="..\XmlFormat\XmlFormat.csproj" />
   </ItemGroup>
 
 </Project>

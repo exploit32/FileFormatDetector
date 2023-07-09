@@ -18,6 +18,8 @@ namespace FileFormatDetector.Console
 
         public List<ITextBasedFormatDetector> TextBasedFormatDetectors { get; private set; } = new List<ITextBasedFormatDetector>();
 
+        public bool AnyPluginsLoaded => BinaryFormatDetectors.Count + TextFormatDetectors.Count + TextBasedFormatDetectors.Count > 0;
+
         public FormatPluginsLoader(string directory)
         {
             PluginsDirectory = directory;

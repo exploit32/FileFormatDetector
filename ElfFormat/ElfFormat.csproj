@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\FormatApi\FormatApi.csproj" />
+		<ProjectReference Include="..\Tools\Tools.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
-    <ProjectReference Include="..\Tools\Tools.csproj" />
-  </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /q /y &quot;$(TargetDir)*.dll&quot; &quot;$(SolutionDir)FileFormatDetector.Console/bin/$(Configuration)/net7.0/Plugins/$(ProjectName)/&quot;&#xD;&#xA;xcopy /q /y &quot;$(TargetDir)*.pdb&quot; &quot;$(SolutionDir)FileFormatDetector.Console\bin\$(Configuration)\net7.0\Plugins\$(ProjectName)\&quot;" />
-  </Target>
-
+	<Target Name="CopyToConsoleProject" AfterTargets="Build">
+		<ItemGroup>
+			<PluginBinaries Include="$(OutDir)*.dll;$(OutDir)*.pdb" />
+		</ItemGroup>
+		<Copy SourceFiles="@(PluginBinaries)" DestinationFolder="$(SolutionDir)FileFormatDetector.Console/bin/$(Configuration)/net7.0/Plugins/$(ProjectName)" SkipUnchangedFiles="true" />
+	</Target>
 </Project>
