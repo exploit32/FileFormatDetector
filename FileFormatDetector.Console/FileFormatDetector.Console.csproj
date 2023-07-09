@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,12 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
-    <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
-    <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />
-    <ProjectReference Include="..\PEFormat\PEFormat.csproj" />
-    <ProjectReference Include="..\TextFilesFormat\TextFilesFormat.csproj" />
-    <ProjectReference Include="..\XmlFormat\XmlFormat.csproj" />
+    <ProjectReference Include="..\FileFormatDetector.Core\FileFormatDetector.Core.csproj" />
   </ItemGroup>
 
 </Project>

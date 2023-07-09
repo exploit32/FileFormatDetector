@@ -114,5 +114,21 @@ namespace Tests.Pe
             Assert.Equal(32, peFormatSummary.Bits);
             Assert.False(peFormatSummary.HasClrHeader);
         }
+
+        [Fact]
+        public void MalformedPE()
+        {
+            //Arrange
+            byte[] file = new byte[] { 0x4D, 0x5A, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00 };
+
+            PEFormatDetector detector = new PEFormatDetector();
+
+            using (var stream = new MemoryStream(file))
+            {
+                //Act
+                //Assert
+                Assert.Throws<FormatException>(() => detector.ReadFormat(stream));
+            }
+        }
     }
 }

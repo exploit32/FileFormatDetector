@@ -28,7 +28,7 @@ namespace Tools
             {
                 var signature = signatures[i];
 
-                if (fileStart.Length > signature.Offset + signature.Value.Length)
+                if (fileStart.Length >= signature.Offset + signature.Value.Length)
                 {
                     success |= CheckSignature(fileStart, signature);
 

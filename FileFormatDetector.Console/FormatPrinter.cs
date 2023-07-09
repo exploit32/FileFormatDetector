@@ -1,21 +1,22 @@
-﻿using FormatApi;
+﻿using FileFormatDetector.Core;
+using FormatApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileFormatDetector
+namespace FileFormatDetector.Console
 {
-    internal class FormatPrinter
+    public class FormatPrinter
     {
         public void PrintRecognizedFiles(IEnumerable<RecognizedFile> files)
         {
             foreach (var file in files)
             {
-                Console.WriteLine($"File {file.FileName} recognized as {file.FormatSummary.FormatName}");
+                System.Console.WriteLine($"File {file.FileName} recognized as {file.FormatSummary.FormatName}");
 
-                PrintFormatSummary(file.FormatSummary, string.Empty);                
+                PrintFormatSummary(file.FormatSummary, string.Empty);
             }
         }
 
@@ -36,14 +37,14 @@ namespace FileFormatDetector
                     for (int i = 0; i < summaries.Length; i++)
                     {
                         if (i != 0)
-                            Console.WriteLine($"{innerPadding}---------------------");
+                            System.Console.WriteLine($"{innerPadding}---------------------");
 
                         PrintFormatSummary(summaries[i], innerPadding);
-                    }                    
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($"{padding}{key}: {value}");
+                    System.Console.WriteLine($"{padding}{key}: {value}");
                 }
             }
         }
@@ -57,7 +58,7 @@ namespace FileFormatDetector
                 var format = formatGroup.Key;
                 var count = formatGroup.Count();
 
-                Console.WriteLine("{0} - {1}", count, format.ToString());
+                System.Console.WriteLine("{0} - {1}", count, format.ToString());
             }
         }
 
@@ -65,7 +66,7 @@ namespace FileFormatDetector
         {
             var keys = formatSummary.GetKeys();
 
-            return string.Format("{0}: {1}", formatSummary.FormatName, String.Join(", ", keys.Select(k => formatSummary[k])));
+            return string.Format("{0}: {1}", formatSummary.FormatName, string.Join(", ", keys.Select(k => formatSummary[k])));
         }
     }
 }

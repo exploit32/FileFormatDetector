@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileFormatDetector
+namespace FileFormatDetector.Core
 {
-    internal class AppConfiguration
+    public class AppConfiguration
     {
         public string Paths { get; set; }
 

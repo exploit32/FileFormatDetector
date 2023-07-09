@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileFormatDetector
+namespace FileFormatDetector.Core
 {
-    internal class FilesIterator: IEnumerable<string>
+    internal class FilesIterator : IEnumerable<string>
     {
         private Stack<string> _paths;
 
@@ -21,7 +21,7 @@ namespace FileFormatDetector
 
         public IEnumerator<string> GetEnumerator()
         {
-            while(_paths.Any())
+            while (_paths.Any())
             {
                 string path = _paths.Pop();
 
@@ -48,7 +48,7 @@ namespace FileFormatDetector
 
                     try
                     {
-                        files = Directory.GetFiles(path);                    
+                        files = Directory.GetFiles(path);
                     }
                     catch (UnauthorizedAccessException) { }
 

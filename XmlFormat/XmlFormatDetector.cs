@@ -5,6 +5,11 @@ namespace XmlFormat
 {
     public class XmlFormatDetector : ITextBasedFormatDetector
     {
+        static XmlFormatDetector()
+        {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
+
         public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary, long? maxBytesToRead)
         {
             if (textFormatSummary.CodePage == 0)

@@ -24,35 +24,26 @@ namespace PEFormat
 
         public FormatSummary? ReadFormat(Stream stream)
         {
-            PEFormatSummary? formatSummary = null;
+            EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 
-            try
+            PEFormatReader peReader = new PEFormatReader(reader);
+
+            DosHeader dosHeader = peReader.ReadDosHeader();
+            COFFHeader coffHeader = peReader.ReadCOFFHeader(dosHeader);
+            OptionalHeader? optionalHeader = peReader.ReadOptionalHeader(coffHeader);
+
+            int bits = GetBitsByOptionalHeader(optionalHeader);
+
+            if (bits == 0)
+                bits = coffHeader.GetBitsByMachineType();
+
+            PEFormatSummary? formatSummary = new PEFormatSummary()
             {
-                EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
-
-                PEFormatReader peReader = new PEFormatReader(reader);
-
-                DosHeader dosHeader = peReader.ReadDosHeader();
-                COFFHeader coffHeader = peReader.ReadCOFFHeader(dosHeader);
-                OptionalHeader? optionalHeader = peReader.ReadOptionalHeader(coffHeader);
-
-                int bits = GetBitsByOptionalHeader(optionalHeader);
-
-                if (bits == 0)
-                    bits = coffHeader.GetBitsByMachineType();
-
-                formatSummary = new PEFormatSummary()
-                {
-                    Architecture = coffHeader.Machine.ToString(),
-                    Bits = bits,
-                    Endianness = GetEndianess(coffHeader.Machine),
-                    HasClrHeader = HasClrMetadata(optionalHeader),
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing file: {ex.Message}");
-            }
+                Architecture = coffHeader.Machine.ToString(),
+                Bits = bits,
+                Endianness = GetEndianess(coffHeader.Machine),
+                HasClrHeader = HasClrMetadata(optionalHeader),
+            };
 
             return formatSummary;
         }

@@ -1,12 +1,8 @@
-﻿using TextFilesFormat;
-using ElfFormat;
-using FormatApi;
-using MachOFormat;
+﻿using FileFormatDetector.Core;
 using Microsoft.Extensions.Configuration;
-using PEFormat;
-using XmlFormat;
 
-namespace FileFormatDetector
+
+namespace FileFormatDetector.Console
 {
     internal class Program
     {
@@ -25,20 +21,24 @@ namespace FileFormatDetector
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
-            Console.CancelKeyPress += (sender, args) =>
+            System.Console.CancelKeyPress += (sender, args) =>
             {
-                Console.WriteLine("Cancellation requested");
+                System.Console.WriteLine("Cancellation requested");
                 cancellationTokenSource.Cancel();
                 args.Cancel = true;
             };
 
-            IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
+            FormatPluginsLoader loader = new FormatPluginsLoader("Plugins");
 
-            ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
+            loader.LoadPlugins();
 
-            ITextBasedFormatDetector[] textBasedFormatDetectors = new ITextBasedFormatDetector[] { new XmlFormatDetector() };
+            //IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
 
-            FormatDetector detector = new FormatDetector(detectorConfiguration, binaryFormats, textFormats, textBasedFormatDetectors);
+            //ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
+
+            //ITextBasedFormatDetector[] textBasedFormatDetectors = new ITextBasedFormatDetector[] { new XmlFormatDetector() };
+
+            FormatDetector detector = new FormatDetector(detectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
 
             var recognizedFiles = await detector.ScanFiles(cancellationTokenSource.Token);
 

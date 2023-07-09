@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileFormatDetector
+namespace FileFormatDetector.Core
 {
-    internal class FormatDetector
+    public class FormatDetector
     {
         private readonly IBinaryFormatDetector[] _binaryFormats;
         private readonly ITextFormatDetector[] _textFormats;
@@ -35,7 +35,7 @@ namespace FileFormatDetector
 
             ParallelOptions parallelOptions = new ParallelOptions();
             parallelOptions.CancellationToken = cancellationToken;
-            parallelOptions.MaxDegreeOfParallelism = Configuration.Threads == 0 ? System.Environment.ProcessorCount : Configuration.Threads;
+            parallelOptions.MaxDegreeOfParallelism = Configuration.Threads == 0 ? Environment.ProcessorCount : Configuration.Threads;
 
             ConcurrentBag<RecognizedFile> recognizedFiles = new ConcurrentBag<RecognizedFile>();
 
@@ -59,13 +59,15 @@ namespace FileFormatDetector
 
         private async Task<RecognizedFile?> DetectFormat(string path, int headerLength)
         {
-            //Console.WriteLine("Processing file {0}", path);
-
             FormatSummary? summary = null;
 
             try
             {
                 if (!File.Exists(path))
+                    return null;
+
+                FileInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Length == 0)
                     return null;
 
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -78,11 +80,12 @@ namespace FileFormatDetector
 
                         if (textFormatSummary != null)
                         {
-                            summary = await TryDetectTextBasedFormat(file, path, textFormatSummary);
-                        }
-                        else
-                        {
-                            summary = textFormatSummary;
+                            FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, textFormatSummary);
+
+                            if (textBasedFormatSummary != null)
+                                summary = textBasedFormatSummary;
+                            else
+                                summary = textFormatSummary;
                         }
                     }
 
@@ -91,7 +94,7 @@ namespace FileFormatDetector
                 }
             }
             catch (UnauthorizedAccessException) { }
-            catch (IOException ex) 
+            catch (IOException ex)
             {
                 Console.WriteLine($"Error opening {path} : {ex.Message}");
             }
@@ -124,11 +127,12 @@ namespace FileFormatDetector
                         summary = format.ReadFormat(stream);
 
                         if (summary != null)
-                        {
-                            //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
                             break;
-                        }
                     }
+                }
+                catch (FormatException ex)
+                {
+                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}. Probably file is malformed.");
                 }
                 catch (Exception ex)
                 {
@@ -152,10 +156,7 @@ namespace FileFormatDetector
                     summary = await format.ReadFormat(stream, 4096);
 
                     if (summary != null)
-                    {
-                        //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
                         break;
-                    }
                 }
                 catch (Exception ex)
                 {
@@ -179,10 +180,7 @@ namespace FileFormatDetector
                     summary = await format.ReadFormat(stream, textFormatSummary, 4096);
 
                     if (summary != null)
-                    {
-                        //Console.WriteLine("File {0} recognized as {1}", path, format.Description);
                         break;
-                    }
                 }
                 catch (Exception ex)
                 {

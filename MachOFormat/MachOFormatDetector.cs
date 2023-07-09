@@ -34,22 +34,13 @@ namespace MachOFormat
 
         public FormatSummary? ReadFormat(Stream stream)
         {
-            FormatSummary? summary = null;
+            EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 
-            try
-            {
-                EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
+            MachOFormatReader machOReader = new MachOFormatReader(reader);
 
-                MachOFormatReader machOReader = new MachOFormatReader(reader);
+            MachO machO = machOReader.ReadMachO();
 
-                MachO machO = machOReader.ReadMachO();
-
-                summary = MakeSummary(machO);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing file: {ex.Message}");
-            }
+            FormatSummary? summary = MakeSummary(machO);
 
             return summary;
         }

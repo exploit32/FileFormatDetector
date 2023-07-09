@@ -23,34 +23,25 @@ namespace ElfFormat
 
         public FormatSummary? ReadFormat(Stream stream)
         {
-            FormatSummary? summary = null;
+            EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 
-            try
+            ElfFormatReader elfReader = new ElfFormatReader(reader);
+
+            var elfHeader = elfReader.ReadHeader();
+
+            var programHeaderSegments = elfReader.ReadProgramHeaders(elfHeader);
+
+            var interpreterSegment = programHeaderSegments.FirstOrDefault(s => s.Type == Structs.SegmentType.Interpreter);
+
+            string interpreterName = interpreterSegment != null ? elfReader.ReadInterpreterSegment(interpreterSegment) : string.Empty;
+
+            FormatSummary? summary = new ElfFormatSummary()
             {
-                EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
-
-                ElfFormatReader elfReader = new ElfFormatReader(reader);
-
-                var elfHeader = elfReader.ReadHeader();
-
-                var programHeaderSegments = elfReader.ReadProgramHeaders(elfHeader);
-
-                var interpreterSegment = programHeaderSegments.FirstOrDefault(s => s.Type == Structs.SegmentType.Interpreter);
-
-                string interpreterName = interpreterSegment != null ? elfReader.ReadInterpreterSegment(interpreterSegment) : string.Empty;
-
-                summary = new ElfFormatSummary()
-                {
-                    Architecture = elfHeader.Machine.ToString(),
-                    Bits = elfHeader.Class == Structs.ElfClass.Bit32 ? 32 : 64,
-                    Endianness = elfHeader.Endianness == Structs.ElfEndianness.LittleEndian ? Endianness.LittleEndian : Endianness.BigEndian,
-                    Interpreter = interpreterName,
-                };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing file: {ex.Message}");
-            }
+                Architecture = elfHeader.Machine.ToString(),
+                Bits = elfHeader.Class == Structs.ElfClass.Bit32 ? 32 : 64,
+                Endianness = elfHeader.Endianness == Structs.ElfEndianness.LittleEndian ? Endianness.LittleEndian : Endianness.BigEndian,
+                Interpreter = interpreterName,
+            };
 
             return summary;
         }

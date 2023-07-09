@@ -9,46 +9,34 @@ namespace Tests.Pe
 {
     public class SignatureTests
     {
-        [Fact]
-        public void MZMagic()
+        [Theory]
+        [InlineData(new byte[] { (byte)'M', (byte)'Z', 0x0, 0x0, 0x0, 0x0 })]
+        [InlineData(new byte[] { (byte)'M', (byte)'Z' })]
+        [InlineData(new byte[] { (byte)'M', (byte)'Z', 0xFF })]
+        public void MZMagic(byte[] magic)
         {
             //Arrange
             PEFormatDetector detector = new PEFormatDetector();
 
-            byte[] signature = new byte[] { (byte)'M', (byte)'Z', 0x0, 0x0, 0x0, 0x0 };
-
             //Act
-            bool signatureFound = detector.CheckSignature(signature.AsSpan());
-            
+            bool signatureFound = detector.CheckSignature(magic.AsSpan());
+
             //Assert
             Assert.True(signatureFound);
         }
 
-        [Fact]
-        public void EmptyMagic()
+        [Theory]
+        [InlineData(new byte[] { (byte)'X', (byte)'Z', 0x0, 0x0, 0x0, 0x0 })]
+        [InlineData(new byte[] { (byte)'M', })]
+        [InlineData(new byte[] { })]
+        [InlineData(new byte[] { 0xfe, 0xed, 0xfa, 0xce })]
+        public void InvalidMagic(byte[] magic)
         {
             //Arrange
             PEFormatDetector detector = new PEFormatDetector();
 
-            byte[] signature = new byte[0];
-
             //Act
-            bool signatureFound = detector.CheckSignature(signature.AsSpan());
-
-            //Assert
-            Assert.False(signatureFound);
-        }
-
-        [Fact]
-        public void InvalidMagic()
-        {
-            //Arrange
-            PEFormatDetector detector = new PEFormatDetector();
-
-            byte[] signature = new byte[] { (byte)'X', (byte)'Z', 0x0, 0x0, 0x0, 0x0 };
-
-            //Act
-            bool signatureFound = detector.CheckSignature(signature.AsSpan());
+            bool signatureFound = detector.CheckSignature(magic.AsSpan());
 
             //Assert
             Assert.False(signatureFound);

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FileFormatDetector
+namespace FileFormatDetector.Core
 {
-    internal class RecognizedFile
+    public class RecognizedFile
     {
         public string FileName { get; }
 

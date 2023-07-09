@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TextFilesFormat
+namespace TextFilesFormat.Checkers
 {
     internal class AsciiChecker
     {
@@ -34,7 +34,7 @@ namespace TextFilesFormat
 
         private bool CheckLowerControlChars(ReadOnlySpan<byte> buffer)
         {
-            for(int i = 0; i < buffer.Length ; i++)
+            for (int i = 0; i < buffer.Length; i++)
             {
                 if (buffer[i] < 0x20 && buffer[i] != '\r' && buffer[i] != '\n' && buffer[i] != '\t')
                     return true;

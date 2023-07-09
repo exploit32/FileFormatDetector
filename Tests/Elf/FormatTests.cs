@@ -251,5 +251,22 @@ namespace Tests.Elf
             Assert.Equal(32, elfFormatSummary.Bits);
             Assert.Equal("/lib/ld-linux.so.2", elfFormatSummary.Interpreter);
         }
+
+        [Fact]
+        public void MalformedElf()
+        {
+            //Arrange
+            byte[] file = new byte[] { 0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00 };
+
+            ElfFormatDetector detector = new ElfFormatDetector();
+
+            using (var stream = new MemoryStream(file))
+            {
+                //Act
+                //Assert
+                Assert.Throws<FormatException>(() => detector.ReadFormat(stream));
+            }
+
+        }
     }
 }
