@@ -33,7 +33,7 @@ namespace TextFilesFormat
         private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
 
-        public async Task<TextFormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead)
+        public async Task<TextFormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
         {
             if (stream.Length == 0)
                 return null;
@@ -43,7 +43,7 @@ namespace TextFilesFormat
             if (summary == null)
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                summary = await TryDetectEncodingWithoutBom(stream, maxBytesToRead);
+                summary = await TryDetectEncodingWithoutBom(stream, maxBytesToRead, cancellationToken);
             }
 
             return summary;
@@ -92,13 +92,13 @@ namespace TextFilesFormat
             return summary;
         }
 
-        private async Task<TextFormatSummary?> TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead)
+        private async Task<TextFormatSummary?> TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
         {
             TextFormatSummary? summary = null;
 
             NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector();
 
-            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead);
+            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead, cancellationToken);
 
             if (detectedEncoding != null)
             {

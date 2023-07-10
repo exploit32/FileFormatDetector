@@ -11,13 +11,13 @@ namespace Tests.TextFiles
     public class AsciiTests
     {
         [Fact]
-        public void Simple()
+        public async Task Simple()
         {
             //Arrange
             string text = "This is simple text";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
 
             //Assert
             Assert.NotNull(format);
@@ -25,13 +25,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Multiline()
+        public async Task Multiline()
         {
             //Arrange
             string text = "This is simple text\r\nwith several lines";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
 
             //Assert
             Assert.NotNull(format);
@@ -39,13 +39,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void MultilineWithTab()
+        public async Task MultilineWithTab()
         {
             //Arrange
             string text = "This is simple text\r\nwith several\tlines";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
 
             //Assert
             Assert.NotNull(format);
@@ -53,13 +53,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void NullsShouldNotBeAscii()
+        public async Task NullsShouldNotBeAscii()
         {
             //Arrange
             string text = "Wait, oh shi\0\0";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
 
             //Assert
             Assert.Null(format);

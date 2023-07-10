@@ -22,7 +22,7 @@ namespace PEFormat
             return SignatureTools.CheckSignature(fileStart, Signature);
         }
 
-        public FormatSummary? ReadFormat(Stream stream)
+        public async Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
         {
             EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 

@@ -32,7 +32,7 @@ namespace MachOFormat
             return SignatureTools.CheckSignatures(fileStart, Signatures);
         }
 
-        public FormatSummary? ReadFormat(Stream stream)
+        public async Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
         {
             EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 

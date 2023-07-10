@@ -14,36 +14,40 @@ namespace FileFormatDetector.Core
         private readonly IBinaryFormatDetector[] _binaryFormats;
         private readonly ITextFormatDetector[] _textFormats;
         private readonly ITextBasedFormatDetector[] _textBasedFormats;
+        private readonly bool _hasFomatsWithSignature = false;
+        private readonly int _maxHeaderLength = 0;
 
-        public AppConfiguration Configuration { get; }
+        public FormatDetectorConfiguration Configuration { get; }
 
-        public FormatDetector(AppConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats, ITextBasedFormatDetector[] textBasedFormats)
+
+        public FormatDetector(FormatDetectorConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats, ITextBasedFormatDetector[] textBasedFormats)
         {
             Configuration = configuration;
             _binaryFormats = binaryFormats ?? throw new ArgumentNullException(nameof(binaryFormats));
             _textFormats = textFormats ?? throw new ArgumentNullException(nameof(textFormats));
             _textBasedFormats = textBasedFormats ?? throw new ArgumentNullException(nameof(textBasedFormats));
+
+            _hasFomatsWithSignature = _binaryFormats.Any(f => f.HasSignature);
+            _maxHeaderLength = _hasFomatsWithSignature ? _binaryFormats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
         }
 
         public async Task<IEnumerable<RecognizedFile>> ScanFiles(CancellationToken cancellationToken)
         {
-            var paths = Configuration.Paths.Split(new char[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            var filesIterator = new FilesIterator(Configuration.Paths, Configuration.Recursive);
 
-            var filesIterator = new FilesIterator(paths, Configuration.Recursive);
-
-            int minReadLength = GetMinReadLength();
-
-            ParallelOptions parallelOptions = new ParallelOptions();
-            parallelOptions.CancellationToken = cancellationToken;
-            parallelOptions.MaxDegreeOfParallelism = Configuration.Threads == 0 ? Environment.ProcessorCount : Configuration.Threads;
+            ParallelOptions parallelOptions = new ParallelOptions()
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = Configuration.Threads.HasValue ? Configuration.Threads.Value : Environment.ProcessorCount,
+            };
 
             ConcurrentBag<RecognizedFile> recognizedFiles = new ConcurrentBag<RecognizedFile>();
 
             try
             {
-                Parallel.ForEach(filesIterator, parallelOptions, async f =>
+                await Parallel.ForEachAsync(filesIterator, parallelOptions, async (f, token) =>
                 {
-                    var recognizedFile = await DetectFormat(f, minReadLength);
+                    var recognizedFile = await DetectFormat(f, token);
 
                     if (recognizedFile != null)
                         recognizedFiles.Add(recognizedFile);
@@ -57,7 +61,7 @@ namespace FileFormatDetector.Core
             return recognizedFiles;
         }
 
-        private async Task<RecognizedFile?> DetectFormat(string path, int headerLength)
+        private async Task<RecognizedFile?> DetectFormat(string path, CancellationToken cancellationToken)
         {
             FormatSummary? summary = null;
 
@@ -72,15 +76,15 @@ namespace FileFormatDetector.Core
 
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    summary = TryDetectBinaryFormat(file, path, headerLength);
+                    summary = await TryDetectBinaryFormat(file, path, cancellationToken);
 
                     if (summary == null)
                     {
-                        TextFormatSummary? textFormatSummary = await TryDetectTextFormat(file, path);
+                        TextFormatSummary? textFormatSummary = await TryDetectTextFormat(file, path, cancellationToken);
 
                         if (textFormatSummary != null)
                         {
-                            FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, textFormatSummary);
+                            FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, textFormatSummary, cancellationToken);
 
                             if (textBasedFormatSummary != null)
                                 summary = textBasedFormatSummary;
@@ -103,18 +107,15 @@ namespace FileFormatDetector.Core
             return summary != null ? new RecognizedFile(path, summary) : null;
         }
 
-        private FormatSummary? TryDetectBinaryFormat(Stream stream, string path, int headerLength)
+        private async Task<FormatSummary?> TryDetectBinaryFormat(Stream stream, string path, CancellationToken cancellationToken)
         {
             FormatSummary? summary = null;
 
-            byte[] buffer = new byte[headerLength];
+            byte[] buffer = new byte[_maxHeaderLength];
 
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
 
             stream.Seek(0, SeekOrigin.Begin);
-
-            if (bytesRead < headerLength)
-                return null;
 
             foreach (var format in _binaryFormats)
             {
@@ -124,7 +125,7 @@ namespace FileFormatDetector.Core
 
                     if (isSignatureFound)
                     {
-                        summary = format.ReadFormat(stream);
+                        summary = await format.ReadFormat(stream, cancellationToken);
 
                         if (summary != null)
                             break;
@@ -143,7 +144,7 @@ namespace FileFormatDetector.Core
             return summary;
         }
 
-        private async Task<TextFormatSummary?> TryDetectTextFormat(Stream stream, string path)
+        private async Task<TextFormatSummary?> TryDetectTextFormat(Stream stream, string path, CancellationToken cancellationToken)
         {
             TextFormatSummary? summary = null;
 
@@ -153,7 +154,7 @@ namespace FileFormatDetector.Core
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, 4096);
+                    summary = await format.ReadFormat(stream, 4096, cancellationToken);
 
                     if (summary != null)
                         break;
@@ -167,7 +168,7 @@ namespace FileFormatDetector.Core
             return summary;
         }
 
-        private async Task<FormatSummary?> TryDetectTextBasedFormat(Stream stream, string path, TextFormatSummary textFormatSummary)
+        private async Task<FormatSummary?> TryDetectTextBasedFormat(Stream stream, string path, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
             FormatSummary? summary = null;
 
@@ -191,11 +192,6 @@ namespace FileFormatDetector.Core
             return summary;
         }
 
-        private bool HasFormatWithSignature() => _binaryFormats.Any(f => f.HasSignature);
 
-        private int GetMinReadLength()
-        {
-            return _binaryFormats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature);
-        }
     }
 }

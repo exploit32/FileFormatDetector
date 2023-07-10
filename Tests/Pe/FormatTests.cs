@@ -6,14 +6,14 @@ namespace Tests.Pe
     public class FormatTests
     {
         [Fact]
-        public void X64App()
+        public async Task X64App()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-x64-cmd");
             PEFormatDetector detector = new PEFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -28,14 +28,14 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public void i386App()
+        public async Task i386App()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-x86-cmd");
             PEFormatDetector detector = new PEFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -50,14 +50,14 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public void ArmApp()
+        public async Task ArmApp()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-ARMv7-Thumb2LE-HelloWorld");
             PEFormatDetector detector = new PEFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -72,14 +72,14 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public void i386App2()
+        public async Task i386App2()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-cygwin-ls.exe");
             PEFormatDetector detector = new PEFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -94,14 +94,14 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public void i386App3()
+        public async Task i386App3()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-mingw32-strip.exe");
             PEFormatDetector detector = new PEFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -116,7 +116,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public void MalformedPE()
+        public async Task MalformedPE()
         {
             //Arrange
             byte[] file = new byte[] { 0x4D, 0x5A, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00 };
@@ -127,7 +127,7 @@ namespace Tests.Pe
             {
                 //Act
                 //Assert
-                Assert.Throws<FormatException>(() => detector.ReadFormat(stream));
+                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
     }

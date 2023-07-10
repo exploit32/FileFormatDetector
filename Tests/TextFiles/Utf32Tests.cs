@@ -11,14 +11,14 @@ namespace Tests.TextFiles
     public class Utf32Tests
     {
         [Fact]
-        public void EnglishText()
+        public async Task EnglishText()
         {
             //Arrange
             string text = "Hello from utf32";
 
             //Act
-            FormatSummary? formatLE = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
-            FormatSummary? formatBE = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
+            FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
+            FormatSummary? formatBE = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
 
             //Assert
             Assert.NotNull(formatLE);
@@ -29,14 +29,14 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void EnglishAndRussianText()
+        public async Task EnglishAndRussianText()
         {
             //Arrange
             string text = "Hello from utf32. Привет, это UTF-32";
 
             //Act
-            FormatSummary? formatLE = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
-            FormatSummary? formatBE = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
+            FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
+            FormatSummary? formatBE = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
 
             //Assert
             Assert.NotNull(formatLE);
@@ -47,14 +47,14 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Emojies()
+        public async Task Emojies()
         {
             //Arrange
             string text = "🐕💉💉💉";
 
             //Act
-            FormatSummary? formatLE = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
-            FormatSummary? formatBE = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
+            FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
+            FormatSummary? formatBE = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
 
             //Assert
             Assert.NotNull(formatLE);
@@ -65,14 +65,14 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void RegularTextAndEmojies()
+        public async Task RegularTextAndEmojies()
         {
             //Arrange
             string text = "Hello 🐕💉💉💉";
 
             //Act
-            FormatSummary? formatLE = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
-            FormatSummary? formatBE = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
+            FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
+            FormatSummary? formatBE = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
 
             //Assert
             Assert.NotNull(formatLE);
@@ -83,14 +83,14 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void NullSumbolsShouldNotBeRecognized()
+        public async Task NullSumbolsShouldNotBeRecognized()
         {
             //Arrange
             string text = "Hello \0 world!";
 
             //Act
-            FormatSummary? formatLE = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
-            FormatSummary? formatBE = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
+            FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32);
+            FormatSummary? formatBE = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE);
 
             //Assert
             Assert.Null(formatLE);

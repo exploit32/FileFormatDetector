@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -103,6 +103,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ElfFormat\ElfFormat.csproj" />
+    <ProjectReference Include="..\FileFormatDetector.Console\FileFormatDetector.Console.csproj" />
     <ProjectReference Include="..\FileFormatDetector.Core\FileFormatDetector.Core.csproj" />
     <ProjectReference Include="..\FormatApi\FormatApi.csproj" />
     <ProjectReference Include="..\MachOFormat\MachOFormat.csproj" />

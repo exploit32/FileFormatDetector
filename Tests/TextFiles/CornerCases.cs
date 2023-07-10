@@ -12,13 +12,13 @@ namespace Tests.TextFiles
     public class CornerCases
     {
         [Fact]
-        public void OneByteFile()
+        public async Task OneByteFile()
         {
             //Arrange
             string text = "T";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.ASCII);
 
             //Assert
             Assert.NotNull(format);
@@ -26,25 +26,25 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void EmptyFileShouldNotBeRecognized()
+        public async Task EmptyFileShouldNotBeRecognized()
         {
             //Arrange
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(Array.Empty<byte>(), Array.Empty<byte>());
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(Array.Empty<byte>(), Array.Empty<byte>());
 
             //Assert
             Assert.Null(format);
         }
 
         [Fact]
-        public void ExceptionShouldBeThrown()
+        public async Task ExceptionShouldBeThrown()
         {
             TextFilesDetector detector = new TextFilesDetector();
 
             var mock = new Mock<Stream>();
             mock.Setup(s => s.Length).Throws<IOException>();
 
-            Assert.ThrowsAsync<IOException>(async () => await detector.ReadFormat(mock.Object, null));
+            await Assert.ThrowsAsync<IOException>(async () => await detector.ReadFormat(mock.Object, null, CancellationToken.None));
         }
     }
 }

@@ -11,13 +11,13 @@ namespace Tests.TextFiles
     public class BomTests
     {
         [Fact]
-        public void Utf8()
+        public async Task Utf8()
         {
             //Arrange
             string text = "Hello";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8, DetectableEncoding.Utf8.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8, DetectableEncoding.Utf8.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -25,13 +25,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf8OnlyBom()
+        public async Task Utf8OnlyBom()
         {
             //Arrange
             string text = "";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8, DetectableEncoding.Utf8.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8, DetectableEncoding.Utf8.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -39,13 +39,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf16LE()
+        public async Task Utf16LE()
         {
             //Arrange
             string text = "Hello";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.Unicode, DetectableEncoding.Utf16LE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.Unicode, DetectableEncoding.Utf16LE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -53,13 +53,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf16LEOnlyBom()
+        public async Task Utf16LEOnlyBom()
         {
             //Arrange
             string text = "";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.Unicode, DetectableEncoding.Utf16LE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.Unicode, DetectableEncoding.Utf16LE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -67,13 +67,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf16BE()
+        public async Task Utf16BE()
         {
             //Arrange
             string text = "Hello";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.BigEndianUnicode, DetectableEncoding.Utf16BE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.BigEndianUnicode, DetectableEncoding.Utf16BE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -81,13 +81,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf16BEOnlyBom()
+        public async Task Utf16BEOnlyBom()
         {
             //Arrange
             string text = "";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.BigEndianUnicode, DetectableEncoding.Utf16BE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.BigEndianUnicode, DetectableEncoding.Utf16BE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -95,13 +95,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf32LE()
+        public async Task Utf32LE()
         {
             //Arrange
             string text = "Hello";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32, DetectableEncoding.Utf32LE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32, DetectableEncoding.Utf32LE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -109,13 +109,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf32LEOnlyBom()
+        public async Task Utf32LEOnlyBom()
         {
             //Arrange
             string text = "";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32, DetectableEncoding.Utf32LE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF32, DetectableEncoding.Utf32LE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -123,13 +123,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf32BE()
+        public async Task Utf32BE()
         {
             //Arrange
             string text = "Hello";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE, DetectableEncoding.Utf32BE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE, DetectableEncoding.Utf32BE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -137,13 +137,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf32BEOnlyBom()
+        public async Task Utf32BEOnlyBom()
         {
             //Arrange
             string text = "";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE, DetectableEncoding.Utf32BE.BomSignature?.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.UTF32BE, DetectableEncoding.Utf32BE.BomSignature?.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -151,13 +151,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf1()
+        public async Task Utf1()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf1.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf1.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -165,13 +165,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Utf7()
+        public async Task Utf7()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf7.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Utf7.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -179,13 +179,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void UtfEbcdict()
+        public async Task UtfEbcdict()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.UtfEbcdict.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.UtfEbcdict.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -193,13 +193,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Gb18030()
+        public async Task Gb18030()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Gb18030.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Gb18030.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -208,13 +208,13 @@ namespace Tests.TextFiles
 
 
         [Fact]
-        public void Bocu1()
+        public async Task Bocu1()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Bocu1.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Bocu1.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);
@@ -222,13 +222,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Scsu()
+        public async Task Scsu()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Scsu.BomSignature!.Value);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, DetectableEncoding.Scsu.BomSignature!.Value);
 
             //Assert
             Assert.NotNull(format);

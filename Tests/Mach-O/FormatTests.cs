@@ -11,14 +11,14 @@ namespace Tests.Mach_O
     public class FormatTests
     {
         [Fact]
-        public void x86OSX()
+        public async Task x86OSX()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-OSX-x86-ls");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -34,14 +34,14 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void x64OSX()
+        public async Task x64OSX()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-OSX-x64-ls");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -57,14 +57,14 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void PowerPcOSX()
+        public async Task PowerPcOSX()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-OSX-ppc-openssl-1.0.1h");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -80,14 +80,14 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void FatPowerPCandX86OSX()
+        public async Task FatPowerPCandX86OSX()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-OSX-ppc-and-i386-bash");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -123,14 +123,14 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void FatThreeArmsIOS()
+        public async Task FatThreeArmsIOS()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-iOS-armv7-armv7s-arm64-Helloworld");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -173,14 +173,14 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void ArmIOS()
+        public async Task ArmIOS()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("MachO-iOS-arm1176JZFS-bash");
             MachOFormatDetector detector = new MachOFormatDetector();
 
             //Act
-            var formatSummary = detector.ReadFormat(stream);
+            var formatSummary = await detector.ReadFormat(stream, CancellationToken.None);
 
             //Assert
             Assert.NotNull(formatSummary);
@@ -196,7 +196,7 @@ namespace Tests.Mach_O
         }
 
         [Fact]
-        public void MalformedMachO()
+        public async Task MalformedMachO()
         {
             //Arrange
             byte[] file = new byte[] { 0xCA, 0xFE, 0xBA, 0xBE, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x09 };
@@ -207,12 +207,12 @@ namespace Tests.Mach_O
             {
                 //Act
                 //Assert
-                Assert.Throws<FormatException>(() => detector.ReadFormat(stream));
+                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
 
         [Fact]
-        public void MalformedMachOSeekOutOfRange()
+        public async Task MalformedMachOSeekOutOfRange()
         {
             //Arrange
             byte[] onlyFatHeaders = new byte[] { 
@@ -229,7 +229,7 @@ namespace Tests.Mach_O
             {
                 //Act
                 //Assert
-                Assert.Throws<FormatException>(() => detector.ReadFormat(stream));
+                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
     }

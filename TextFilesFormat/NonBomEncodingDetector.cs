@@ -20,7 +20,7 @@ namespace TextFilesFormat
 
         public bool SkipUtf32Check { get; set; } = false;
 
-        public async Task<DetectableEncoding?> TryDetectEncoding(Stream stream, long? maxBytesToRead)
+        public async Task<DetectableEncoding?> TryDetectEncoding(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
         {
             if (maxBytesToRead.HasValue && maxBytesToRead % 4 != 0)
                 throw new ArgumentException("Block size should be multiple of 4");
@@ -46,7 +46,7 @@ namespace TextFilesFormat
             do
             {
                 int bytesToRead = (int)Math.Min(readLength - stream.Position, bufferSize);
-                bytesRead = await stream.ReadAsync(buffer, 0, bytesToRead);
+                bytesRead = await stream.ReadAsync(buffer, 0, bytesToRead, cancellationToken);
 
                 Memory<byte> bytes = buffer.AsMemory(0, bytesRead);
 
@@ -62,7 +62,7 @@ namespace TextFilesFormat
                 if (mayBeUtf32)
                     mayBeUtf32 = utf32Checker.CheckValidRange(bytes.Span);
 
-            } while (stream.Position < readLength && bytesRead > 0 && (mayBeAsciiOrWindows125x || mayBeUtf8 || mayBeUtf16 || mayBeUtf32));
+            } while (!cancellationToken.IsCancellationRequested && stream.Position < readLength && bytesRead > 0 && (mayBeAsciiOrWindows125x || mayBeUtf8 || mayBeUtf16 || mayBeUtf32));
 
             //Assuming ASCII encoding if all bytes are less than 0x7F and there is no control chars lower than 0x20 except tab, carriage return, line feed
             if (asciiChecker.MayBeAscii)

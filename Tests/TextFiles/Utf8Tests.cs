@@ -11,13 +11,13 @@ namespace Tests.TextFiles
     public class Utf8Tests
     {
         [Fact]
-        public void TestRussianText()
+        public async Task TestRussianText()
         {
             //Arrange
             string text = "Приветики";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);
@@ -25,13 +25,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void TestRussianTextWithEvenTextLength()
+        public async Task TestRussianTextWithEvenTextLength()
         {
             //Arrange
             string text = "Привет";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);
@@ -39,13 +39,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void TestEnglishAndRussianText()
+        public async Task TestEnglishAndRussianText()
         {
             //Arrange
             string text = "Hello, Hi\nПривет!";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);
@@ -53,13 +53,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void MixedTextWithoutSpaces()
+        public async Task MixedTextWithoutSpaces()
         {
             //Arrange
             string text = "HelloПривет";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);
@@ -67,13 +67,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void ChineeseText()
+        public async Task ChineeseText()
         {
             //Arrange
             string text = "關於我和鬼變成家人的那件事》是一部2023年的臺灣動作喜劇電影，由程偉豪執導，許光漢、林柏宏、王淨主演；劇本由吳瑾蓉與程偉豪擔任編劇";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);
@@ -81,13 +81,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void Emojies()
+        public async Task Emojies()
         {
             //Arrange
             string text = "🐕💉💉💉";
 
             //Act
-            FormatSummary? format = TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.UTF8);
 
             //Assert
             Assert.NotNull(format);

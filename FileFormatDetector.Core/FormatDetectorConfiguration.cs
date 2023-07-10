@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Core
 {
-    public class AppConfiguration
+    public class FormatDetectorConfiguration
     {
-        public string Paths { get; set; } = string.Empty;
+        public string[] Paths { get; set; } = Array.Empty<string>();
 
-        public int Threads { get; set; }
+        public int? Threads { get; set; }
 
         public bool Recursive { get; set; } = true;
     }

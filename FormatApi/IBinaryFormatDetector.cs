@@ -10,6 +10,6 @@
 
         bool CheckSignature(ReadOnlySpan<byte> fileStart);
 
-        FormatSummary? ReadFormat(Stream stream);
+        Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken);
     }
 }

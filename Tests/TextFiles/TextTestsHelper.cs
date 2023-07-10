@@ -18,7 +18,7 @@ namespace Tests.TextFiles
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        internal static DetectableEncoding? EncodeAndDetect(string text, Encoding encoding, byte[]? bom = null)
+        internal static async Task<DetectableEncoding?> EncodeAndDetect(string text, Encoding encoding, byte[]? bom = null)
         {
             var bytes = encoding.GetBytes(text);
 
@@ -38,13 +38,13 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(bytes))
             {
-                detectedEncoding = detector.TryDetectEncoding(stream, null).Result;
+                detectedEncoding = await detector.TryDetectEncoding(stream, null, CancellationToken.None);
             }
 
             return detectedEncoding;
         }
 
-        internal static FormatSummary? EncodeAndDetectFull(string text, Encoding encoding, byte[]? bom = null)
+        internal static async Task<FormatSummary?> EncodeAndDetectFull(string text, Encoding encoding, byte[]? bom = null)
         {
             var bytes = encoding.GetBytes(text);
 
@@ -64,13 +64,13 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(bytes))
             {
-                detectedEncoding = detector.ReadFormat(stream, null).Result;
+                detectedEncoding = await detector.ReadFormat(stream, null, CancellationToken.None);
             }
 
             return detectedEncoding;
         }
 
-        internal static FormatSummary? EncodeAndDetectFull(byte[] encodedText, byte[] bom)
+        internal static async Task<FormatSummary?> EncodeAndDetectFull(byte[] encodedText, byte[] bom)
         {
             TextFilesDetector detector = new TextFilesDetector();
 
@@ -83,7 +83,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(newBuffer))
             {
-                detectedEncoding = detector.ReadFormat(stream, null).Result;
+                detectedEncoding = await detector.ReadFormat(stream, null, CancellationToken.None);
             }
 
             return detectedEncoding;

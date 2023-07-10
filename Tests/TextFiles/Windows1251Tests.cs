@@ -10,13 +10,13 @@ namespace Tests.TextFiles
     public class Windows1251Tests
     {
         [Fact]
-        public void TestRussianText()
+        public async Task TestRussianText()
         {
             //Arrange
             string text = "Привет!";
 
             //Act
-            DetectableEncoding? encoding = TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
+            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
 
             //Assert
             Assert.NotNull(encoding);
@@ -24,13 +24,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void TestRussianTextWithEvenTextLength()
+        public async Task TestRussianTextWithEvenTextLength()
         {
             //Arrange
             string text = "При  вет";
 
             //Act
-            DetectableEncoding? encoding = TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
+            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
 
             //Assert
             Assert.NotNull(encoding);
@@ -38,13 +38,13 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public void TestEnglishAndRussianText()
+        public async Task TestEnglishAndRussianText()
         {
             //Arrange
             string text = "Hello, Hi\nПривет!";
 
             //Act
-            DetectableEncoding? encoding = TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
+            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
 
             //Assert
             Assert.NotNull(encoding);

@@ -1,6 +1,4 @@
 ﻿using FileFormatDetector.Core;
-using Microsoft.Extensions.Configuration;
-
 
 namespace FileFormatDetector.Console
 {
@@ -8,24 +6,32 @@ namespace FileFormatDetector.Console
     {
         private const string PluginsDirectory = "Plugins";
 
-        public static IConfiguration? Configuration { get; set; }
-
         static async Task<int> Main(string[] args)
         {
-            var builder = new ConfigurationBuilder()
-            .AddCommandLine(args);
+            var commandLineParser = new CommandLineParser(args);
 
-            Configuration = builder.Build();
+            AppConfiguration configuration;
 
-            AppConfiguration detectorConfiguration = new AppConfiguration();
+            try
+            {
+                if (commandLineParser.HelpRequested())
+                {
+                    commandLineParser.PrintHelp();
+                    return (int)ExitCodes.OK;
+                }
 
-            Configuration.Bind(detectorConfiguration);
+                configuration = commandLineParser.Parse();
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"Error parsing command line arguments: {ex.Message}");
+                return (int)ExitCodes.InvalidArgs;
+            }
 
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             System.Console.CancelKeyPress += (sender, args) =>
             {
-                System.Console.WriteLine("Cancellation requested");
                 cancellationTokenSource.Cancel();
                 args.Cancel = true;
             };
@@ -40,14 +46,15 @@ namespace FileFormatDetector.Console
                 return (int)ExitCodes.NoPlugins;
             }
 
-            FormatDetector detector = new FormatDetector(detectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
+            FormatDetector detector = new FormatDetector(configuration.DetectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
 
             var recognizedFiles = await detector.ScanFiles(cancellationTokenSource.Token);
 
             FormatPrinter printer = new FormatPrinter();
 
-            printer.PrintRecognizedFiles(recognizedFiles);
-
+            if (configuration.Verbose)
+                printer.PrintRecognizedFiles(recognizedFiles);
+            
             printer.PrintDistinctCount(recognizedFiles);
 
             return (int)ExitCodes.OK;
@@ -56,7 +63,8 @@ namespace FileFormatDetector.Console
         enum ExitCodes
         {
             OK = 0,
-            NoPlugins = 1,
+            InvalidArgs = 1,
+            NoPlugins = 2,
         }
     }
 }
