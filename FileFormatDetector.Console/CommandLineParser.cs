@@ -38,7 +38,12 @@ namespace FileFormatDetector.Console
                             string threadsCountStr = _args[index++];
 
                             if (int.TryParse(threadsCountStr, out var threadsCount))
+                            {
+                                if (threadsCount <= 0)
+                                    throw new ArgumentException("Number of threads should be greater than 0");
+
                                 appConfiguration.DetectorConfiguration.Threads = threadsCount;
+                            }
                             else
                                 throw new ArgumentException("Error parsing threads count. Value should be integer.");
                         }

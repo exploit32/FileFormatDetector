@@ -83,7 +83,9 @@
     <EmbeddedResource Include="Samples\binary-samples\pe-cygwin-ls.exe" />
     <EmbeddedResource Include="Samples\binary-samples\pe-mingw32-strip.exe" />
     <EmbeddedResource Include="Samples\binary-samples\pe-Windows-ARMv7-Thumb2LE-HelloWorld" />
-    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x64-cmd" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x64-cmd">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x86-cmd" />
   </ItemGroup>
 

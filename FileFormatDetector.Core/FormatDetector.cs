@@ -19,6 +19,8 @@ namespace FileFormatDetector.Core
 
         public FormatDetectorConfiguration Configuration { get; }
 
+        public IFilesFactory FilesFactory { get; set; } = new DiskFilesFactory();
+
 
         public FormatDetector(FormatDetectorConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats, ITextBasedFormatDetector[] textBasedFormats)
         {
@@ -67,14 +69,10 @@ namespace FileFormatDetector.Core
 
             try
             {
-                if (!File.Exists(path))
+                if (!FilesFactory.CheckFileExistsAndNotEmpty(path))
                     return null;
 
-                FileInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Length == 0)
-                    return null;
-
-                using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var file = FilesFactory.Open(path))
                 {
                     summary = await TryDetectBinaryFormat(file, path, cancellationToken);
 
@@ -154,7 +152,7 @@ namespace FileFormatDetector.Core
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, 4096, cancellationToken);
+                    summary = await format.ReadFormat(stream, Configuration.FileScanSizeLimit, cancellationToken);
 
                     if (summary != null)
                         break;
@@ -178,7 +176,7 @@ namespace FileFormatDetector.Core
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, textFormatSummary, 4096);
+                    summary = await format.ReadFormat(stream, textFormatSummary, Configuration.FileScanSizeLimit);
 
                     if (summary != null)
                         break;

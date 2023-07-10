@@ -172,5 +172,18 @@ namespace Tests
             //Assert
             Assert.True(parser.HelpRequested());
         }
+
+        [Fact]
+        public void UnknownParameter()
+        {
+            //Arrange
+            string[] args = new string[] { "--wft" };
+
+            CommandLineParser parser = new CommandLineParser(args);
+
+            //Act
+            //Assert
+            Assert.Throws<ArgumentException>(() => parser.Parse());
+        }
     }
 }
