@@ -49,44 +49,112 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Samples\binary-samples\elf-FreeBSD-x86_64-echo" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC2-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC7-WebPositive" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-HPUX-ia64-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Alpha-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARM64-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARMv7-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-hppa-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ia64-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x64.so" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x86.so" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Mips4-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-PowerPC-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-s390-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SparcV8-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SuperH4-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x64-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x86-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-NetBSD-x86_64-echo" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-OpenBSD-x86_64-sh" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-sparc-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-x86-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\libSystem.B.dylib" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-arm1176JZFS-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7-armv7s-arm64-Helloworld" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7s-Helloworld" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-and-i386-bash" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-openssl-1.0.1h" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x64-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x86-ls" />
-    <EmbeddedResource Include="Samples\binary-samples\MIT_LICENSE" />
-    <EmbeddedResource Include="Samples\binary-samples\pe-cygwin-ls.exe" />
-    <EmbeddedResource Include="Samples\binary-samples\pe-mingw32-strip.exe" />
-    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-ARMv7-Thumb2LE-HelloWorld" />
-    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x64-cmd">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    <EmbeddedResource Include="Samples\binary-samples\elf-FreeBSD-x86_64-echo">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x86-cmd" />
+    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC2-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Haiku-GCC7-WebPositive">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-HPUX-ia64-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Alpha-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARM64-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ARMv7-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-hppa-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-ia64-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x64.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-lib-x86.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-Mips4-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-PowerPC-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-s390-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SparcV8-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-SuperH4-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x64-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-Linux-x86-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-NetBSD-x86_64-echo">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-OpenBSD-x86_64-sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-sparc-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\elf-solaris-x86-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\libSystem.B.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-arm1176JZFS-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7-armv7s-arm64-Helloworld">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-iOS-armv7s-Helloworld">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-and-i386-bash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-ppc-openssl-1.0.1h">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x64-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MachO-OSX-x86-ls">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\MIT_LICENSE" />
+    <EmbeddedResource Include="Samples\binary-samples\pe-cygwin-ls.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\pe-mingw32-strip.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-ARMv7-Thumb2LE-HelloWorld">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x64-cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\binary-samples\pe-Windows-x86-cmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -113,6 +181,57 @@
     <ProjectReference Include="..\TextFilesFormat\TextFilesFormat.csproj" />
     <ProjectReference Include="..\Tools\Tools.csproj" />
     <ProjectReference Include="..\XmlFormat\XmlFormat.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Samples\Text\bom\sample-utf-16-be-bom-only.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-16-be-bom.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-16-le-bom-only.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-16-le-bom.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-32-be-bom-only.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-32-be-bom.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-32-le-bom-only.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-32-le-bom.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-8-bom-only.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\bom\sample-utf-8-bom.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\cp-1251.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\ru.utf-8.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\utf-16-be.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\utf-16-le-surrogates.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\utf-16-le.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Text\no-bom\utf-8.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

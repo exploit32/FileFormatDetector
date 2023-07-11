@@ -107,6 +107,28 @@ namespace Tests
             Assert.Equal(4, formats.Count(f => f.FormatSummary is MachOFormatSummary));
         }
 
+        [Fact]
+        public async Task DetectTextFilesWithBom()
+        {
+            //Arrange
+            //Act
+            var formats = (await CreateDetectorAndScan(new string[] { Path.Combine(Directory.GetCurrentDirectory(), "Samples", "Text", "bom") })).ToArray();
+
+            //Assert
+            Assert.Equal(10, formats.Count(f => f.FormatSummary is TextFormatSummary));
+        }
+
+        [Fact]
+        public async Task DetectTextFilesWithoutBom()
+        {
+            //Arrange
+            //Act
+            var formats = (await CreateDetectorAndScan(new string[] { Path.Combine(Directory.GetCurrentDirectory(), "Samples", "Text", "no-bom") })).ToArray();
+
+            //Assert
+            Assert.Equal(6, formats.Count(f => f.FormatSummary is TextFormatSummary));
+        }
+
         private async Task<IEnumerable<RecognizedFile>> CreateDetectorAndScan(string[] paths)
         {
             FormatDetectorConfiguration configuration = new FormatDetectorConfiguration()
