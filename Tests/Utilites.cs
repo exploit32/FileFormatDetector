@@ -18,8 +18,6 @@ namespace Tests
                 throw new FileNotFoundException($"Could not find resource '{name}'.");
 
             return result;
-        }
-
-        
+        }        
     }
 }
