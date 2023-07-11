@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tests.Mach_O
+namespace Tests.MachO
 {
     public class FormatTests
     {
@@ -95,7 +95,7 @@ namespace Tests.Mach_O
 
             var machOFormatSummary = (MachOFormatSummary)formatSummary;
 
-            Assert.Equal(String.Empty, machOFormatSummary.Architecture);
+            Assert.Equal(string.Empty, machOFormatSummary.Architecture);
             Assert.Equal(FormatApi.Endianness.BigEndian, machOFormatSummary.Endianness);
             Assert.Equal(32, machOFormatSummary.Bits);
 
@@ -111,7 +111,7 @@ namespace Tests.Mach_O
             Assert.Equal(32, app1.Bits);
             Assert.False(app1.IsFat);
             Assert.True(app1.HasSignature);
-            
+
 
             var app2 = machOFormatSummary.InnerApps[1];
 
@@ -138,7 +138,7 @@ namespace Tests.Mach_O
 
             var machOFormatSummary = (MachOFormatSummary)formatSummary;
 
-            Assert.Equal(String.Empty, machOFormatSummary.Architecture);
+            Assert.Equal(string.Empty, machOFormatSummary.Architecture);
             Assert.Equal(FormatApi.Endianness.BigEndian, machOFormatSummary.Endianness);
             Assert.Equal(32, machOFormatSummary.Bits);
 
@@ -202,7 +202,7 @@ namespace Tests.Mach_O
             byte[] file = new byte[] { 0xCA, 0xFE, 0xBA, 0xBE, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x09 };
 
             MachOFormatDetector detector = new MachOFormatDetector();
-            
+
             using (var stream = new MemoryStream(file))
             {
                 //Act
@@ -215,7 +215,7 @@ namespace Tests.Mach_O
         public async Task MalformedMachOSeekOutOfRange()
         {
             //Arrange
-            byte[] onlyFatHeaders = new byte[] { 
+            byte[] onlyFatHeaders = new byte[] {
                 0xCA, 0xFE, 0xBA, 0xBE, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x09,
                 0x00, 0x00, 0x40, 0x00, 0x00, 0x01, 0x66, 0x90, 0x00, 0x00, 0x00, 0x0E, 0x00, 0x00, 0x00, 0x0C,
                 0x00, 0x00, 0x00, 0x0B, 0x00, 0x01, 0xC0, 0x00, 0x00, 0x01, 0x66, 0x90, 0x00, 0x00, 0x00, 0x0E,
@@ -224,7 +224,7 @@ namespace Tests.Mach_O
             };
 
             MachOFormatDetector detector = new MachOFormatDetector();
-            
+
             using (var stream = new MemoryStream(onlyFatHeaders))
             {
                 //Act

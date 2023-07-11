@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tests.Mach_O
+namespace Tests.MachO
 {
     public class SignatureTests
     {
