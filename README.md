@@ -37,6 +37,26 @@ cd FileFormatDetector
 
 dotnet build
 ```
+
+# How to run?
+
+```FileFormatDetector.Console.exe [Options] (List of files and directories to scan)```
+
+| Parameter | Meaning | Example |
+| ----------| ------- | ------- |
+| ```-h```, ```--help```  | Show help | |
+| ```-t N```, ```--threads N```  | Number of parallel threads (default is number of CPU cores) | ```--threads 1``` |
+| ```-n```, ```--no-recursion```  | Scan directories non recursively |  |
+| ```-v```, ```--verbose```  | Print summary about each file individually |  |
+
+## Examples
+
+```./FileFormatDetector.Console.exe --threads 1 /home/user/documents /home/user/Downloads```
+
+```./FileFormatDetector.Console.exe --no-recursion /home/user/Downloads```
+
+```.\FileFormatDetector.Console.exe --no-recursion C:\Users\Konstantin\Documents```
+
 # How to run tests?
 
 ```bash
