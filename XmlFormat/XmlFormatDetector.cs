@@ -32,7 +32,13 @@ namespace XmlFormat
 
             if (xmlValid)
             {
-                return new XmlFormatSummary();
+                return new XmlFormatSummary()
+                {
+                    CodePage = textFormatSummary.CodePage,
+                    EncodingFullName = textFormatSummary.EncodingFullName,
+                    EncodingName = textFormatSummary.EncodingName,
+                    HasBOM = textFormatSummary.HasBOM,
+                };
             }
 
             return null;
