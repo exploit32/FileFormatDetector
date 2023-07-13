@@ -22,7 +22,7 @@ namespace MachOFormat
 
         public int BytesToReadSignature => _bytesToReadSignature.Value;
 
-        public string Description => "Mach-O";
+        public string Description => "Mach-O format";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

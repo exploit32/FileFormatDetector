@@ -40,7 +40,8 @@ namespace FileFormatDetector.Console
                     BinaryFormatDetectors.AddRange(TryCreateFormatDetector<IBinaryFormatDetector>(pluginAssembly));
                     TextFormatDetectors.AddRange(TryCreateFormatDetector<ITextFormatDetector>(pluginAssembly));
                     TextBasedFormatDetectors.AddRange(TryCreateFormatDetector<ITextBasedFormatDetector>(pluginAssembly));
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     System.Console.WriteLine($"Error loading plugin {plugin}: {ex.Message}");
                 }

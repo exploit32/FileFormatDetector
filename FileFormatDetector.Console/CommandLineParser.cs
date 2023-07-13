@@ -71,7 +71,7 @@ namespace FileFormatDetector.Console
                 }
             }
 
-            appConfiguration.DetectorConfiguration.Paths = paths.ToArray();
+            appConfiguration.Paths = paths.ToArray();
 
             return appConfiguration;
         }

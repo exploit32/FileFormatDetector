@@ -81,10 +81,7 @@ namespace Tests
 
         private async Task<IEnumerable<RecognizedFile>> CreateDetectorAndScan(string[] paths)
         {
-            FormatDetectorConfiguration configuration = new FormatDetectorConfiguration()
-            {
-                Paths = paths,
-            };
+            FormatDetectorConfiguration configuration = new FormatDetectorConfiguration();
 
             IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
             ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
@@ -92,7 +89,7 @@ namespace Tests
 
             FormatDetector detector = new FormatDetector(configuration, binaryFormats, textFormats, textBasedFormatDetectors);
 
-            return await detector.ScanFiles(CancellationToken.None);
+            return await detector.ScanFiles(paths, CancellationToken.None);
         }
     }
 }

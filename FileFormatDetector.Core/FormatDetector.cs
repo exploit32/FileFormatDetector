@@ -30,9 +30,9 @@ namespace FileFormatDetector.Core
             _maxHeaderLength = _hasFomatsWithSignature ? _binaryFormats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
         }
 
-        public async Task<IEnumerable<RecognizedFile>> ScanFiles(CancellationToken cancellationToken)
+        public async Task<IEnumerable<RecognizedFile>> ScanFiles(string[] paths, CancellationToken cancellationToken)
         {
-            var filesIterator = new FilesIterator(Configuration.Paths, Configuration.Recursive);
+            var filesIterator = new FilesIterator(paths, Configuration.Recursive);
 
             ParallelOptions parallelOptions = new ParallelOptions()
             {

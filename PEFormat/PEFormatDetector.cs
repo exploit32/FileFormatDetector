@@ -12,7 +12,7 @@ namespace PEFormat
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
 
-        public string Description => "PE Format";
+        public string Description => "PE format";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

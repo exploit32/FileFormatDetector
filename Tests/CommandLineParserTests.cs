@@ -25,8 +25,8 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Single(parameters.DetectorConfiguration.Paths);
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
+            Assert.Single(parameters.Paths);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.True(parameters.DetectorConfiguration.Recursive);
             Assert.Null(parameters.DetectorConfiguration.Threads);
             Assert.False(parameters.Verbose);
@@ -48,11 +48,11 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Equal(3, parameters.DetectorConfiguration.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Length);
 
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
-            Assert.Equal("C:\\Users", parameters.DetectorConfiguration.Paths[1]);
-            Assert.Equal("C:\\test.txt", parameters.DetectorConfiguration.Paths[2]);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
+            Assert.Equal("C:\\Users", parameters.Paths[1]);
+            Assert.Equal("C:\\test.txt", parameters.Paths[2]);
             Assert.True(parameters.DetectorConfiguration.Recursive);
             Assert.Null(parameters.DetectorConfiguration.Threads);
             Assert.False(parameters.Verbose);
@@ -74,11 +74,11 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Equal(3, parameters.DetectorConfiguration.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Length);
 
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
-            Assert.Equal("C:\\Users", parameters.DetectorConfiguration.Paths[1]);
-            Assert.Equal("C:\\test.txt", parameters.DetectorConfiguration.Paths[2]);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
+            Assert.Equal("C:\\Users", parameters.Paths[1]);
+            Assert.Equal("C:\\test.txt", parameters.Paths[2]);
             Assert.True(parameters.DetectorConfiguration.Recursive);
             Assert.NotNull(parameters.DetectorConfiguration.Threads);
             Assert.Equal(6, parameters.DetectorConfiguration.Threads);
@@ -101,11 +101,11 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Equal(3, parameters.DetectorConfiguration.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Length);
 
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
-            Assert.Equal("C:\\Users", parameters.DetectorConfiguration.Paths[1]);
-            Assert.Equal("C:\\test.txt", parameters.DetectorConfiguration.Paths[2]);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
+            Assert.Equal("C:\\Users", parameters.Paths[1]);
+            Assert.Equal("C:\\test.txt", parameters.Paths[2]);
             Assert.True(parameters.DetectorConfiguration.Recursive);
             Assert.NotNull(parameters.DetectorConfiguration.Threads);
             Assert.Equal(6, parameters.DetectorConfiguration.Threads);
@@ -128,8 +128,8 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Single(parameters.DetectorConfiguration.Paths);
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
+            Assert.Single(parameters.Paths);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.False(parameters.DetectorConfiguration.Recursive);
             Assert.NotNull(parameters.DetectorConfiguration.Threads);
             Assert.Equal(6, parameters.DetectorConfiguration.Threads);
@@ -152,8 +152,8 @@ namespace Tests
             Assert.NotNull(parameters);
 
             Assert.NotNull(parameters.DetectorConfiguration);
-            Assert.Single(parameters.DetectorConfiguration.Paths);
-            Assert.Equal("C:\\Windows", parameters.DetectorConfiguration.Paths[0]);
+            Assert.Single(parameters.Paths);
+            Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.False(parameters.DetectorConfiguration.Recursive);
             Assert.NotNull(parameters.DetectorConfiguration.Threads);
             Assert.Equal(6, parameters.DetectorConfiguration.Threads);

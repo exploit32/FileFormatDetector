@@ -11,7 +11,7 @@ namespace ElfFormat
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
 
-        public string Description => throw new NotImplementedException();
+        public string Description => "ELF format";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

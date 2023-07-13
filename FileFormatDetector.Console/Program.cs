@@ -48,7 +48,7 @@ namespace FileFormatDetector.Console
 
             FormatDetector detector = new FormatDetector(configuration.DetectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
 
-            var recognizedFiles = await detector.ScanFiles(cancellationTokenSource.Token);
+            var recognizedFiles = await detector.ScanFiles(configuration.Paths, cancellationTokenSource.Token);
 
             FormatPrinter printer = new FormatPrinter();
 

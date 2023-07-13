@@ -40,7 +40,7 @@ dotnet build
 
 # How to run?
 
-```FileFormatDetector.Console.exe [Options] (List of files and directories to scan)```
+```FileFormatDetector.Console.exe [Options] (List of files or directories to scan)```
 
 | Parameter | Meaning | Example |
 | ----------| ------- | ------- |
