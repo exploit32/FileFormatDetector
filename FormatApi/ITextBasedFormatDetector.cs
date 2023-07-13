@@ -8,6 +8,6 @@ namespace FormatApi
 {
     public interface ITextBasedFormatDetector
     {
-        Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary, long? maxBytesToRead);
+        Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary);
     }
 }

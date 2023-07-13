@@ -161,7 +161,7 @@ namespace FileFormatDetector.Core
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, Configuration.FileScanSizeLimit, cancellationToken);
+                    summary = await format.ReadFormat(stream, cancellationToken);
 
                     if (summary != null)
                         break;
@@ -185,7 +185,7 @@ namespace FileFormatDetector.Core
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, textFormatSummary, Configuration.FileScanSizeLimit);
+                    summary = await format.ReadFormat(stream, textFormatSummary);
 
                     if (summary != null)
                         break;

@@ -44,7 +44,7 @@ namespace Tests.TextFiles
             var mock = new Mock<Stream>();
             mock.Setup(s => s.Length).Throws<IOException>();
 
-            await Assert.ThrowsAsync<IOException>(async () => await detector.ReadFormat(mock.Object, null, CancellationToken.None));
+            await Assert.ThrowsAsync<IOException>(async () => await detector.ReadFormat(mock.Object, CancellationToken.None));
         }
     }
 }

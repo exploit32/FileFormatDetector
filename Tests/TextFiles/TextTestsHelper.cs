@@ -64,7 +64,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(bytes))
             {
-                detectedEncoding = await detector.ReadFormat(stream, null, CancellationToken.None);
+                detectedEncoding = await detector.ReadFormat(stream, CancellationToken.None);
             }
 
             return detectedEncoding;
@@ -83,7 +83,7 @@ namespace Tests.TextFiles
 
             using (MemoryStream stream = new MemoryStream(newBuffer))
             {
-                detectedEncoding = await detector.ReadFormat(stream, null, CancellationToken.None);
+                detectedEncoding = await detector.ReadFormat(stream, CancellationToken.None);
             }
 
             return detectedEncoding;

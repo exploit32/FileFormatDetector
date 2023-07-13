@@ -7,12 +7,13 @@ using System.Xml;
 
 namespace XmlFormat
 {
+
     internal class XmlValidator
     {
-        private const int BufferSize = 4096;
-        public async Task<bool> ReadFile(Stream stream, Encoding encoding, long? maxBytesToRead)
+        public async Task<XmlValidationResult> Validate(Stream stream, Encoding encoding, ValidationMethod validationMethod)
         {
             bool xmlValid = true;
+            string xmlDeclarationEncoding = string.Empty;
 
             XmlReaderSettings settings = new XmlReaderSettings()
             {
@@ -22,32 +23,40 @@ namespace XmlFormat
                 CloseInput = false
             };
 
-            Stream streamToUse = stream;
-            
-            if (maxBytesToRead.HasValue)
-            {
-                LengthLimitingReadOnlyStreamWrapper wrapper = new LengthLimitingReadOnlyStreamWrapper(stream, maxBytesToRead.Value);
-                streamToUse = wrapper;
-            }
-
-            using (StreamReader reader = new StreamReader(streamToUse, encoding, leaveOpen: true, bufferSize: BufferSize))
+            using (StreamReader reader = new StreamReader(stream, encoding, leaveOpen: true))
             using (XmlReader xmlReader = XmlReader.Create(reader, settings))
             {
                 try
                 {
                     while (xmlReader.Read())
                     {
-                        //Console.WriteLine(xmlReader.Value);
+                        if (xmlReader.NodeType == XmlNodeType.XmlDeclaration)
+                        {
+                            xmlDeclarationEncoding = xmlReader.GetAttribute("encoding") ?? String.Empty;
+                        }
+
+                        if (validationMethod == ValidationMethod.UntilFirstNode && xmlReader.NodeType != XmlNodeType.Whitespace)
+                            break;
                     }
                 }
                 catch (Exception)
                 {
-                    //Console.WriteLine(ex.ToString());
                     xmlValid = false;
                 }
             }
 
-            return xmlValid;
+            return new XmlValidationResult()
+            {
+                Valid = xmlValid,
+                XmlDeclarationEncoding = xmlDeclarationEncoding,
+            };
         }
+    }
+
+    class XmlValidationResult
+    {
+        public bool Valid { get; init; }
+
+        public string XmlDeclarationEncoding { get; init; }
     }
 }

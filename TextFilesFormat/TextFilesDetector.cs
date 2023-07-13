@@ -9,7 +9,7 @@ using Tools;
 
 namespace TextFilesFormat
 {
-    public class TextFilesDetector : ITextFormatDetector
+    public class TextFilesDetector : ITextFormatDetector, IConfigurableDetector
     {
         private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
@@ -32,8 +32,15 @@ namespace TextFilesFormat
         private static Lazy<int> MinPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
         private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
+        private const string MaxBytesToReadParameterName = "max-bytes-to-read";
 
-        public async Task<TextFormatSummary?> ReadFormat(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
+        private static ParameterDescription[] Parameters = new ParameterDescription[] { new ParameterDescription(MaxBytesToReadParameterName, "Detect format by first N bytes", false) };
+
+        public long? MaxBytesToRead { get; set; }
+
+        public IEnumerable<ParameterDescription> GetParameters() => Parameters;
+
+        public async Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
         {
             if (stream.Length == 0)
                 return null;
@@ -43,10 +50,29 @@ namespace TextFilesFormat
             if (summary == null)
             {
                 stream.Seek(0, SeekOrigin.Begin);
-                summary = await TryDetectEncodingWithoutBom(stream, maxBytesToRead, cancellationToken);
+                summary = await TryDetectEncodingWithoutBom(stream, cancellationToken);
             }
 
             return summary;
+        }
+
+        public void SetParameter(string key, string value)
+        {
+            if (key == MaxBytesToReadParameterName)
+            {
+                if (long.TryParse(value, out var maxBytesToRead))
+                {
+                    if (maxBytesToRead <= 0)
+                        throw new ArgumentException($"{key} must be greater than 0", key);
+
+                    if (maxBytesToRead % 4 != 0)
+                        throw new ArgumentException($"{key} value should be multiple of 4", key);
+
+                    MaxBytesToRead = maxBytesToRead;
+                }
+                else
+                    throw new ArgumentException($"Cannot parse {key} value {value}. Value should be positive long integer");
+            }
         }
 
         private DetectableEncoding? CheckSignatures(ReadOnlySpan<byte> fileStart, DetectableEncoding[] encodings)
@@ -92,13 +118,13 @@ namespace TextFilesFormat
             return summary;
         }
 
-        private async Task<TextFormatSummary?> TryDetectEncodingWithoutBom(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
+        private async Task<TextFormatSummary?> TryDetectEncodingWithoutBom(Stream stream, CancellationToken cancellationToken)
         {
             TextFormatSummary? summary = null;
 
             NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector();
 
-            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, maxBytesToRead, cancellationToken);
+            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, MaxBytesToRead, cancellationToken);
 
             if (detectedEncoding != null)
             {

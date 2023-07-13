@@ -48,12 +48,16 @@ dotnet build
 | ```-t N```, ```--threads N```  | Number of parallel threads (default is number of CPU cores) | ```--threads 1``` |
 | ```-n```, ```--no-recursion```  | Scan directories non recursively |  |
 | ```-v```, ```--verbose```  | Print summary about each file individually |  |
+| ```--validate-full-xml```  | If set, XML documents will be validated completely |  |
+| ```--max-bytes-to-read N```  | Use only first N bytes to detect encoding of text files without BOM | ```--max-bytes-to-read 4096```  |
 
 ## Examples
 
-```./FileFormatDetector.Console.exe --threads 1 /home/user/documents /home/user/Downloads```
+```./FileFormatDetector.Console.exe --help```
 
-```./FileFormatDetector.Console.exe --no-recursion /home/user/Downloads```
+```./FileFormatDetector.Console.exe --threads 1 /home/user/documents /home/user/Downloads --max-bytes-to-read 4096```
+
+```./FileFormatDetector.Console.exe --no-recursion /home/user/Downloads --validate-full-xml```
 
 ```.\FileFormatDetector.Console.exe --no-recursion C:\Users\Konstantin\Documents```
 

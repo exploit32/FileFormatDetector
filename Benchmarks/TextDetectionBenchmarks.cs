@@ -31,7 +31,7 @@ For example, lowercase i would be represented in the ASCII encoding by binary 11
             
             using (MemoryStream stream = new MemoryStream(buffer))
             {
-                return await detector.ReadFormat(stream, null, CancellationToken.None);
+                return await detector.ReadFormat(stream, CancellationToken.None);
             }
         }
 

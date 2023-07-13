@@ -15,7 +15,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -38,7 +38,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -64,7 +64,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt", "-t", "6" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -91,7 +91,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt", "--threads", "6" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -118,7 +118,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--threads", "6", "--no-recursion" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -142,7 +142,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--threads", "6", "-n", "--verbose" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             var parameters = parser.Parse();
@@ -166,7 +166,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--help" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             //Assert
@@ -179,7 +179,7 @@ namespace Tests
             //Arrange
             string[] args = new string[] { "--wft" };
 
-            CommandLineParser parser = new CommandLineParser(args);
+            CommandLineParser parser = new CommandLineParser(args, new Parameter[0]);
 
             //Act
             //Assert

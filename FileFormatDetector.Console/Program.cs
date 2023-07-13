@@ -8,7 +8,19 @@ namespace FileFormatDetector.Console
 
         static async Task<int> Main(string[] args)
         {
-            var commandLineParser = new CommandLineParser(args);
+            FormatPluginsLoader loader = new FormatPluginsLoader(PluginsDirectory);
+
+            loader.LoadPlugins();
+
+            if (!loader.AnyPluginsLoaded)
+            {
+                System.Console.WriteLine($"No format pluging were found. Build solution to put them to {PluginsDirectory} directory");
+                return (int)ExitCodes.NoPlugins;
+            }
+
+            DetectorsConfigurator configurator = new DetectorsConfigurator(loader.BinaryFormatDetectors, loader.TextFormatDetectors, loader.TextBasedFormatDetectors);
+
+            var commandLineParser = new CommandLineParser(args, configurator.Parameters);
 
             AppConfiguration configuration;
 
@@ -28,6 +40,16 @@ namespace FileFormatDetector.Console
                 return (int)ExitCodes.InvalidArgs;
             }
 
+            try
+            {
+                configurator.ApplyParameters();
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine($"Error applying detector's parameters: {ex.Message}");
+                return (int)ExitCodes.InvalidArgs;
+            }
+
             CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
 
             System.Console.CancelKeyPress += (sender, args) =>
@@ -35,16 +57,6 @@ namespace FileFormatDetector.Console
                 cancellationTokenSource.Cancel();
                 args.Cancel = true;
             };
-
-            FormatPluginsLoader loader = new FormatPluginsLoader(PluginsDirectory);
-
-            loader.LoadPlugins();
-
-            if (!loader.AnyPluginsLoaded)
-            {
-                System.Console.WriteLine($"No format pluging were found. Build solution to put them to {PluginsDirectory} directory");
-                return (int)ExitCodes.NoPlugins;
-            }
 
             FormatDetector detector = new FormatDetector(configuration.DetectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
 
