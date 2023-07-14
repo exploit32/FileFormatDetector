@@ -244,7 +244,7 @@
     <None Update="Samples\Xml\car-rental-utf8.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Samples\Xml\GolfCountryClub-utf8.xml">
+    <None Update="Samples\Xml\GolfCountryClub-utf8-bom.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Samples\Xml\Invoice-iso-8859-1.xml">
@@ -262,10 +262,6 @@
     <None Update="Samples\Xml\simple-utf16le.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Samples\Xml\" />
   </ItemGroup>
 
 </Project>

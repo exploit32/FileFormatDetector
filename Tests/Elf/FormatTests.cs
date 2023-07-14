@@ -11,7 +11,7 @@ namespace Tests.Elf
     public class FormatTests
     {
         [Fact]
-        public async Task x64_linux()
+        public async Task x64LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-x64-bash");
@@ -33,7 +33,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task x86_Linux()
+        public async Task x86LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-x86-bash");
@@ -55,7 +55,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task ia64_HPUX()
+        public async Task ia64HPUXAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-HPUX-ia64-bash");
@@ -77,7 +77,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task Arm64_Linux()
+        public async Task Arm64LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-ARM64-bash");
@@ -99,7 +99,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task PowerPC_Linux()
+        public async Task PowerPCLinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-PowerPC-bash");
@@ -121,7 +121,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task s390_Linux()
+        public async Task s390LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-s390-bash");
@@ -143,7 +143,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task x86_Linux_Shared_Library()
+        public async Task x86LinuxSharedLibraryShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-lib-x86.so");
@@ -165,7 +165,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task x64_Linux_Shared_Library()
+        public async Task x64LinuxSharedLibraryShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-lib-x64.so");
@@ -187,7 +187,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task Sparc_Solaris()
+        public async Task SparcSolarisAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-solaris-sparc-ls");
@@ -209,7 +209,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task SparcV8_Linux()
+        public async Task SparcV8LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-SparcV8-bash");
@@ -231,7 +231,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task SuperH4_Linux()
+        public async Task SuperH4LinuxAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("elf-Linux-SuperH4-bash");
@@ -253,7 +253,7 @@ namespace Tests.Elf
         }
 
         [Fact]
-        public async Task MalformedElf()
+        public async Task MalformedElfShouldThrowException()
         {
             //Arrange
             byte[] file = new byte[] { 0x7F, 0x45, 0x4C, 0x46, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00 };

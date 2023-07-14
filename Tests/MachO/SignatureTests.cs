@@ -17,7 +17,7 @@ namespace Tests.MachO
         [InlineData(new byte[] { 0xca, 0xfe, 0xba, 0xbe })]
         [InlineData(new byte[] { 0xca, 0xfe, 0xba, 0xbf })]
         [InlineData(new byte[] { 0xce, 0xfa, 0xed, 0xfe, 0, 0 })]
-        public void CheckMagic(byte[] magic)
+        public void CorrectMachOMagicShouldBeFound(byte[] magic)
         {
             //Arrange
             MachOFormatDetector detector = new MachOFormatDetector();
@@ -34,7 +34,7 @@ namespace Tests.MachO
         [InlineData(new byte[] { 0xfe, })]
         [InlineData(new byte[] { })]
         [InlineData(new byte[] { 0x7F, (byte)'E', (byte)'L', (byte)'F' })]
-        public void CheckInvalidMagic(byte[] magic)
+        public void InvalidMachOMagicShouldBeIgnored(byte[] magic)
         {
             //Arrange
             MachOFormatDetector detector = new MachOFormatDetector();

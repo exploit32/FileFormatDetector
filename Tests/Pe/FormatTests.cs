@@ -6,7 +6,7 @@ namespace Tests.Pe
     public class FormatTests
     {
         [Fact]
-        public async Task X64App()
+        public async Task X64AppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-x64-cmd");
@@ -28,7 +28,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public async Task i386App()
+        public async Task i386AppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-x86-cmd");
@@ -50,7 +50,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public async Task ArmApp()
+        public async Task ArmAppShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-Windows-ARMv7-Thumb2LE-HelloWorld");
@@ -72,7 +72,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public async Task i386App2()
+        public async Task i386App2ShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-cygwin-ls.exe");
@@ -94,7 +94,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public async Task i386App3()
+        public async Task i386App3ShouldBeParsed()
         {
             //Arrange
             var stream = Utilities.GetBinaryStream("pe-mingw32-strip.exe");
@@ -116,7 +116,7 @@ namespace Tests.Pe
         }
 
         [Fact]
-        public async Task MalformedPE()
+        public async Task MalformedPEhouldThrowException()
         {
             //Arrange
             byte[] file = new byte[] { 0x4D, 0x5A, 0x90, 0x00, 0x03, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0x00, 0x00 };

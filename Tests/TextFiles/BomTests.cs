@@ -11,7 +11,7 @@ namespace Tests.TextFiles
     public class BomTests
     {
         [Fact]
-        public async Task Utf8()
+        public async Task Utf8BomShouldBeDetected()
         {
             //Arrange
             string text = "Hello";
@@ -25,7 +25,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf8OnlyBom()
+        public async Task Utf8OnlyBomShouldBeDetected()
         {
             //Arrange
             string text = "";
@@ -39,7 +39,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf16LE()
+        public async Task Utf16LEBomShouldBeDetected()
         {
             //Arrange
             string text = "Hello";
@@ -53,7 +53,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf16LEOnlyBom()
+        public async Task Utf16LEOnlyBomShouldBeDetected()
         {
             //Arrange
             string text = "";
@@ -67,7 +67,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf16BE()
+        public async Task Utf16BEBomShouldBeDetected()
         {
             //Arrange
             string text = "Hello";
@@ -81,7 +81,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf16BEOnlyBom()
+        public async Task Utf16BEOnlyBomShouldBeDetected()
         {
             //Arrange
             string text = "";
@@ -95,7 +95,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf32LE()
+        public async Task Utf32LEBomShouldBeDetected()
         {
             //Arrange
             string text = "Hello";
@@ -109,7 +109,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf32LEOnlyBom()
+        public async Task Utf32LEOnlyBomShouldBeDetected()
         {
             //Arrange
             string text = "";
@@ -123,7 +123,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf32BE()
+        public async Task Utf32BEBomShouldBeDetected()
         {
             //Arrange
             string text = "Hello";
@@ -137,7 +137,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf32BEOnlyBom()
+        public async Task Utf32BEOnlyBomShouldBeDetected()
         {
             //Arrange
             string text = "";
@@ -151,7 +151,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf1()
+        public async Task Utf1BomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
@@ -165,7 +165,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Utf7()
+        public async Task Utf7BomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
@@ -179,7 +179,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task UtfEbcdict()
+        public async Task UtfEbcdictBomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
@@ -193,7 +193,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Gb18030()
+        public async Task Gb18030BomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
@@ -208,7 +208,7 @@ namespace Tests.TextFiles
 
 
         [Fact]
-        public async Task Bocu1()
+        public async Task Bocu1BomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use
@@ -222,7 +222,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Scsu()
+        public async Task ScsuBomShouldBeDetected()
         {
             //Arrange
             byte[] text = Encoding.ASCII.GetBytes("Hello"); // ASCII text instead of real encoding use

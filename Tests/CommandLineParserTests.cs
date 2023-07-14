@@ -10,7 +10,7 @@ namespace Tests
     public class CommandLineParserTests
     {
         [Fact]
-        public void OneDirectory()
+        public void OneDirectoryArgShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows" };
@@ -33,7 +33,7 @@ namespace Tests
         }
 
         [Fact]
-        public void SeveralDirectories()
+        public void SeveralDirectoriesArgsShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt" };
@@ -59,7 +59,7 @@ namespace Tests
         }
 
         [Fact]
-        public void SeveralDirectoriesAndThreads()
+        public void SeveralDirectoriesAndThreadsArgsShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt", "-t", "6" };
@@ -86,7 +86,7 @@ namespace Tests
         }
 
         [Fact]
-        public void SeveralDirectoriesAndThreadsLong()
+        public void SeveralDirectoriesAndThreadsLongArgsShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "C:\\Users", "C:\\test.txt", "--threads", "6" };
@@ -113,7 +113,7 @@ namespace Tests
         }
 
         [Fact]
-        public void OneDirectoryThreadsLongNoRecursion()
+        public void OneDirectoryThreadsLongNoRecursionArgsShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--threads", "6", "--no-recursion" };
@@ -137,7 +137,7 @@ namespace Tests
         }
 
         [Fact]
-        public void OneDirectoryThreadsLongNoRecursionVerbose()
+        public void OneDirectoryThreadsLongNoRecursionVerboseArgsShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--threads", "6", "-n", "--verbose" };
@@ -161,7 +161,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Help()
+        public void HelpArgShouldBeParsed()
         {
             //Arrange
             string[] args = new string[] { "C:\\Windows", "--help" };
@@ -174,7 +174,7 @@ namespace Tests
         }
 
         [Fact]
-        public void UnknownParameter()
+        public void UnknownParameterShouldThrowException()
         {
             //Arrange
             string[] args = new string[] { "--wft" };

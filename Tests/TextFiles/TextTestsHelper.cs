@@ -18,70 +18,31 @@ namespace Tests.TextFiles
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        internal static async Task<DetectableEncoding?> EncodeAndDetect(string text, Encoding encoding, byte[]? bom = null)
+        internal static async Task<FormatSummary?> EncodeAndDetectFull(string text, Encoding encoding, byte[]? bom = null, long? lengthLimit = null)
         {
             var bytes = encoding.GetBytes(text);
 
-            NonBomEncodingDetector detector = new NonBomEncodingDetector();
-
-            DetectableEncoding? detectedEncoding;
-
-            if (bom != null)
-            {
-                byte[] newBuffer = new byte[bytes.Length + bom.Length];
-
-                Array.Copy(bom, newBuffer, bom.Length);
-                Array.Copy(bytes, 0, newBuffer, bom.Length, bytes.Length);
-
-                bytes = newBuffer;
-            }
-
-            using (MemoryStream stream = new MemoryStream(bytes))
-            {
-                detectedEncoding = await detector.TryDetectEncoding(stream, null, CancellationToken.None);
-            }
-
-            return detectedEncoding;
+            return await EncodeAndDetectFull(bytes, bom, lengthLimit);
         }
 
-        internal static async Task<FormatSummary?> EncodeAndDetectFull(string text, Encoding encoding, byte[]? bom = null)
+        internal static async Task<FormatSummary?> EncodeAndDetectFull(byte[] encodedText, byte[]? bom = null, long? lengthLimit = null)
         {
-            var bytes = encoding.GetBytes(text);
-
             TextFilesDetector detector = new TextFilesDetector();
+            detector.MaxBytesToRead = lengthLimit;
 
             FormatSummary? detectedEncoding;
 
             if (bom != null)
             {
-                byte[] newBuffer = new byte[bytes.Length + bom.Length];
+                byte[] newBuffer = new byte[encodedText.Length + bom.Length];
 
                 Array.Copy(bom, newBuffer, bom.Length);
-                Array.Copy(bytes, 0, newBuffer, bom.Length, bytes.Length);
+                Array.Copy(encodedText, 0, newBuffer, bom.Length, encodedText.Length);
 
-                bytes = newBuffer;
+                encodedText = newBuffer;
             }
 
-            using (MemoryStream stream = new MemoryStream(bytes))
-            {
-                detectedEncoding = await detector.ReadFormat(stream, CancellationToken.None);
-            }
-
-            return detectedEncoding;
-        }
-
-        internal static async Task<FormatSummary?> EncodeAndDetectFull(byte[] encodedText, byte[] bom)
-        {
-            TextFilesDetector detector = new TextFilesDetector();
-
-            FormatSummary? detectedEncoding;
-
-            byte[] newBuffer = new byte[encodedText.Length + bom.Length];
-
-            Array.Copy(bom, newBuffer, bom.Length);
-            Array.Copy(encodedText, 0, newBuffer, bom.Length, encodedText.Length);
-
-            using (MemoryStream stream = new MemoryStream(newBuffer))
+            using (MemoryStream stream = new MemoryStream(encodedText))
             {
                 detectedEncoding = await detector.ReadFormat(stream, CancellationToken.None);
             }

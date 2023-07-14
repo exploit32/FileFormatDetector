@@ -9,8 +9,15 @@ using Tools;
 
 namespace TextFilesFormat
 {
+    /// <summary>
+    /// Detector ot text files
+    /// </summary>
     public class TextFilesDetector : ITextFormatDetector, IConfigurableDetector
     {
+        private const string MaxBytesToReadParameterName = "max-bytes-to-read";
+
+        private static ParameterDescription[] Parameters = new ParameterDescription[] { new ParameterDescription(MaxBytesToReadParameterName, "Detect format by first N bytes", false) };
+
         private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
             DetectableEncoding.Utf1,
@@ -32,29 +39,12 @@ namespace TextFilesFormat
         private static Lazy<int> MinPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
         private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
-        private const string MaxBytesToReadParameterName = "max-bytes-to-read";
-
-        private static ParameterDescription[] Parameters = new ParameterDescription[] { new ParameterDescription(MaxBytesToReadParameterName, "Detect format by first N bytes", false) };
-
+        /// <summary>
+        /// Use only first N bytes to detect encoding
+        /// </summary>
         public long? MaxBytesToRead { get; set; }
 
         public IEnumerable<ParameterDescription> GetParameters() => Parameters;
-
-        public async Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
-        {
-            if (stream.Length == 0)
-                return null;
-
-            TextFormatSummary? summary = await TryDetectEncodingWithBom(stream);
-
-            if (summary == null)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                summary = await TryDetectEncodingWithoutBom(stream, cancellationToken);
-            }
-
-            return summary;
-        }
 
         public void SetParameter(string key, string value)
         {
@@ -74,6 +64,24 @@ namespace TextFilesFormat
                     throw new ArgumentException($"Cannot parse {key} value {value}. Value should be positive long integer");
             }
         }
+
+
+        public async Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
+        {
+            if (stream.Length == 0)
+                return null;
+
+            TextFormatSummary? summary = await TryDetectEncodingWithBom(stream);
+
+            if (summary == null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                summary = await TryDetectEncodingWithoutBom(stream, cancellationToken);
+            }
+
+            return summary;
+        }
+
 
         private DetectableEncoding? CheckSignatures(ReadOnlySpan<byte> fileStart, DetectableEncoding[] encodings)
         {

@@ -8,10 +8,10 @@ using TextFilesFormat;
 
 namespace Tests.TextFiles
 {
-    public class Utf32Tests
+    public class Utf32NoBomTests
     {
         [Fact]
-        public async Task EnglishText()
+        public async Task EnglishTextShouldBeDetected()
         {
             //Arrange
             string text = "Hello from utf32";
@@ -29,7 +29,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task EnglishAndRussianText()
+        public async Task EnglishAndRussianTextShouldBeDetected()
         {
             //Arrange
             string text = "Hello from utf32. Привет, это UTF-32";
@@ -47,7 +47,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Emojies()
+        public async Task EmojiesShouldBeDetected()
         {
             //Arrange
             string text = "🐕💉💉💉";
@@ -65,7 +65,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task RegularTextAndEmojies()
+        public async Task RegularTextAndEmojiesShouldBeDetected()
         {
             //Arrange
             string text = "Hello 🐕💉💉💉";

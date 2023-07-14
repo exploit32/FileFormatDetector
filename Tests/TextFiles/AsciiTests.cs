@@ -11,7 +11,7 @@ namespace Tests.TextFiles
     public class AsciiTests
     {
         [Fact]
-        public async Task Simple()
+        public async Task SimpleTextShouldBeDetected()
         {
             //Arrange
             string text = "This is simple text";
@@ -25,7 +25,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Multiline()
+        public async Task MultilineTextShouldBeDetected()
         {
             //Arrange
             string text = "This is simple text\r\nwith several lines";
@@ -39,7 +39,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task MultilineWithTab()
+        public async Task MultilineTextWithTabsShouldBeDetected()
         {
             //Arrange
             string text = "This is simple text\r\nwith several\tlines";

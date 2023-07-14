@@ -8,10 +8,10 @@ using TextFilesFormat;
 
 namespace Tests.TextFiles
 {
-    public class Utf8Tests
+    public class Utf8NoBomTests
     {
         [Fact]
-        public async Task TestRussianText()
+        public async Task RussianTextShouldBeDetected()
         {
             //Arrange
             string text = "Приветики";
@@ -25,7 +25,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task TestRussianTextWithEvenTextLength()
+        public async Task RussianTextWithEvenLengthShouldBeDetected()
         {
             //Arrange
             string text = "Привет";
@@ -39,7 +39,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task TestEnglishAndRussianText()
+        public async Task EnglishAndRussianTextShouldBeDetected()
         {
             //Arrange
             string text = "Hello, Hi\nПривет!";
@@ -53,7 +53,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task MixedTextWithoutSpaces()
+        public async Task MixedTextWithoutSpacesShouldBeDetected()
         {
             //Arrange
             string text = "HelloПривет";
@@ -67,7 +67,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task ChineeseText()
+        public async Task ChineeseTextShouldBeDetected()
         {
             //Arrange
             string text = "關於我和鬼變成家人的那件事》是一部2023年的臺灣動作喜劇電影，由程偉豪執導，許光漢、林柏宏、王淨主演；劇本由吳瑾蓉與程偉豪擔任編劇";
@@ -81,7 +81,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Emojies()
+        public async Task EmojiesShouldBeDetected()
         {
             //Arrange
             string text = "🐕💉💉💉";

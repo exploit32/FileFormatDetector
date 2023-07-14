@@ -8,10 +8,10 @@ using TextFilesFormat;
 
 namespace Tests.TextFiles
 {
-    public class Utf16Tests
+    public class Utf16NoBomTests
     {
         [Fact]
-        public async Task EnglishText()
+        public async Task EnglishTextShouldBeDetected()
         {
             //Arrange
             string text = "Hello from utf16";
@@ -29,7 +29,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task EnglishTextWithoutSpaces()
+        public async Task EnglishTextWithoutSpacesShouldBeDetected()
         {
             //Arrange
             string text = "Hellofromutf16";
@@ -47,7 +47,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task ChineeseText()
+        public async Task ChineeseTextShouldBeDetected()
         {
             //Arrange
             string text = "關於我和鬼變成家人的那件事》是一部2023年的臺灣動作喜劇電影，由程偉豪執導，許光漢、林柏宏、王淨主演；劇本由吳瑾蓉與程偉豪擔任編劇";
@@ -65,7 +65,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task MixedTextWithoutSpaces()
+        public async Task MixedTextWithoutSpacesShouldBeDetected()
         {
             //Arrange
             string text = "HelloТест";
@@ -83,10 +83,10 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task EnglishAndRussianText()
+        public async Task EnglishAndRussianTextShouldBeDetected()
         {
             //Arrange
-            string text = "Hello from utf32. Привет, это UTF-16";
+            string text = "Hello from utf16. Привет, это UTF-16";
 
             //Act
             FormatSummary? formatLE = await TextTestsHelper.EncodeAndDetectFull(text, Encoding.Unicode);
@@ -101,7 +101,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task RussianTextWithoutSpaces()
+        public async Task RussianTextWithoutSpacesShouldBeDetected()
         {
             //Arrange
             string text = "Привет";
@@ -119,7 +119,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task Emojies()
+        public async Task EmojiesShouldBeDetected()
         {
             //Arrange
             string text = "🐕💉💉💉";
@@ -137,7 +137,7 @@ namespace Tests.TextFiles
         }
 
         [Fact]
-        public async Task RegularTextAndEmojies()
+        public async Task RegularTextAndEmojiesShouldBeDetected()
         {
             //Arrange
             string text = "Hello 🐕💉💉💉";

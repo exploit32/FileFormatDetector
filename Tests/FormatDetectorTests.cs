@@ -23,7 +23,7 @@ namespace Tests
         public string UnknownSamplesDirectory => Path.Combine(Directory.GetCurrentDirectory(), "Samples", "Unknown");
 
         [Fact]
-        public async Task DetectBinaryFiles()
+        public async Task BinaryFilesShouldBeDetected()
         {
             //Arrange
             //Act
@@ -36,7 +36,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task DetectTextFilesWithBom()
+        public async Task TextFilesWithBomShouldBeDetected()
         {
             //Arrange
             //Act
@@ -47,7 +47,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task DetectTextFilesWithoutBom()
+        public async Task TextFilesWithoutBomShouldBeDetected()
         {
             //Arrange
             //Act
@@ -58,7 +58,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task DetectXmlFiles()
+        public async Task XmlFilesShouldBeDetected()
         {
             //Arrange
             //Act
@@ -69,7 +69,7 @@ namespace Tests
         }
 
         [Fact]
-        public async Task TestUnknownFiles()
+        public async Task UnknownFilesShouldBeDetectedAsUnknown()
         {
             //Arrange
             //Act

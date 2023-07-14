@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FormatApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,46 +10,19 @@ namespace Tests.TextFiles
 {
     public class Windows1251Tests
     {
-        [Fact]
-        public async Task TestRussianText()
+        [Theory]
+        [InlineData("Привет!")]
+        [InlineData("При  вет")]
+        [InlineData("Hello, Hi\nПривет!")]
+        public async Task Windows1251TextShouldBeDetected(string text)
         {
             //Arrange
-            string text = "Привет!";
-
             //Act
-            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
+            FormatSummary? format = await TextTestsHelper.EncodeAndDetectFull(text, TextTestsHelper.Windows1251);
 
             //Assert
-            Assert.NotNull(encoding);
-            Assert.Equal(DetectableEncoding.Windows125x, encoding);
-        }
-
-        [Fact]
-        public async Task TestRussianTextWithEvenTextLength()
-        {
-            //Arrange
-            string text = "При  вет";
-
-            //Act
-            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
-
-            //Assert
-            Assert.NotNull(encoding);
-            Assert.Equal(DetectableEncoding.Windows125x, encoding);
-        }
-
-        [Fact]
-        public async Task TestEnglishAndRussianText()
-        {
-            //Arrange
-            string text = "Hello, Hi\nПривет!";
-
-            //Act
-            DetectableEncoding? encoding = await TextTestsHelper.EncodeAndDetect(text, TextTestsHelper.Windows1251);
-
-            //Assert
-            Assert.NotNull(encoding);
-            Assert.Equal(DetectableEncoding.Windows125x, encoding);
+            Assert.NotNull(format);
+            TextTestsHelper.CheckFormat(DetectableEncoding.Windows125x, false, format);
         }
     }
 }
