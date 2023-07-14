@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,9 +30,41 @@ namespace FileFormatDetector.Console
             foreach (var parameter in Parameters)
             {
                 if (parameter.ValueSet)
-                    parameter.Detector.SetParameter(parameter.Description.Key, parameter.Value!);
+                {
+                    if (parameter.ParameterType == typeof(string))
+                    {
+                        parameter.Property.SetValue(parameter.Detector, parameter.Value);
+                    } 
+                    else if (parameter.ParameterType == typeof(int) || parameter.ParameterType == typeof(int?))
+                    {
+                        ParseAndSet<int>(parameter, int.TryParse);
+                    }
+                    else if (parameter.ParameterType == typeof(long) || parameter.ParameterType == typeof(long?))
+                    {
+                        ParseAndSet<long>(parameter, long.TryParse);
+                    }
+                    else if (parameter.ParameterType == typeof(bool) || parameter.ParameterType == typeof(bool?))
+                    {
+                        ParseAndSet<bool>(parameter, bool.TryParse);
+                    }
+                }
             }
         }
+
+        delegate bool TryParseDelegate<T>(string text, out T value);
+
+        private void ParseAndSet<T>(Parameter parameter, TryParseDelegate<T> tryParse)
+        {
+            if (tryParse(parameter.Value, out T parsed))
+            {
+                parameter.Property.SetValue(parameter.Detector, parsed);
+            }
+            else
+            {
+                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.Detector.GetType().Name}");
+            }
+        }
+        
 
         private IEnumerable<Parameter> LoadDetectorsParameters()
         {
@@ -48,20 +81,28 @@ namespace FileFormatDetector.Console
         {
             foreach (var detector in detectors)
             {
-                if (detector is IConfigurableDetector)
+                var properties = detector.GetType().GetProperties();
+
+                foreach (var prop in properties)
                 {
-                    var configurableDetector = (IConfigurableDetector)detector;
+                    var parameterAttribute = prop.GetCustomAttribute<ParameterAttribute>(true);
 
-                    var detectorParameters = configurableDetector.GetParameters();
-
-                    foreach (var parameter in detectorParameters)
+                    if (parameterAttribute != null)
                     {
-                        var existing = parameters.FirstOrDefault(p => p.Description.Key.Equals(parameter.Key, StringComparison.InvariantCultureIgnoreCase));
+                        var existing = parameters.FirstOrDefault(p => p.Key.Equals(parameterAttribute.Key, StringComparison.InvariantCultureIgnoreCase));
 
                         if (existing != null)
-                            throw new ArgumentException($"Detector {detector.GetType().Name} declares parameter {parameter.Key} which is already declared by detector {existing.Detector.GetType().Name}");
+                            throw new ArgumentException($"Detector {detector.GetType().Name} declares parameter {parameterAttribute.Key} which is already declared by detector {existing.Detector.GetType().Name}");
 
-                        parameters.Add(new Parameter(configurableDetector, parameter));
+                        parameters.Add(new Parameter()
+                        {
+                            Key = parameterAttribute.Key,
+                            Description = parameterAttribute.Description,
+                            Detector = detector,
+                            Property = prop,
+                            ParameterType = prop.PropertyType,
+                            IsFlag = prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?),
+                        });
                     }
                 }
             }

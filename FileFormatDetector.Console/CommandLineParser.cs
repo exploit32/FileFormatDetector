@@ -70,17 +70,21 @@ namespace FileFormatDetector.Console
 
                         foreach (var parameter in _detectorParameters)  
                         {
-                            if (currentTrimmed.Equals(parameter.Description.Key, StringComparison.InvariantCultureIgnoreCase))
+                            if (currentTrimmed.Equals(parameter.Key, StringComparison.InvariantCultureIgnoreCase))
                             {
                                 if (parameter.ValueSet)
                                     throw new ArgumentException($"Value for parameter {currentTrimmed} was already set");
 
-                                if (!parameter.Description.IsFlag)
+                                if (!parameter.IsFlag)
                                 {
                                     if (index < _args.Length)
                                         parameter.Value = _args[index++];
                                     else
                                         throw new ArgumentException($"Error parsing {currentTrimmed} parameter: value is missing");
+                                }
+                                else
+                                {
+                                    parameter.Value = true.ToString();
                                 }
 
                                 parameter.ValueSet = true;
@@ -124,21 +128,37 @@ namespace FileFormatDetector.Console
                 System.Console.WriteLine();
                 System.Console.WriteLine("Detector's options:");
                 
-                var paramsDescription = _detectorParameters.Select(p => (Name: $"--{p.Description.Key}{(p.Description.IsFlag ? "" : " (value)")}:", Description: p.Description.Description, Detector: p.Detector.GetType().Name)).ToList();
+                var paramsDescription = _detectorParameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.Detector.GetType().Name)).ToList();
 
                 int parameterNameLength = paramsDescription.Max(p => p.Name.Length);
-                int parameterDescriptionLength = paramsDescription.Max(p => p.Description.Length);
+                int parameterDescriptionLength = paramsDescription
+                    .SelectMany(p => p.Description.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+                    .Max(v => v.Length);
 
-                int padding = 3;
+                int padding = 2;
 
                 foreach (var parameter in paramsDescription)
                 {
-                    System.Console.WriteLine("{0}{1}{2}{3}({4})",
-                        parameter.Name,
-                        new string(' ', parameterNameLength - parameter.Name.Length + padding),
-                        parameter.Description,
-                        new string(' ', parameterDescriptionLength - parameter.Description.Length + padding),
-                        parameter.Detector);
+                    var descriptionLines = parameter.Description.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+                    for (int i = 0; i < descriptionLines.Length; i++)
+                    {
+                        if (i == 0)
+                        {
+                            System.Console.WriteLine("{0}{1}{2}{3}({4})",
+                                parameter.Name,
+                                new string(' ', parameterNameLength - parameter.Name.Length + padding),
+                                descriptionLines[i],
+                                new string(' ', parameterDescriptionLength - descriptionLines[i].Length + padding),
+                                parameter.Detector);
+                        }
+                        else
+                        {
+                            System.Console.WriteLine("{0}{1}",
+                                new string(' ', parameterNameLength + padding),
+                                descriptionLines[i]);
+                        }
+                    }
                 }
             }
         }

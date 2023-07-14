@@ -49,7 +49,7 @@ dotnet build
 | ```-n```, ```--no-recursion```  | Scan directories non recursively |  |
 | ```-v```, ```--verbose```  | Print summary about each file individually |  |
 | ```--validate-full-xml```  | If set, XML documents will be validated completely |  |
-| ```--max-bytes-to-read N```  | Use only first N bytes to detect encoding of text files without BOM | ```--max-bytes-to-read 4096```  |
+| ```--file-scan-size-limit N```  | Number of bytes to scan to detect encoding of text files without BOM | ```--max-bytes-to-read 4096```  |
 
 ## Examples
 

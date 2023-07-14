@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace FormatApi
 {
     /// <summary>
-    /// Description of detector's parameter
+    /// Attribute that indicates configurable parameter
     /// </summary>
-    public class ParameterDescription
+    public class ParameterAttribute: Attribute
     {
         /// <summary>
         /// Parameter key. Will be used in command line arguments
@@ -21,16 +21,10 @@ namespace FormatApi
         /// </summary>
         public string Description { get; }
 
-        /// <summary>
-        /// Indicates that parameter doesn't have value
-        /// </summary>
-        public bool IsFlag { get; }
-
-        public ParameterDescription(string key, string description, bool isFlag)
+        public ParameterAttribute(string key, string description)
         {
             Key = key;
             Description = description;
-            IsFlag = isFlag;
         }
     }
 }

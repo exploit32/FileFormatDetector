@@ -28,7 +28,7 @@ namespace Tests.TextFiles
         internal static async Task<FormatSummary?> EncodeAndDetectFull(byte[] encodedText, byte[]? bom = null, long? lengthLimit = null)
         {
             TextFilesDetector detector = new TextFilesDetector();
-            detector.MaxBytesToRead = lengthLimit;
+            detector.FileScanSizeLimit = lengthLimit;
 
             FormatSummary? detectedEncoding;
 

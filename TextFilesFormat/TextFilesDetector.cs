@@ -12,12 +12,8 @@ namespace TextFilesFormat
     /// <summary>
     /// Detector ot text files
     /// </summary>
-    public class TextFilesDetector : ITextFormatDetector, IConfigurableDetector
+    public class TextFilesDetector : ITextFormatDetector
     {
-        private const string MaxBytesToReadParameterName = "max-bytes-to-read";
-
-        private static ParameterDescription[] Parameters = new ParameterDescription[] { new ParameterDescription(MaxBytesToReadParameterName, "Detect format by first N bytes", false) };
-
         private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
             DetectableEncoding.Utf1,
@@ -40,30 +36,10 @@ namespace TextFilesFormat
         private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
         /// <summary>
-        /// Use only first N bytes to detect encoding
+        /// Number of bytes to scan for probabilistic format detection. Null means no boundary
         /// </summary>
-        public long? MaxBytesToRead { get; set; }
-
-        public IEnumerable<ParameterDescription> GetParameters() => Parameters;
-
-        public void SetParameter(string key, string value)
-        {
-            if (key == MaxBytesToReadParameterName)
-            {
-                if (long.TryParse(value, out var maxBytesToRead))
-                {
-                    if (maxBytesToRead <= 0)
-                        throw new ArgumentException($"{key} must be greater than 0", key);
-
-                    if (maxBytesToRead % 4 != 0)
-                        throw new ArgumentException($"{key} value should be multiple of 4", key);
-
-                    MaxBytesToRead = maxBytesToRead;
-                }
-                else
-                    throw new ArgumentException($"Cannot parse {key} value {value}. Value should be positive long integer");
-            }
-        }
+        [Parameter("file-scan-size-limit", "Number of bytes to scan for probabilistic format detection.\nShould be greater than 0 and be a multiple of 4.")]
+        public long? FileScanSizeLimit { get; set; }
 
 
         public async Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
@@ -132,7 +108,7 @@ namespace TextFilesFormat
 
             NonBomEncodingDetector nonBomEncodingDetector = new NonBomEncodingDetector();
 
-            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, MaxBytesToRead, cancellationToken);
+            var detectedEncoding = await nonBomEncodingDetector.TryDetectEncoding(stream, FileScanSizeLimit, cancellationToken);
 
             if (detectedEncoding != null)
             {

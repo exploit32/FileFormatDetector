@@ -158,7 +158,7 @@ namespace Tests.Xml
         private async Task<FormatSummary?> DetectEncodingAndXmlFormat(string path, long? maxBytes = null, bool validateFullXml = true)
         {
             TextFilesDetector textDetector = new TextFilesDetector();
-            textDetector.MaxBytesToRead = maxBytes;
+            textDetector.FileScanSizeLimit = maxBytes;
 
             XmlFormatDetector xmlDetector = new XmlFormatDetector();
             xmlDetector.ValidateFullXml = validateFullXml;

@@ -3,20 +3,16 @@ using System.Text;
 
 namespace XmlFormat
 {
-    public class XmlFormatDetector : ITextBasedFormatDetector, IConfigurableDetector
+    public class XmlFormatDetector : ITextBasedFormatDetector
     {
         static XmlFormatDetector()
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         }
 
-        const string ValidateFullXmlParameterName = "validate-full-xml";
 
-        private static ParameterDescription[] Parameters = new ParameterDescription[] { new ParameterDescription(ValidateFullXmlParameterName, "Falidate full xml document", true) };
-
+        [Parameter("validate-full-xml", "Validate full xml document.\nBy default the file is read up to the first\ncorrect non-whitespace element")]
         public bool ValidateFullXml { get; set; } = false;
-
-        public IEnumerable<ParameterDescription> GetParameters() => Parameters;
 
         public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary)
         {
@@ -51,14 +47,6 @@ namespace XmlFormat
             }
 
             return null;
-        }
-
-        public void SetParameter(string key, string value)
-        {
-            if (key == ValidateFullXmlParameterName)
-            {
-                ValidateFullXml = true;
-            }
         }
     }
 }

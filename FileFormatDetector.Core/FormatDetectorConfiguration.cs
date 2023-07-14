@@ -17,10 +17,5 @@ namespace FileFormatDetector.Core
         /// Scan directories recursively
         /// </summary>
         public bool Recursive { get; set; } = true;
-
-        /// <summary>
-        /// Number of bytes to scan for probabilistic format detection. Null means no boundary.
-        /// </summary>
-        public long? FileScanSizeLimit { get; set; }
     }
 }
