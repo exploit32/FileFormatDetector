@@ -173,7 +173,7 @@ namespace Tests.Xml
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                xmlFormat = await xmlDetector.ReadFormat(stream, textFormat);
+                xmlFormat = await xmlDetector.ReadFormat(stream, textFormat, CancellationToken.None);
             }
 
             return xmlFormat;

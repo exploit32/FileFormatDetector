@@ -10,7 +10,7 @@ namespace XmlFormat
 
     internal class XmlValidator
     {
-        public async Task<XmlValidationResult> Validate(Stream stream, Encoding encoding, ValidationMethod validationMethod)
+        public async Task<XmlValidationResult> Validate(Stream stream, Encoding encoding, ValidationMethod validationMethod, CancellationToken cancellationToken)
         {
             bool xmlValid = true;
             string xmlDeclarationEncoding = string.Empty;
@@ -20,7 +20,8 @@ namespace XmlFormat
                 ValidationFlags = System.Xml.Schema.XmlSchemaValidationFlags.None,
                 ValidationType = ValidationType.None,
                 DtdProcessing = DtdProcessing.Ignore,
-                CloseInput = false
+                CloseInput = false,
+                Async = true,
             };
 
             using (StreamReader reader = new StreamReader(stream, encoding, leaveOpen: true))
@@ -28,7 +29,7 @@ namespace XmlFormat
             {
                 try
                 {
-                    while (xmlReader.Read())
+                    while (await xmlReader.ReadAsync())
                     {
                         if (xmlReader.NodeType == XmlNodeType.XmlDeclaration)
                         {
@@ -37,6 +38,8 @@ namespace XmlFormat
 
                         if (validationMethod == ValidationMethod.UntilFirstNode && xmlReader.NodeType != XmlNodeType.Whitespace)
                             break;
+
+                        cancellationToken.ThrowIfCancellationRequested();
                     }
                 }
                 catch (Exception)
@@ -57,6 +60,6 @@ namespace XmlFormat
     {
         public bool Valid { get; init; }
 
-        public string XmlDeclarationEncoding { get; init; }
+        public string? XmlDeclarationEncoding { get; init; }
     }
 }

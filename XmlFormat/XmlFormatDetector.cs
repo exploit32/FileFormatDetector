@@ -14,7 +14,7 @@ namespace XmlFormat
         [Parameter("validate-full-xml", "Validate full xml document.\nBy default the file is read up to the first\ncorrect non-whitespace element")]
         public bool ValidateFullXml { get; set; } = false;
 
-        public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary)
+        public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
             if (textFormatSummary.CodePage == 0)
                 throw new FormatException($"Cannot read encoding {textFormatSummary.EncodingName}");
@@ -32,7 +32,7 @@ namespace XmlFormat
 
             XmlValidator validator = new XmlValidator();
 
-            var validationResult = await validator.Validate(stream, encoding, ValidateFullXml ? ValidationMethod.Full : ValidationMethod.UntilFirstNode);
+            var validationResult = await validator.Validate(stream, encoding, ValidateFullXml ? ValidationMethod.Full : ValidationMethod.UntilFirstNode, cancellationToken);
 
             if (validationResult.Valid)
             {
@@ -42,7 +42,7 @@ namespace XmlFormat
                     EncodingFullName = textFormatSummary.EncodingFullName,
                     EncodingName = textFormatSummary.EncodingName,
                     HasBOM = textFormatSummary.HasBOM,
-                    XmlDeclarationEncoding = validationResult.XmlDeclarationEncoding,
+                    XmlDeclarationEncoding = validationResult.XmlDeclarationEncoding ?? string.Empty,
                 };
             }
 

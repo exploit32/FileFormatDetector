@@ -229,7 +229,7 @@ namespace Tests.Xml
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                format = await detector.ReadFormat(stream, new FormatApi.TextFormatSummary() { CodePage = encoding.CodePage, EncodingName = encoding.EncodingName, HasBOM = true });
+                format = await detector.ReadFormat(stream, new FormatApi.TextFormatSummary() { CodePage = encoding.CodePage, EncodingName = encoding.EncodingName, HasBOM = true }, CancellationToken.None);
             }
 
             return format;
