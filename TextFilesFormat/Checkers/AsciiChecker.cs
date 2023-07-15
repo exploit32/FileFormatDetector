@@ -12,55 +12,28 @@ namespace TextFilesFormat.Checkers
 
         public bool HasControlCharsLower0x20 { get; set; } = false;
 
-        public bool HasNulls { get; private set; } = false;
+        public bool MayBeAscii => !HasValuesGreater0x7F && !HasControlCharsLower0x20;
 
-        public bool MayBeAscii => !HasNulls && !HasValuesGreater0x7F && !HasControlCharsLower0x20;
-
-        public bool MayBeWindows1251 => !HasNulls && !HasControlCharsLower0x20;
+        public bool MayBeWindows1251 => !HasControlCharsLower0x20;
 
         public bool CheckValidRange(ReadOnlySpan<byte> buffer)
         {
-            if (!HasControlCharsLower0x20)
-                HasControlCharsLower0x20 = CheckLowerControlChars(buffer);
+            if (!HasControlCharsLower0x20 || !HasValuesGreater0x7F)
+                CheckLowerControlChars(buffer);
 
-            if (!HasValuesGreater0x7F)
-                HasValuesGreater0x7F = CheckValuesGreater0x7F(buffer);
-
-            if (!HasNulls)
-                HasNulls = CheckNulls(buffer);
-
-            return !HasValuesGreater0x7F || !HasValuesGreater0x7F || !HasNulls;
+            return !HasValuesGreater0x7F || !HasValuesGreater0x7F;
         }
 
-        private bool CheckLowerControlChars(ReadOnlySpan<byte> buffer)
+        private void CheckLowerControlChars(ReadOnlySpan<byte> buffer)
         {
-            for (int i = 0; i < buffer.Length; i++)
+            foreach (byte c in buffer)
             {
-                if (buffer[i] < 0x20 && buffer[i] != '\r' && buffer[i] != '\n' && buffer[i] != '\t')
-                    return true;
+                if (c < 0x20 && c != '\r' && c != '\n' && c != '\t')
+                    HasControlCharsLower0x20 = true;
+
+                if (c >= 0x7F)
+                    HasValuesGreater0x7F = true;
             }
-
-            return false;
-        }
-
-        private bool CheckValuesGreater0x7F(ReadOnlySpan<byte> buffer)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                if (buffer[i] >= 0x7F)
-                    return true;
-            }
-
-            return false;
-        }
-
-        private bool CheckNulls(ReadOnlySpan<byte> buffer)
-        {
-            for (int i = 0; i < buffer.Length; i++)
-                if (buffer[i] == 0)
-                    return true;
-
-            return false;
         }
     }
 }
