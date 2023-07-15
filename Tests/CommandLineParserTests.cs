@@ -49,7 +49,7 @@ namespace Tests
             Assert.False(parser.HelpRequested(args));
             Assert.NotNull(parameters);
 
-            Assert.Equal(3, parameters.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Count());
 
             Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.Equal("C:\\Users", parameters.Paths[1]);
@@ -76,7 +76,7 @@ namespace Tests
             Assert.False(parser.HelpRequested(args));
             Assert.NotNull(parameters);
 
-            Assert.Equal(3, parameters.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Count());
 
             Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.Equal("C:\\Users", parameters.Paths[1]);
@@ -104,7 +104,7 @@ namespace Tests
             Assert.False(parser.HelpRequested(args));
             Assert.NotNull(parameters);
 
-            Assert.Equal(3, parameters.Paths.Length);
+            Assert.Equal(3, parameters.Paths.Count());
 
             Assert.Equal("C:\\Windows", parameters.Paths[0]);
             Assert.Equal("C:\\Users", parameters.Paths[1]);

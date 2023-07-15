@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FormatApi
 {
-    public class UnknownFormatSummary : FormatSummary, IEquatable<UnknownFormatSummary>
+    public sealed class UnknownFormatSummary : FormatSummary, IEquatable<UnknownFormatSummary>
     {
         private static string[] Keys = Array.Empty<string>();
 

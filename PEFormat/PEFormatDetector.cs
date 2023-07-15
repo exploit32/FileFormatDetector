@@ -10,6 +10,8 @@ namespace PEFormat
 
         public bool HasSignature => true;
 
+        public bool SignatureIsMandatory => true;
+
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
 
         public string Description => "PE format";

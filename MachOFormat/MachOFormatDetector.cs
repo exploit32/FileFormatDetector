@@ -18,6 +18,8 @@ namespace MachOFormat
 
         public bool HasSignature => true;
 
+        public bool SignatureIsMandatory => true;
+
         private Lazy<int> _bytesToReadSignature = new Lazy<int>(() => Signatures.Max(s => s.Value.Length + s.Offset));
 
         public int BytesToReadSignature => _bytesToReadSignature.Value;

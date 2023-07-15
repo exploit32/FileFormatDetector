@@ -11,7 +11,7 @@ namespace FileFormatDetector.Console
 
         public bool HelpRequested(string[] args)
         {
-            return args.Any(a => a.Equals("-h", StringComparison.InvariantCultureIgnoreCase) || a.Equals("--help", StringComparison.InvariantCultureIgnoreCase));
+            return args.Any(a => a.Equals("--help", StringComparison.InvariantCultureIgnoreCase));
         }
 
         public void Configure(IEnumerable<object> objects)
@@ -35,13 +35,13 @@ namespace FileFormatDetector.Console
                     var existing = _parameters.FirstOrDefault(p => p.Key.Equals(parameterAttribute.Key, StringComparison.InvariantCultureIgnoreCase));
 
                     if (existing != null)
-                        throw new ArgumentException($"Detector {obj.GetType().Name} declares parameter {parameterAttribute.Key} which is already declared by detector {existing.Detector.GetType().Name}");
+                        throw new ArgumentException($"Detector {obj.GetType().Name} declares parameter {parameterAttribute.Key} which is already declared by detector {existing.Object.GetType().Name}");
 
                     _parameters.Add(new Parameter()
                     {
                         Key = parameterAttribute.Key,
                         Description = parameterAttribute.Description,
-                        Detector = obj,
+                        Object = obj,
                         Property = prop,
                         ParameterType = prop.PropertyType,
                         IsFlag = prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?),
@@ -55,6 +55,9 @@ namespace FileFormatDetector.Console
                 {
                     if (_defaultParameter != null)
                         throw new ArgumentException($"Only one default parameter is allowed. Object {obj.GetType().Name} declares default parameter, but default parameter is already declared by object {_defaultParameter.Detector.GetType().Name}");
+
+                    if (!prop.PropertyType.IsAssignableTo(typeof(IEnumerable<string>)))
+                        throw new ArgumentException($"Default parameter should be assignable to {nameof(IEnumerable<string>)}");
 
                     _defaultParameter = new DefaultParameter()
                     {
@@ -123,12 +126,12 @@ namespace FileFormatDetector.Console
             System.Console.WriteLine("Options:");
             System.Console.WriteLine(" -h,  --help:        Print help");
 
-            var ownParameters = _parameters.Where(p => p.Detector.GetType().Assembly == typeof(Program).Assembly).ToList();
+            var ownParameters = _parameters.Where(p => p.Object.GetType().Assembly == typeof(Program).Assembly).ToList();
 
             if (ownParameters.Any())
                 PrintParameters(ownParameters, false);
 
-            var detectorParameters = _parameters.Where(p => p.Detector.GetType().Assembly != typeof(Program).Assembly).ToList();
+            var detectorParameters = _parameters.Where(p => p.Object.GetType().Assembly != typeof(Program).Assembly).ToList();
 
             if (detectorParameters.Any())
             {
@@ -141,7 +144,7 @@ namespace FileFormatDetector.Console
 
         private void PrintParameters(IEnumerable<Parameter> parameters, bool printClass)
         {
-            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.Detector.GetType().Name)).ToList();
+            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.Object.GetType().Name)).ToList();
 
             int parameterNameLength = paramsDescription.Max(p => p.Name.Length);
             int parameterDescriptionLength = paramsDescription
@@ -185,11 +188,11 @@ namespace FileFormatDetector.Console
                 {
                     if (parameter.ParameterType == typeof(string))
                     {
-                        parameter.Property.SetValue(parameter.Detector, parameter.Value);
+                        parameter.Property.SetValue(parameter.Object, parameter.Value);
                     }
                     else if (parameter.ParameterType == typeof(bool) || parameter.ParameterType == typeof(bool?))
                     {
-                        parameter.Property.SetValue(parameter.Detector, !parameter.IsInverted);
+                        parameter.Property.SetValue(parameter.Object, !parameter.IsInverted);
                     }
                     else if (parameter.ParameterType == typeof(int) || parameter.ParameterType == typeof(int?))
                     {
@@ -218,21 +221,21 @@ namespace FileFormatDetector.Console
 
             if (tryParse(parameter.Value, out T parsed))
             {
-                parameter.Property.SetValue(parameter.Detector, parsed);
+                parameter.Property.SetValue(parameter.Object, parsed);
             }
             else
             {
-                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.Detector.GetType().Name}");
+                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.Object.GetType().Name}");
             }
         }
 
-        internal class Parameter
+        class Parameter
         {
             public string Key { get; init; }
 
             public string Description { get; init; }
 
-            public object Detector { get; init; }
+            public object Object { get; init; }
 
             public Type ParameterType { get; init; }
 
@@ -252,7 +255,7 @@ namespace FileFormatDetector.Console
             }
         }
 
-        internal class DefaultParameter
+        class DefaultParameter
         {
             public object Detector { get; init; }
 

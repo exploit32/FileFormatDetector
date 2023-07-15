@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FormatApi
 {
+    /// <summary>
+    /// Interface of text files detectors
+    /// </summary>
     public interface ITextFormatDetector
     {
         Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken);

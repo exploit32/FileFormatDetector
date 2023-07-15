@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FormatApi
 {
+    /// <summary>
+    /// Exception to be thrown be format detectors if they have errors parsing format
+    /// </summary>
     public class FileFormatException : Exception
     {
         public FileFormatException()

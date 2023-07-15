@@ -62,7 +62,7 @@ namespace FileFormatDetector.Console
                                                          loader.TextFormatDetectors.ToArray(),
                                                          loader.TextBasedFormatDetectors.ToArray());
 
-            var recognizedFiles = await detector.ScanFiles(configuration.Paths, cancellationTokenSource.Token);
+            var recognizedFiles = await detector.ScanFiles(configuration.Paths.ToArray(), cancellationTokenSource.Token);
 
             FormatPrinter printer = new FormatPrinter();
 
