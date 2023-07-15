@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Core
 {
+    /// <summary>
+    /// Iterator that scans for files in specified path
+    /// </summary>
     internal class FilesIterator : IEnumerable<string>
     {
         private Stack<string> _paths;
@@ -42,6 +45,7 @@ namespace FileFormatDetector.Core
                             }
                         }
                         catch (UnauthorizedAccessException) { }
+                        catch (IOException) { }
                     }
 
                     var files = Array.Empty<string>();
@@ -51,6 +55,7 @@ namespace FileFormatDetector.Core
                         files = Directory.GetFiles(path);
                     }
                     catch (UnauthorizedAccessException) { }
+                    catch (IOException) { }
 
                     foreach (var file in files)
                         yield return file;

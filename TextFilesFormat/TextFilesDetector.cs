@@ -1,4 +1,5 @@
 ﻿using FormatApi;
+using System;
 using System.Drawing;
 using System.IO.MemoryMappedFiles;
 using System.Reflection.Emit;
@@ -12,7 +13,7 @@ namespace TextFilesFormat
     /// <summary>
     /// Detector ot text files
     /// </summary>
-    public class TextFilesDetector : ITextFormatDetector
+    public class TextFilesDetector : IFormatDetector
     {
         private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
@@ -32,8 +33,8 @@ namespace TextFilesFormat
         .OrderByDescending(e => e.BomSignature!.Value.Length)
         .ToArray();
 
-        private static Lazy<int> MinPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
-        private static Lazy<int> MaxPreambleLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
+        private static Lazy<int> MinBomLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
+        private static Lazy<int> MaxBomLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
         /// <summary>
         /// Number of bytes to scan for probabilistic format detection. Null means no boundary
@@ -41,23 +42,18 @@ namespace TextFilesFormat
         [Parameter("file-scan-size-limit", "Number of bytes to scan for probabilistic format detection.\nShould be greater than 0 and be a multiple of 4.")]
         public long? FileScanSizeLimit { get; set; }
 
+        public bool HasSignature => true;
 
-        public async Task<TextFormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
+        public bool SignatureIsMandatory => false;
+
+        public int BytesToReadSignature => MaxBomLength.Value;
+
+        public string Description => "Text files detector. Supports BOM detection. Supported encodings: ASCII, UTF-8, UTF-16 BE/LE, UTF-32 BE/LE";
+
+        public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {
-            if (stream.Length == 0)
-                return null;
-
-            TextFormatSummary? summary = await TryDetectEncodingWithBom(stream);
-
-            if (summary == null)
-            {
-                stream.Seek(0, SeekOrigin.Begin);
-                summary = await TryDetectEncodingWithoutBom(stream, cancellationToken);
-            }
-
-            return summary;
+            return CheckSignatures(fileStart, EncodingsWithSignature) != null;
         }
-
 
         private DetectableEncoding? CheckSignatures(ReadOnlySpan<byte> fileStart, DetectableEncoding[] encodings)
         {
@@ -75,16 +71,32 @@ namespace TextFilesFormat
             return null;
         }
 
+        public async Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
+        {
+            if (stream.Length == 0)
+                return null;
+
+            TextFormatSummary? summary = await TryDetectEncodingWithBom(stream);
+
+            if (summary == null)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+                summary = await TryDetectEncodingWithoutBom(stream, cancellationToken);
+            }
+
+            return summary;
+        }
+
         private async Task<TextFormatSummary?> TryDetectEncodingWithBom(Stream stream)
         {
             TextFormatSummary? summary = null;
 
-            if (stream.Length < MinPreambleLength.Value)
+            if (stream.Length < MinBomLength.Value)
                 return null;
 
-            byte[] buffer = new byte[MaxPreambleLength.Value];
+            byte[] buffer = new byte[MaxBomLength.Value];
 
-            int bytesRead = await stream.ReadAsync(buffer, 0, MaxPreambleLength.Value);
+            int bytesRead = await stream.ReadAsync(buffer, 0, MaxBomLength.Value);
 
             DetectableEncoding? detectedEncoding = CheckSignatures(buffer.AsSpan(0, bytesRead), EncodingsWithSignature);
 

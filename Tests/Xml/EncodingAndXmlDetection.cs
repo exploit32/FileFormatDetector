@@ -167,13 +167,14 @@ namespace Tests.Xml
 
             using (var stream = File.OpenRead(path))
             {
-                TextFormatSummary? textFormat = await textDetector.ReadFormat(stream, CancellationToken.None);
+                FormatSummary? format = await textDetector.ReadFormat(stream, CancellationToken.None);
 
-                Assert.NotNull(textFormat);
+                Assert.NotNull(format);
+                Assert.IsType<TextFormatSummary>(format);
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                xmlFormat = await xmlDetector.ReadFormat(stream, textFormat, CancellationToken.None);
+                xmlFormat = await xmlDetector.ReadFormat(stream, (TextFormatSummary)format, CancellationToken.None);
             }
 
             return xmlFormat;

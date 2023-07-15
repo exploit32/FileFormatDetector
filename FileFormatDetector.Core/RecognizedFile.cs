@@ -7,15 +7,24 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Core
 {
+    /// <summary>
+    /// Class that represents file which format was recognized
+    /// </summary>
     public class RecognizedFile
     {
-        public string FileName { get; }
+        /// <summary>
+        /// File path
+        /// </summary>
+        public string Path { get; }
 
+        /// <summary>
+        /// File format
+        /// </summary>
         public FormatSummary FormatSummary { get; }
 
-        public RecognizedFile(string fileName, FormatSummary formatSummary)
+        public RecognizedFile(string path, FormatSummary formatSummary)
         {
-            FileName = fileName;
+            Path = path;
             FormatSummary = formatSummary;
         }
     }

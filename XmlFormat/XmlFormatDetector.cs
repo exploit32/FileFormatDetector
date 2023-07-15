@@ -14,6 +14,8 @@ namespace XmlFormat
         [Parameter("validate-full-xml", "Validate full xml document.\nBy default the file is read up to the first\ncorrect non-whitespace element")]
         public bool ValidateFullXml { get; set; } = false;
 
+        public string Description => "Xml files detector. Supports xml version 1.0.";
+
         public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
             if (textFormatSummary.CodePage == 0)

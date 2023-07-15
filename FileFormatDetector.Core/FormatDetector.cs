@@ -1,35 +1,42 @@
 ﻿using FormatApi;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace FileFormatDetector.Core
 {
+    /// <summary>
+    /// Format detector
+    /// </summary>
     public class FormatDetector
     {
-        private readonly IBinaryFormatDetector[] _binaryFormats;
-        private readonly ITextFormatDetector[] _textFormats;
-        private readonly ITextBasedFormatDetector[] _textBasedFormats;
+        private readonly IFormatDetector[] _generalFormatDetectors;
+        private readonly ITextBasedFormatDetector[] _textBasedFormatDetectors;
         private readonly bool _hasFomatsWithSignature = false;
         private readonly int _maxHeaderLength = 0;
+        private readonly IFormatDetector[] _formatsWithMandatorySignature;
+        private readonly IFormatDetector[] _formatsWithOptionalOrMissingSignature;
 
         public FormatDetectorConfiguration Configuration { get; }
 
-        public FormatDetector(FormatDetectorConfiguration configuration, IBinaryFormatDetector[] binaryFormats, ITextFormatDetector[] textFormats, ITextBasedFormatDetector[] textBasedFormats)
+        public FormatDetector(FormatDetectorConfiguration configuration, IFormatDetector[] generalFormats, ITextBasedFormatDetector[] textBasedFormats)
         {
             Configuration = configuration;
-            _binaryFormats = binaryFormats ?? throw new ArgumentNullException(nameof(binaryFormats));
-            _textFormats = textFormats ?? throw new ArgumentNullException(nameof(textFormats));
-            _textBasedFormats = textBasedFormats ?? throw new ArgumentNullException(nameof(textBasedFormats));
+            _generalFormatDetectors = generalFormats ?? throw new ArgumentNullException(nameof(generalFormats));
+            _textBasedFormatDetectors = textBasedFormats ?? throw new ArgumentNullException(nameof(textBasedFormats));
 
-            _hasFomatsWithSignature = _binaryFormats.Any(f => f.HasSignature);
-            _maxHeaderLength = _hasFomatsWithSignature ? _binaryFormats.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
+            _formatsWithMandatorySignature = _generalFormatDetectors.Where(f => f.HasSignature && f.SignatureIsMandatory).ToArray();
+            _formatsWithOptionalOrMissingSignature = _generalFormatDetectors.Where(f => !f.HasSignature || f.HasSignature && !f.SignatureIsMandatory).ToArray();
+
+            _hasFomatsWithSignature = _formatsWithMandatorySignature.Any();
+            _maxHeaderLength = _hasFomatsWithSignature ? _generalFormatDetectors.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
         }
 
+        /// <summary>
+        /// Scan provided paths and check files' formats
+        /// </summary>
+        /// <param name="paths">Collection of paths to scan. May contain directories or individual files</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Collection of recognized files</returns>
         public async Task<IEnumerable<RecognizedFile>> ScanFiles(string[] paths, CancellationToken cancellationToken)
         {
             var filesIterator = new FilesIterator(paths, Configuration.Recursive);
@@ -54,42 +61,43 @@ namespace FileFormatDetector.Core
             }
             catch (OperationCanceledException)
             {
-                Console.WriteLine("Detection cancelled");
             }
 
             return recognizedFiles;
         }
 
+        /// <summary>
+        /// Detect format of a single file
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns></returns>
         private async Task<RecognizedFile?> DetectFormat(string path, CancellationToken cancellationToken)
         {
             FormatSummary? summary = null;
 
             try
             {
-                if (!CheckFileExistsAndNotEmpty(path))
+                if (!File.Exists(path))
+                    return null;
+
+                FileInfo fileInfo = new FileInfo(path);
+                if (fileInfo.Length == 0)
                     return null;
 
                 using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    summary = await TryDetectBinaryFormat(file, path, cancellationToken);
+                    summary = await TryDetectGeneralFormat(file, path, cancellationToken);
 
-                    if (summary == null)
+                    if (summary != null && summary is TextFormatSummary)
                     {
-                        TextFormatSummary? textFormatSummary = await TryDetectTextFormat(file, path, cancellationToken);
+                        FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, (TextFormatSummary)summary, cancellationToken);
 
-                        if (textFormatSummary != null)
-                        {
-                            FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, textFormatSummary, cancellationToken);
-
-                            if (textBasedFormatSummary != null)
-                                summary = textBasedFormatSummary;
-                            else
-                                summary = textFormatSummary;
-                        }
+                        if (textBasedFormatSummary != null)
+                            summary = textBasedFormatSummary;
                     }
 
-                    if (summary == null)
-                        summary = new UnknownFormatSummary();
+                    summary ??= new UnknownFormatSummary();
                 }
             }
             catch (UnauthorizedAccessException) { }
@@ -102,40 +110,43 @@ namespace FileFormatDetector.Core
             return summary != null ? new RecognizedFile(path, summary) : null;
         }
 
-        private bool CheckFileExistsAndNotEmpty(string path)
+
+        private async Task<FormatSummary?> TryDetectGeneralFormat(Stream stream, string path, CancellationToken cancellationToken)
         {
-            if (!File.Exists(path))
-                return false;
-
-            FileInfo fileInfo = new FileInfo(path);
-            if (fileInfo.Length == 0)
-                return false;
-
-            return true;
-        }
-
-        private async Task<FormatSummary?> TryDetectBinaryFormat(Stream stream, string path, CancellationToken cancellationToken)
-        {
-            FormatSummary? summary = null;
-
             byte[] buffer = new byte[_maxHeaderLength];
 
             int bytesRead = stream.Read(buffer, 0, buffer.Length);
 
             stream.Seek(0, SeekOrigin.Begin);
 
-            foreach (var format in _binaryFormats)
+            Memory<byte> signature = buffer.AsMemory(0, bytesRead);
+
+            //Trying formats with mandatory signature
+            var summary = await Detect(_formatsWithMandatorySignature, stream, path, signature, cancellationToken);
+
+            //Trying formats with optional signature
+            summary ??= await Detect(_formatsWithOptionalOrMissingSignature, stream, path, signature, cancellationToken);
+
+            return summary;
+        }
+
+        private async Task<FormatSummary?> Detect(IEnumerable<IFormatDetector> detectors, Stream stream, string path, Memory<byte> signature, CancellationToken cancellationToken)
+        {
+            foreach (var format in detectors)
             {
                 try
                 {
-                    var isSignatureFound = format.CheckSignature(buffer.AsSpan(0, bytesRead));
+                    var isSignatureFound = format.HasSignature && format.CheckSignature(signature.Span);
 
-                    if (isSignatureFound)
+                    if (isSignatureFound || !format.SignatureIsMandatory)
                     {
-                        summary = await format.ReadFormat(stream, cancellationToken);
+                        if (stream.Position != 0)
+                            stream.Seek(0, SeekOrigin.Begin);
+
+                        var summary = await format.ReadFormat(stream, cancellationToken);
 
                         if (summary != null)
-                            break;
+                            return summary;
                     }
                 }
                 catch (FormatException ex)
@@ -148,42 +159,20 @@ namespace FileFormatDetector.Core
                 }
             }
 
-            return summary;
+            return null;
         }
 
-        private async Task<TextFormatSummary?> TryDetectTextFormat(Stream stream, string path, CancellationToken cancellationToken)
-        {
-            TextFormatSummary? summary = null;
-
-            foreach (var format in _textFormats)
-            {
-                try
-                {
-                    stream.Seek(0, SeekOrigin.Begin);
-
-                    summary = await format.ReadFormat(stream, cancellationToken);
-
-                    if (summary != null)
-                        break;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
-                }
-            }
-
-            return summary;
-        }
 
         private async Task<FormatSummary?> TryDetectTextBasedFormat(Stream stream, string path, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
             FormatSummary? summary = null;
 
-            foreach (var format in _textBasedFormats)
+            foreach (var format in _textBasedFormatDetectors)
             {
                 try
                 {
-                    stream.Seek(0, SeekOrigin.Begin);
+                    if (stream.Position != 0)
+                        stream.Seek(0, SeekOrigin.Begin);
 
                     summary = await format.ReadFormat(stream, textFormatSummary, cancellationToken);
 
@@ -198,7 +187,5 @@ namespace FileFormatDetector.Core
 
             return summary;
         }
-
-
     }
 }

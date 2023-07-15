@@ -17,14 +17,30 @@ namespace FileFormatDetector.Console
                 System.Console.WriteLine($"No format pluging were found. Build solution to put them into {PluginsDirectory} directory");
                 return (int)ExitCodes.NoPlugins;
             }
+            else
+            {
+                if (loader.GeneralFormatDetectors.Any())
+                {
+                    System.Console.WriteLine("Loaded general format detectors:");
+                    foreach (var formatDetector in loader.GeneralFormatDetectors)
+                        System.Console.WriteLine($" - {formatDetector.Description}");
+                }
+
+                if (loader.TextBasedFormatDetectors.Any())
+                {
+                    System.Console.WriteLine("Loaded text-based format detectors:");
+                    foreach (var formatDetector in loader.TextBasedFormatDetectors)
+                        System.Console.WriteLine($" - {formatDetector.Description}");
+                }
+
+            }
 
             AppConfiguration configuration = new AppConfiguration();
 
             var commandLineParser = new CommandLineParser();
 
             commandLineParser.Configure(configuration);
-            commandLineParser.Configure(loader.BinaryFormatDetectors);
-            commandLineParser.Configure(loader.TextFormatDetectors);
+            commandLineParser.Configure(loader.GeneralFormatDetectors);
             commandLineParser.Configure(loader.TextBasedFormatDetectors);
 
             try
@@ -58,9 +74,10 @@ namespace FileFormatDetector.Console
             };
 
             FormatDetector detector = new FormatDetector(detectorConfiguration,
-                                                         loader.BinaryFormatDetectors.ToArray(),
-                                                         loader.TextFormatDetectors.ToArray(),
+                                                         loader.GeneralFormatDetectors.ToArray(),
                                                          loader.TextBasedFormatDetectors.ToArray());
+
+            System.Console.WriteLine("Scanning files and directories...");
 
             var recognizedFiles = await detector.ScanFiles(configuration.Paths.ToArray(), cancellationTokenSource.Token);
 

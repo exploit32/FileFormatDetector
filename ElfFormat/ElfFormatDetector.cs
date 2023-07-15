@@ -3,7 +3,7 @@ using Tools;
 
 namespace ElfFormat
 {
-    public class ElfFormatDetector : IBinaryFormatDetector
+    public class ElfFormatDetector : IFormatDetector
     {
         public static readonly Signature Signature = new Signature(new byte[] { 0x7F, (byte)'E', (byte)'L', (byte)'F' });
 
@@ -13,7 +13,7 @@ namespace ElfFormat
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
 
-        public string Description => "ELF format";
+        public string Description => "ELF format detector";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

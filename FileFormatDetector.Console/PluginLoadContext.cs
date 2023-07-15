@@ -17,7 +17,7 @@ namespace FileFormatDetector.Console
         protected override Assembly? Load(AssemblyName assemblyName)
         {
             // Skipping duplicates of FormatApi assembly
-            if (assemblyName.Name == typeof(IBinaryFormatDetector).Assembly.GetName().Name)
+            if (assemblyName.Name == typeof(IFormatDetector).Assembly.GetName().Name)
                 return null;
 
             string? target = _resolver.ResolveAssemblyToPath(assemblyName);

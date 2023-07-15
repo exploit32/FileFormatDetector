@@ -1,9 +1,9 @@
 ﻿namespace FormatApi
 {
     /// <summary>
-    /// Interface of binary format detectors. These detectors are run before other detectors.
+    /// Interface of general format detectors
     /// </summary>
-    public interface IBinaryFormatDetector
+    public interface IFormatDetector
     {
         /// <summary>
         /// Indicates that file of this format has a mandatory byte sequence identifies this format (sometimes called magic)
@@ -11,7 +11,7 @@
         bool HasSignature { get; }
 
         /// <summary>
-        /// Flag that indicates that file must contain signature
+        /// Indicates that file must contain signature
         /// </summary>
         bool SignatureIsMandatory { get; }
 

@@ -83,11 +83,10 @@ namespace Tests
         {
             FormatDetectorConfiguration configuration = new FormatDetectorConfiguration();
 
-            IBinaryFormatDetector[] binaryFormats = new IBinaryFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector() };
-            ITextFormatDetector[] textFormats = new ITextFormatDetector[] { new TextFilesDetector() };
+            IFormatDetector[] binaryFormats = new IFormatDetector[] { new PEFormatDetector(), new ElfFormatDetector(), new MachOFormatDetector(), new TextFilesDetector() };
             ITextBasedFormatDetector[] textBasedFormatDetectors = new ITextBasedFormatDetector[] { new XmlFormatDetector() };
 
-            FormatDetector detector = new FormatDetector(configuration, binaryFormats, textFormats, textBasedFormatDetectors);
+            FormatDetector detector = new FormatDetector(configuration, binaryFormats, textBasedFormatDetectors);
 
             return await detector.ScanFiles(paths, CancellationToken.None);
         }

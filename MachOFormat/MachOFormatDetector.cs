@@ -4,7 +4,7 @@ using Tools;
 
 namespace MachOFormat
 {
-    public class MachOFormatDetector : IBinaryFormatDetector
+    public class MachOFormatDetector : IFormatDetector
     {
         public static readonly Signature[] Signatures = new[]
         {
@@ -24,7 +24,7 @@ namespace MachOFormat
 
         public int BytesToReadSignature => _bytesToReadSignature.Value;
 
-        public string Description => "Mach-O format";
+        public string Description => "Mach-O format detector";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

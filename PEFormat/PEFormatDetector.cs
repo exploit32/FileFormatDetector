@@ -4,7 +4,7 @@ using Tools;
 
 namespace PEFormat
 {
-    public class PEFormatDetector : IBinaryFormatDetector
+    public class PEFormatDetector : IFormatDetector
     {
         public static readonly Signature Signature = new Signature(new byte[] { (byte)'M', (byte)'Z' });
 
@@ -14,7 +14,7 @@ namespace PEFormat
 
         public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
 
-        public string Description => "PE format";
+        public string Description => "PE format detector";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace FormatApi
 {
+    /// <summary>
+    /// Base class for text and text-based formats
+    /// </summary>
     public class TextFormatSummary : FormatSummary, IEquatable<TextFormatSummary>
     {
         private static string[] Keys = new[] { nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };

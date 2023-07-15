@@ -14,7 +14,7 @@ namespace FileFormatDetector.Console
         {
             foreach (var file in files)
             {
-                System.Console.WriteLine($"File {file.FileName} recognized as {file.FormatSummary.FormatName}");
+                System.Console.WriteLine($"File {file.Path} recognized as {file.FormatSummary.FormatName}");
 
                 PrintFormatSummary(file.FormatSummary, string.Empty);
             }

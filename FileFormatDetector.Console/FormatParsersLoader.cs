@@ -12,13 +12,11 @@ namespace FileFormatDetector.Console
     {
         public string PluginsDirectory { get; }
 
-        public List<IBinaryFormatDetector> BinaryFormatDetectors { get; private set; } = new List<IBinaryFormatDetector>();
-
-        public List<ITextFormatDetector> TextFormatDetectors { get; private set; } = new List<ITextFormatDetector>();
+        public List<IFormatDetector> GeneralFormatDetectors { get; private set; } = new List<IFormatDetector>();
 
         public List<ITextBasedFormatDetector> TextBasedFormatDetectors { get; private set; } = new List<ITextBasedFormatDetector>();
 
-        public bool AnyPluginsLoaded => BinaryFormatDetectors.Count + TextFormatDetectors.Count + TextBasedFormatDetectors.Count > 0;
+        public bool AnyPluginsLoaded => GeneralFormatDetectors.Count + TextBasedFormatDetectors.Count > 0;
 
         public FormatPluginsLoader(string directory)
         {
@@ -37,8 +35,7 @@ namespace FileFormatDetector.Console
 
                     var pluginAssembly = context.LoadFromAssemblyPath(plugin);
 
-                    BinaryFormatDetectors.AddRange(TryCreateFormatDetector<IBinaryFormatDetector>(pluginAssembly));
-                    TextFormatDetectors.AddRange(TryCreateFormatDetector<ITextFormatDetector>(pluginAssembly));
+                    GeneralFormatDetectors.AddRange(TryCreateFormatDetector<IFormatDetector>(pluginAssembly));
                     TextBasedFormatDetectors.AddRange(TryCreateFormatDetector<ITextBasedFormatDetector>(pluginAssembly));
                 }
                 catch (Exception ex)
