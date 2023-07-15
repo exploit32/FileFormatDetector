@@ -7,10 +7,19 @@ using System.Xml.Linq;
 
 namespace FormatApi
 {
+    /// <summary>
+    /// Class represents signature or magic sequence. Predefined sequence of bytes that identifies particular format
+    /// </summary>
     public class Signature : IEquatable<Signature>
     {
+        /// <summary>
+        /// Bytes sequence
+        /// </summary>
         public byte[] Value { get; init; }
 
+        /// <summary>
+        /// Offset from the beginning of file
+        /// </summary>
         public int Offset { get; init; }
 
         public Signature(byte[] value, int offset)

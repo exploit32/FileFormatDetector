@@ -1,4 +1,5 @@
 ﻿using FileFormatDetector.Core;
+using FormatApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,16 +13,25 @@ namespace FileFormatDetector.Console
         /// <summary>
         /// List of files and directories to scan
         /// </summary>
+        [DefaultParameter]
         public string[] Paths { get; set; } = Array.Empty<string>();
 
         /// <summary>
         /// Print information about each file individually
         /// </summary>
+        [Parameter("verbose", "Print summary about each file individually")]
         public bool Verbose { get; set; }
 
         /// <summary>
-        /// Detector settings
+        /// Number of parallel scanning threads
         /// </summary>
-        public FormatDetectorConfiguration DetectorConfiguration { get; private set; } = new FormatDetectorConfiguration();        
+        [Parameter("threads", "Number of parallel threads (default is number of CPU cores)")]
+        public int? Threads { get; set; }
+
+        /// <summary>
+        /// Scan directories recursively
+        /// </summary>
+        [Parameter("no-recursion", "Scan directories non recursively", isInverted: true)]
+        public bool Recursive { get; set; } = true;
     }
 }

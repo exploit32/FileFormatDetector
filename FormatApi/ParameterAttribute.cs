@@ -9,6 +9,7 @@ namespace FormatApi
     /// <summary>
     /// Attribute that indicates configurable parameter
     /// </summary>
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class ParameterAttribute: Attribute
     {
         /// <summary>
@@ -21,10 +22,16 @@ namespace FormatApi
         /// </summary>
         public string Description { get; }
 
-        public ParameterAttribute(string key, string description)
+        /// <summary>
+        /// For boolean types indicates that presence of flag means false value
+        /// </summary>
+        public bool IsInverted { get; }
+
+        public ParameterAttribute(string key, string description, bool isInverted = false)
         {
             Key = key;
             Description = description;
+            IsInverted = isInverted;
         }
     }
 }

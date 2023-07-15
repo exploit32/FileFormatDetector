@@ -14,39 +14,32 @@ namespace FileFormatDetector.Console
 
             if (!loader.AnyPluginsLoaded)
             {
-                System.Console.WriteLine($"No format pluging were found. Build solution to put them to {PluginsDirectory} directory");
+                System.Console.WriteLine($"No format pluging were found. Build solution to put them into {PluginsDirectory} directory");
                 return (int)ExitCodes.NoPlugins;
             }
 
-            DetectorsConfigurator configurator = new DetectorsConfigurator(loader.BinaryFormatDetectors, loader.TextFormatDetectors, loader.TextBasedFormatDetectors);
+            AppConfiguration configuration = new AppConfiguration();
 
-            var commandLineParser = new CommandLineParser(args, configurator.Parameters);
+            var commandLineParser = new CommandLineParser();
 
-            AppConfiguration configuration;
+            commandLineParser.Configure(configuration);
+            commandLineParser.Configure(loader.BinaryFormatDetectors);
+            commandLineParser.Configure(loader.TextFormatDetectors);
+            commandLineParser.Configure(loader.TextBasedFormatDetectors);
 
             try
             {
-                if (commandLineParser.HelpRequested())
+                if (commandLineParser.HelpRequested(args))
                 {
                     commandLineParser.PrintHelp();
                     return (int)ExitCodes.OK;
                 }
 
-                configuration = commandLineParser.Parse();
+                commandLineParser.Parse(args);
             }
             catch (Exception ex)
             {
                 System.Console.WriteLine($"Error parsing command line arguments: {ex.Message}");
-                return (int)ExitCodes.InvalidArgs;
-            }
-
-            try
-            {
-                configurator.ApplyParameters();
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine($"Error applying detector's parameters: {ex.Message}");
                 return (int)ExitCodes.InvalidArgs;
             }
 
@@ -58,7 +51,16 @@ namespace FileFormatDetector.Console
                 args.Cancel = true;
             };
 
-            FormatDetector detector = new FormatDetector(configuration.DetectorConfiguration, loader.BinaryFormatDetectors.ToArray(), loader.TextFormatDetectors.ToArray(), loader.TextBasedFormatDetectors.ToArray());
+            var detectorConfiguration = new FormatDetectorConfiguration()
+            {
+                Recursive = configuration.Recursive,
+                Threads = configuration.Threads,
+            };
+
+            FormatDetector detector = new FormatDetector(detectorConfiguration,
+                                                         loader.BinaryFormatDetectors.ToArray(),
+                                                         loader.TextFormatDetectors.ToArray(),
+                                                         loader.TextBasedFormatDetectors.ToArray());
 
             var recognizedFiles = await detector.ScanFiles(configuration.Paths, cancellationTokenSource.Token);
 
