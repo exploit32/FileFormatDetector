@@ -28,3 +28,17 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Publish
+      run: |
+        dotnet publish FileFormatDetector.Console -p:PublishProfile=FolderProfile
+        dotnet publish ElfFormat -p:PublishProfile=FolderProfile
+        dotnet publish PeFormat -p:PublishProfile=FolderProfile
+        dotnet publish MachOFormat -p:PublishProfile=FolderProfile
+        dotnet publish TextFilesFormat -p:PublishProfile=FolderProfile
+        dotnet publish XmlFormat -p:PublishProfile=FolderProfile
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: published-app
+        path: FileFormatDetector.Console/bin/publish/*
+        
