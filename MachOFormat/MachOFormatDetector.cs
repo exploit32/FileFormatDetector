@@ -20,7 +20,7 @@ namespace MachOFormat
 
         public bool SignatureIsMandatory => true;
 
-        private Lazy<int> _bytesToReadSignature = new Lazy<int>(() => Signatures.Max(s => s.Value.Length + s.Offset));
+        private readonly Lazy<int> _bytesToReadSignature = new Lazy<int>(() => Signatures.Max(s => s.Value.Length + s.Offset));
 
         public int BytesToReadSignature => _bytesToReadSignature.Value;
 

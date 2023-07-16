@@ -6,9 +6,9 @@ namespace PEFormat
 {
     internal class PEFormatReader
     {
-        private byte[] DosSignature = new byte[] { (byte)'M', (byte)'Z' };
+        private readonly byte[] _dosSignature = new byte[] { (byte)'M', (byte)'Z' };
 
-        private byte[] PESignature = new byte[] { (byte)'P', (byte)'E', 0, 0 };
+        private readonly byte[] _peSignature = new byte[] { (byte)'P', (byte)'E', 0, 0 };
         
         private readonly EndiannessAwareBinaryReader _reader;
 
@@ -19,9 +19,9 @@ namespace PEFormat
 
         public DosHeader ReadDosHeader()
         {
-            byte[] signature = _reader.ReadBytes(DosSignature.Length);
+            byte[] signature = _reader.ReadBytes(_dosSignature.Length);
 
-            if (!signature.SequenceEqual(DosSignature))
+            if (!signature.SequenceEqual(_dosSignature))
                 throw new FileFormatException("Expected MZ header was not found");
 
             _reader.Stream.Seek(0x3C, SeekOrigin.Begin);
@@ -41,9 +41,9 @@ namespace PEFormat
         {
             _reader.Stream.Seek(dosHeader.PEHeaderOffset, SeekOrigin.Begin);
 
-            byte[] signature = _reader.ReadBytes(PESignature.Length);
+            byte[] signature = _reader.ReadBytes(_peSignature.Length);
 
-            if (!signature.SequenceEqual(PESignature))
+            if (!signature.SequenceEqual(_peSignature))
                 throw new FileFormatException("Expected PE header was not found");
 
             return new COFFHeader()

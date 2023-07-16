@@ -307,8 +307,10 @@ No more xml
 
         private async Task<FormatSummary?> EncodeAndDetect(string xml, Encoding encoding, bool validateFullXml = true)
         {
-            XmlFormatDetector detector = new XmlFormatDetector();
-            detector.ValidateFullXml = validateFullXml;
+            XmlFormatDetector detector = new XmlFormatDetector
+            {
+                ValidateFullXml = validateFullXml
+            };
 
             FormatSummary? format = null;
 

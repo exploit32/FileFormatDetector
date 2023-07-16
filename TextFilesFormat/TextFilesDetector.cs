@@ -15,7 +15,7 @@ namespace TextFilesFormat
     /// </summary>
     public class TextFilesDetector : IFormatDetector
     {
-        private static DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
+        private static readonly DetectableEncoding[] EncodingsWithSignature = new DetectableEncoding[]
         {
             DetectableEncoding.Utf1,
             DetectableEncoding.Utf7,
@@ -33,8 +33,8 @@ namespace TextFilesFormat
         .OrderByDescending(e => e.BomSignature!.Value.Length)
         .ToArray();
 
-        private static Lazy<int> MinBomLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
-        private static Lazy<int> MaxBomLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
+        private static readonly Lazy<int> MinBomLength = new Lazy<int>(() => EncodingsWithSignature.Min(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
+        private static readonly Lazy<int> MaxBomLength = new Lazy<int>(() => EncodingsWithSignature.Max(e => e.BomSignature!.Value.Length + e.BomSignature.Offset));
 
         /// <summary>
         /// Number of bytes to scan for probabilistic format detection. Null means no boundary

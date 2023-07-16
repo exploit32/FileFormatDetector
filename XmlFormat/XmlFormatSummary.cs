@@ -9,7 +9,7 @@ namespace XmlFormat
 {
     public class XmlFormatSummary : TextFormatSummary,  IEquatable<XmlFormatSummary>
     {
-        private static string[] Keys = new[] { nameof(XmlDeclarationEncoding), nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
+        private static readonly string[] Keys = new[] { nameof(XmlDeclarationEncoding), nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
 
         public override dynamic this[string key] => key switch
         {

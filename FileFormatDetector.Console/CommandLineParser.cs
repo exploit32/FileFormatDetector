@@ -35,15 +35,10 @@ namespace FileFormatDetector.Console
                     var existing = _parameters.FirstOrDefault(p => p.Key.Equals(parameterAttribute.Key, StringComparison.InvariantCultureIgnoreCase));
 
                     if (existing != null)
-                        throw new ArgumentException($"Detector {obj.GetType().Name} declares parameter {parameterAttribute.Key} which is already declared by detector {existing.Object.GetType().Name}");
+                        throw new ArgumentException($"Detector {obj.GetType().Name} declares parameter {parameterAttribute.Key} which is already declared by detector {existing.TargetObject.GetType().Name}");
 
-                    _parameters.Add(new Parameter()
+                    _parameters.Add(new Parameter(parameterAttribute.Key, parameterAttribute.Description, obj, prop)
                     {
-                        Key = parameterAttribute.Key,
-                        Description = parameterAttribute.Description,
-                        Object = obj,
-                        Property = prop,
-                        ParameterType = prop.PropertyType,
                         IsFlag = prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?),
                         IsInverted = parameterAttribute.IsInverted,
                     });
@@ -54,17 +49,12 @@ namespace FileFormatDetector.Console
                 if (defaultParameterAttribute != null)
                 {
                     if (_defaultParameter != null)
-                        throw new ArgumentException($"Only one default parameter is allowed. Object {obj.GetType().Name} declares default parameter, but default parameter is already declared by object {_defaultParameter.Detector.GetType().Name}");
+                        throw new ArgumentException($"Only one default parameter is allowed. Object {obj.GetType().Name} declares default parameter, but default parameter is already declared by object {_defaultParameter.TargetObject.GetType().Name}");
 
                     if (!prop.PropertyType.IsAssignableTo(typeof(IEnumerable<string>)))
                         throw new ArgumentException($"Default parameter should be assignable to {nameof(IEnumerable<string>)}");
 
-                    _defaultParameter = new DefaultParameter()
-                    {
-                        Detector = obj,
-                        Property = prop,
-                        ParameterType = prop.PropertyType,
-                    };
+                    _defaultParameter = new DefaultParameter(obj, prop);
                 }
             }
         }
@@ -79,7 +69,7 @@ namespace FileFormatDetector.Console
 
                 if (current.StartsWith("--"))
                 {
-                    string currentTrimmed = current.Substring(2);
+                    string currentTrimmed = current[2..];
                     bool parameterSet = false;
 
                     foreach (var parameter in _parameters)  
@@ -126,12 +116,12 @@ namespace FileFormatDetector.Console
             System.Console.WriteLine("Options:");
             System.Console.WriteLine(" -h,  --help:        Print help");
 
-            var ownParameters = _parameters.Where(p => p.Object.GetType().Assembly == typeof(Program).Assembly).ToList();
+            var ownParameters = _parameters.Where(p => p.TargetObject.GetType().Assembly == typeof(Program).Assembly).ToList();
 
             if (ownParameters.Any())
                 PrintParameters(ownParameters, false);
 
-            var detectorParameters = _parameters.Where(p => p.Object.GetType().Assembly != typeof(Program).Assembly).ToList();
+            var detectorParameters = _parameters.Where(p => p.TargetObject.GetType().Assembly != typeof(Program).Assembly).ToList();
 
             if (detectorParameters.Any())
             {
@@ -144,7 +134,7 @@ namespace FileFormatDetector.Console
 
         private void PrintParameters(IEnumerable<Parameter> parameters, bool printClass)
         {
-            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.Object.GetType().Name)).ToList();
+            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.TargetObject.GetType().Name)).ToList();
 
             int parameterNameLength = paramsDescription.Max(p => p.Name.Length);
             int parameterDescriptionLength = paramsDescription
@@ -188,11 +178,11 @@ namespace FileFormatDetector.Console
                 {
                     if (parameter.ParameterType == typeof(string))
                     {
-                        parameter.Property.SetValue(parameter.Object, parameter.Value);
+                        parameter.Property.SetValue(parameter.TargetObject, parameter.Value);
                     }
                     else if (parameter.ParameterType == typeof(bool) || parameter.ParameterType == typeof(bool?))
                     {
-                        parameter.Property.SetValue(parameter.Object, !parameter.IsInverted);
+                        parameter.Property.SetValue(parameter.TargetObject, !parameter.IsInverted);
                     }
                     else if (parameter.ParameterType == typeof(int) || parameter.ParameterType == typeof(int?))
                     {
@@ -208,9 +198,9 @@ namespace FileFormatDetector.Console
             if (_defaultParameter != null)
             {
                 if (_defaultParameter.ParameterType.IsArray)
-                    _defaultParameter.Property.SetValue(_defaultParameter.Detector, _defaultParameter.Values.ToArray());
+                    _defaultParameter.Property.SetValue(_defaultParameter.TargetObject, _defaultParameter.Values.ToArray());
                 else
-                    _defaultParameter.Property.SetValue(_defaultParameter.Detector, _defaultParameter.Values);
+                    _defaultParameter.Property.SetValue(_defaultParameter.TargetObject, _defaultParameter.Values);
             }
         }
 
@@ -221,11 +211,11 @@ namespace FileFormatDetector.Console
 
             if (tryParse(parameter.Value, out T parsed))
             {
-                parameter.Property.SetValue(parameter.Object, parsed);
+                parameter.Property.SetValue(parameter.TargetObject, parsed);
             }
             else
             {
-                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.Object.GetType().Name}");
+                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.TargetObject.GetType().Name}");
             }
         }
 
@@ -235,7 +225,7 @@ namespace FileFormatDetector.Console
 
             public string Description { get; init; }
 
-            public object Object { get; init; }
+            public object TargetObject { get; init; }
 
             public Type ParameterType { get; init; }
 
@@ -249,6 +239,15 @@ namespace FileFormatDetector.Console
 
             public bool ValueSet { get; set; }
 
+            public Parameter(string key, string description, object targetObject, PropertyInfo property)
+            {
+                Key = key;
+                Description = description;
+                TargetObject = targetObject;                
+                Property = property;
+                ParameterType = property.PropertyType;
+            }
+
             public override string ToString()
             {
                 return $"{Key}: {ParameterType.Name}";
@@ -257,13 +256,20 @@ namespace FileFormatDetector.Console
 
         class DefaultParameter
         {
-            public object Detector { get; init; }
+            public object TargetObject { get; init; }
 
             public Type ParameterType { get; init; }
 
             public PropertyInfo Property { get; init; }
 
             public List<string> Values { get; set; } = new List<string>();
+
+            public DefaultParameter(object targetObject, PropertyInfo property)
+            {
+                TargetObject = targetObject;
+                Property = property;
+                ParameterType = property.PropertyType;
+            }
         }
     }
 }
