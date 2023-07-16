@@ -13,8 +13,7 @@ App can detect:
 App detects formats and prints summary like this:
 ```
 98 - Text: no-BOM, ASCII
-27 - Xml
-20 - Unknown
+27 - Xml: no-BOM, UTF-8
 15 - Text: no-BOM, utf-8
 10 - Text: BOM, utf-8
 6 - Text: BOM, utf-16LE
@@ -25,6 +24,8 @@ App detects formats and prints summary like this:
 3 - PE: I386, 32bit-LE, Unmanaged
 3 - ELF: ARM, 32bit-LE
 3 - Text: no-BOM, utf-16BE
+1 - ELF: S390, 64bit-BE, /lib/ld64.so.1
+33 - Unknown
 ```
 
 # How to build?
@@ -44,18 +45,18 @@ dotnet build
 
 | Parameter | Meaning | Example |
 | ----------| ------- | ------- |
-| ```-h```, ```--help```  | Show help | |
-| ```-t N```, ```--threads N```  | Number of parallel threads (default is number of CPU cores) | ```--threads 1``` |
-| ```-n```, ```--no-recursion```  | Scan directories non recursively |  |
-| ```-v```, ```--verbose```  | Print summary about each file individually |  |
+| ```--help```  | Show help | |
+| ```--threads N```  | Number of parallel threads (default is number of CPU cores) | ```--threads 1``` |
+| ```--no-recursion```  | Scan directories non recursively |  |
+| ```--verbose```  | Print summary about each file individually |  |
 | ```--validate-full-xml```  | If set, XML documents will be validated completely |  |
-| ```--file-scan-size-limit N```  | Number of bytes to scan to detect encoding of text files without BOM | ```--max-bytes-to-read 4096```  |
+| ```--file-scan-size-limit N```  | Number of bytes to scan to detect encoding of text files without BOM | ```--file-scan-size-limit 4096```  |
 
 ## Examples
 
 ```./FileFormatDetector.Console.exe --help```
 
-```./FileFormatDetector.Console.exe --threads 1 /home/user/documents /home/user/Downloads --max-bytes-to-read 4096```
+```./FileFormatDetector.Console.exe --threads 1 /home/user/documents /home/user/Downloads --file-scan-size-limit 4096```
 
 ```./FileFormatDetector.Console.exe --no-recursion /home/user/Downloads --validate-full-xml```
 

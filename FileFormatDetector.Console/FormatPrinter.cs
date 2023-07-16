@@ -25,7 +25,15 @@ namespace FileFormatDetector.Console
                 }
                 else if (file.IsFaulted)
                 {
-                    System.Console.WriteLine($"Recognition of file {file.Path} threw an exception {file.Exception!.GetType().Name}: {file.Exception!.Message}");
+                    if (file.Exception is FileRecognitionException)
+                    {
+                        var fileRecognitionException = file.Exception as FileRecognitionException;
+                        System.Console.WriteLine($"Recognition of file {file.Path} threw an exception by detector {fileRecognitionException!.Detector.GetType().Name}: {file.Exception!.Message}");
+                    }
+                    else
+                    {
+                        System.Console.WriteLine($"Recognition of file {file.Path} threw an exception {file.Exception!.GetType().Name}: {file.Exception!.Message}");
+                    }
                 }
                 else
                 {

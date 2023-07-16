@@ -57,9 +57,7 @@ namespace FileFormatDetector.Core
                 await Parallel.ForEachAsync(filesIterator, parallelOptions, async (f, token) =>
                 {
                     var recognizedFile = await DetectFormat(f, token);
-
-                    if (recognizedFile != null)
-                        recognizedFiles.Add(recognizedFile);
+                    recognizedFiles.Add(recognizedFile);
                 });
             }
             catch (OperationCanceledException)
@@ -84,7 +82,15 @@ namespace FileFormatDetector.Core
                 FileInfo fileInfo = new FileInfo(path);
                 if (fileInfo.Length > 0)
                 {
-                    using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                    FileStreamOptions options = new FileStreamOptions()
+                    {
+                        Mode = FileMode.Open,
+                        Access = FileAccess.Read,
+                        Share = FileShare.ReadWrite,
+                        Options = FileOptions.Asynchronous,
+                    };
+
+                    using (var file = File.Open(path, options))
                     {
                         recognitionResult = await TryDetectGeneralFormat(file, path, cancellationToken);
 

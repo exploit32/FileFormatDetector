@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Core
 {
-    internal class FileRecognitionException: Exception
+    public class FileRecognitionException: Exception
     {
         public object Detector { get; private set; }
 
