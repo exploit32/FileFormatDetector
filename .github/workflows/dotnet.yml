@@ -32,7 +32,7 @@ jobs:
       run: |
         dotnet publish FileFormatDetector.Console -p:PublishProfile=FolderProfile
         dotnet publish ElfFormat -p:PublishProfile=FolderProfile
-        dotnet publish PeFormat -p:PublishProfile=FolderProfile
+        dotnet publish PEFormat -p:PublishProfile=FolderProfile
         dotnet publish MachOFormat -p:PublishProfile=FolderProfile
         dotnet publish TextFilesFormat -p:PublishProfile=FolderProfile
         dotnet publish XmlFormat -p:PublishProfile=FolderProfile
