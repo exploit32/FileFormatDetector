@@ -55,22 +55,6 @@ namespace TextFilesFormat
             return CheckSignatures(fileStart, EncodingsWithSignature) != null;
         }
 
-        private DetectableEncoding? CheckSignatures(ReadOnlySpan<byte> fileStart, DetectableEncoding[] encodings)
-        {
-            for (int i = 0; i < encodings.Length; i++)
-            {
-                var encoding = encodings[i];
-
-                if (fileStart.Length >= encoding.BomSignature!.Offset + encoding.BomSignature.Value.Length)
-                {
-                    if (SignatureTools.CheckSignature(fileStart, encoding.BomSignature))
-                        return encoding;
-                }
-            }
-
-            return null;
-        }
-
         public async Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
         {
             if (stream.Length == 0)
@@ -85,6 +69,22 @@ namespace TextFilesFormat
             }
 
             return summary;
+        }
+
+        private DetectableEncoding? CheckSignatures(ReadOnlySpan<byte> fileStart, DetectableEncoding[] encodings)
+        {
+            for (int i = 0; i < encodings.Length; i++)
+            {
+                var encoding = encodings[i];
+
+                if (fileStart.Length >= encoding.BomSignature!.Offset + encoding.BomSignature.Value.Length)
+                {
+                    if (SignatureTools.CheckSignature(fileStart, encoding.BomSignature))
+                        return encoding;
+                }
+            }
+
+            return null;
         }
 
         private async Task<TextFormatSummary?> TryDetectEncodingWithBom(Stream stream)

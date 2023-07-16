@@ -1,5 +1,6 @@
 ﻿using PEFormat;
 using PEFormat.Structs;
+using FormatApi;
 
 namespace Tests.Pe
 {
@@ -127,7 +128,7 @@ namespace Tests.Pe
             {
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
+                await Assert.ThrowsAsync<FileFormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
     }

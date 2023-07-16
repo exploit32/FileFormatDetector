@@ -25,7 +25,7 @@ namespace ElfFormat
             byte[] magic = _reader.ReadBytes(4);
 
             if (!magic.SequenceEqual(Magic))
-                throw new FormatException("Expected ELF header was not found");
+                throw new FileFormatException("Expected ELF header was not found");
 
             ElfClass elfClass = _reader.ParseEnumChecked<ElfClass>(_reader.ReadByte());
             ElfEndianness endianness = _reader.ParseEnumChecked<ElfEndianness>(_reader.ReadByte());

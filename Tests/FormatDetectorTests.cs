@@ -76,10 +76,10 @@ namespace Tests
             var formats = (await CreateDetectorAndScan(new string[] { UnknownSamplesDirectory })).ToArray();
 
             //Assert
-            Assert.Equal(2, formats.Count(f => f.FormatSummary is UnknownFormatSummary));
+            Assert.All(formats, f => Assert.True(f.IsUnknown));
         }
 
-        private async Task<IEnumerable<RecognizedFile>> CreateDetectorAndScan(string[] paths)
+        private async Task<IEnumerable<FileRecognitionResult>> CreateDetectorAndScan(string[] paths)
         {
             FormatDetectorConfiguration configuration = new FormatDetectorConfiguration();
 

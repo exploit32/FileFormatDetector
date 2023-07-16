@@ -39,6 +39,10 @@
         /// <param name="stream">File to detect format</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>FormatSummary if file was successfully parsed, otherwise null</returns>
+        /// <exception cref="NotSupportedException" If format is propably valid, but detector doesn't support particular features></exception>
+        /// <exception cref="FileFormatException" If file is malformed></exception>
+        /// <exception cref="IOException" If there was an exception during file reading></exception>
+        /// <exception cref="OperationCanceledException" If detecton was cancelled></exception>
         Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken);
     }
 }

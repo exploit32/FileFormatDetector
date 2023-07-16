@@ -16,6 +16,9 @@ namespace FileFormatDetector.Core
         private readonly IFormatDetector[] _formatsWithMandatorySignature;
         private readonly IFormatDetector[] _formatsWithOptionalOrMissingSignature;
 
+        /// <summary>
+        /// Format detector's configuration
+        /// </summary>
         public FormatDetectorConfiguration Configuration { get; }
 
         public FormatDetector(FormatDetectorConfiguration configuration, IFormatDetector[] generalFormats, ITextBasedFormatDetector[] textBasedFormats)
@@ -37,7 +40,7 @@ namespace FileFormatDetector.Core
         /// <param name="paths">Collection of paths to scan. May contain directories or individual files</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Collection of recognized files</returns>
-        public async Task<IEnumerable<RecognizedFile>> ScanFiles(string[] paths, CancellationToken cancellationToken)
+        public async Task<IEnumerable<FileRecognitionResult>> ScanFiles(string[] paths, CancellationToken cancellationToken)
         {
             var filesIterator = new FilesIterator(paths, Configuration.Recursive);
 
@@ -47,7 +50,7 @@ namespace FileFormatDetector.Core
                 MaxDegreeOfParallelism = Configuration.Threads.HasValue ? Configuration.Threads.Value : Environment.ProcessorCount,
             };
 
-            ConcurrentBag<RecognizedFile> recognizedFiles = new ConcurrentBag<RecognizedFile>();
+            ConcurrentBag<FileRecognitionResult> recognizedFiles = new ConcurrentBag<FileRecognitionResult>();
 
             try
             {
@@ -72,65 +75,61 @@ namespace FileFormatDetector.Core
         /// <param name="path">File path</param>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns></returns>
-        private async Task<RecognizedFile?> DetectFormat(string path, CancellationToken cancellationToken)
+        private async Task<FileRecognitionResult> DetectFormat(string path, CancellationToken cancellationToken)
         {
-            FormatSummary? summary = null;
+            FileRecognitionResult? recognitionResult = null;
 
             try
             {
-                if (!File.Exists(path))
-                    return null;
-
                 FileInfo fileInfo = new FileInfo(path);
-                if (fileInfo.Length == 0)
-                    return null;
-
-                using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                if (fileInfo.Length > 0)
                 {
-                    summary = await TryDetectGeneralFormat(file, path, cancellationToken);
-
-                    if (summary != null && summary is TextFormatSummary)
+                    using (var file = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                     {
-                        FormatSummary? textBasedFormatSummary = await TryDetectTextBasedFormat(file, path, (TextFormatSummary)summary, cancellationToken);
+                        recognitionResult = await TryDetectGeneralFormat(file, path, cancellationToken);
 
-                        if (textBasedFormatSummary != null)
-                            summary = textBasedFormatSummary;
+                        if (recognitionResult != null && recognitionResult.IsTextFile)
+                        {
+                            var textBasedFormat = await TryDetectTextBasedFormat(path, file, (TextFormatSummary)recognitionResult.FormatSummary!, cancellationToken);
+
+                            if (textBasedFormat != null)
+                                recognitionResult = textBasedFormat;
+                        }
                     }
-
-                    summary ??= new UnknownFormatSummary();
                 }
             }
-            catch (UnauthorizedAccessException) { }
-            catch (IOException ex)
+            catch (OperationCanceledException)
             {
-                Console.WriteLine($"Error opening {path} : {ex.Message}");
+                //If detection was cancelled, then the file is considered unknown
+            }
+            catch (Exception ex)
+            {
+                return FileRecognitionResult.Faulted(path, ex);
             }
 
-
-            return summary != null ? new RecognizedFile(path, summary) : null;
+            return recognitionResult ?? FileRecognitionResult.Unknown(path);
         }
 
 
-        private async Task<FormatSummary?> TryDetectGeneralFormat(Stream stream, string path, CancellationToken cancellationToken)
+        private async Task<FileRecognitionResult?> TryDetectGeneralFormat(Stream stream, string path, CancellationToken cancellationToken)
         {
             byte[] buffer = new byte[_maxHeaderLength];
-
-            int bytesRead = stream.Read(buffer, 0, buffer.Length);
+            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
 
             stream.Seek(0, SeekOrigin.Begin);
 
             Memory<byte> signature = buffer.AsMemory(0, bytesRead);
 
             //Trying formats with mandatory signature
-            var summary = await Detect(_formatsWithMandatorySignature, stream, path, signature, cancellationToken);
+            FileRecognitionResult? recognitionResult = await Detect(path, stream, signature, _formatsWithMandatorySignature, cancellationToken);
 
             //Trying formats with optional signature
-            summary ??= await Detect(_formatsWithOptionalOrMissingSignature, stream, path, signature, cancellationToken);
+            recognitionResult ??= await Detect(path, stream, signature, _formatsWithOptionalOrMissingSignature, cancellationToken);
 
-            return summary;
+            return recognitionResult;
         }
 
-        private async Task<FormatSummary?> Detect(IEnumerable<IFormatDetector> detectors, Stream stream, string path, Memory<byte> signature, CancellationToken cancellationToken)
+        private async Task<FileRecognitionResult?> Detect(string path, Stream stream, Memory<byte> signature, IEnumerable<IFormatDetector> detectors, CancellationToken cancellationToken)
         {
             foreach (var format in detectors)
             {
@@ -146,16 +145,18 @@ namespace FileFormatDetector.Core
                         var summary = await format.ReadFormat(stream, cancellationToken);
 
                         if (summary != null)
-                            return summary;
+                        {
+                            return FileRecognitionResult.Recognized(path, summary);
+                        }
                     }
                 }
-                catch (FormatException ex)
+                catch (NotSupportedException)
                 {
-                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}. Probably file is malformed.");
+                    //File is considered unknown
                 }
-                catch (Exception ex)
+                catch (FileFormatException ex)
                 {
-                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
+                    return FileRecognitionResult.Faulted(path, new FileRecognitionException(ex.Message, format, ex));
                 }
             }
 
@@ -163,10 +164,8 @@ namespace FileFormatDetector.Core
         }
 
 
-        private async Task<FormatSummary?> TryDetectTextBasedFormat(Stream stream, string path, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
+        private async Task<FileRecognitionResult?> TryDetectTextBasedFormat(string path, Stream stream, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
-            FormatSummary? summary = null;
-
             foreach (var format in _textBasedFormatDetectors)
             {
                 try
@@ -174,18 +173,24 @@ namespace FileFormatDetector.Core
                     if (stream.Position != 0)
                         stream.Seek(0, SeekOrigin.Begin);
 
-                    summary = await format.ReadFormat(stream, textFormatSummary, cancellationToken);
+                    var summary = await format.ReadFormat(stream, textFormatSummary, cancellationToken);
 
                     if (summary != null)
-                        break;
+                    {
+                        return FileRecognitionResult.Recognized(path, summary);
+                    }
                 }
-                catch (Exception ex)
+                catch (NotSupportedException)
                 {
-                    Console.WriteLine($"Detector {format.GetType()} threw an exception while processing file {path}: {ex.Message}");
+                    //File is considered unknown
+                }
+                catch (FileFormatException ex)
+                {
+                    return FileRecognitionResult.Faulted(path, new FileRecognitionException(ex.Message, format, ex));
                 }
             }
 
-            return summary;
+            return null;
         }
     }
 }

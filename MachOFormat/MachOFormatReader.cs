@@ -70,7 +70,7 @@ namespace MachOFormat
             }
             else
             {
-                throw new FormatException("Expected Mach-O header was not found");
+                throw new FileFormatException("Expected Mach-O header was not found");
             }
 
             return new MachOMagic()

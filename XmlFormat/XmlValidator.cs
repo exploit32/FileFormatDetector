@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FormatApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +25,8 @@ namespace XmlFormat
                 Async = true,
             };
 
+            bool nonWhitespaceElementFound = false;
+
             using (StreamReader reader = new StreamReader(stream, encoding, leaveOpen: true))
             using (XmlReader xmlReader = XmlReader.Create(reader, settings))
             {
@@ -36,14 +39,25 @@ namespace XmlFormat
                             xmlDeclarationEncoding = xmlReader.GetAttribute("encoding") ?? String.Empty;
                         }
 
+                        nonWhitespaceElementFound |= xmlReader.NodeType != XmlNodeType.Whitespace;
+
                         if (validationMethod == ValidationMethod.UntilFirstNode && xmlReader.NodeType != XmlNodeType.Whitespace)
                             break;
 
                         cancellationToken.ThrowIfCancellationRequested();
                     }
                 }
-                catch (Exception)
+                catch (XmlException ex) when (ex.Message.StartsWith("Version number"))
                 {
+                    throw new NotSupportedException(ex.Message, ex);
+                }
+                catch (Exception ex)
+                {
+                    //Exception is thrown if validation method is Full and file has valid xml nodes at the beginning.
+                    //This file is treated as malformed xml
+                    if (validationMethod == ValidationMethod.Full && nonWhitespaceElementFound)
+                        throw new FileFormatException(ex.Message, ex);
+
                     xmlValid = false;
                 }
             }
@@ -54,12 +68,5 @@ namespace XmlFormat
                 XmlDeclarationEncoding = xmlDeclarationEncoding,
             };
         }
-    }
-
-    class XmlValidationResult
-    {
-        public bool Valid { get; init; }
-
-        public string? XmlDeclarationEncoding { get; init; }
     }
 }

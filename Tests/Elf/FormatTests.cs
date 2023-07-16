@@ -1,10 +1,6 @@
 ﻿using ElfFormat;
 using ElfFormat.Structs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FormatApi;
 
 namespace Tests.Elf
 {
@@ -264,7 +260,7 @@ namespace Tests.Elf
             {
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
+                await Assert.ThrowsAsync<FileFormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
 
         }

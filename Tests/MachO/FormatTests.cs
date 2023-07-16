@@ -1,10 +1,6 @@
 ﻿using MachOFormat;
 using MachOFormat.Structs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using FormatApi;
 
 namespace Tests.MachO
 {
@@ -250,7 +246,7 @@ namespace Tests.MachO
             {
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
+                await Assert.ThrowsAsync<FileFormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
 
@@ -272,7 +268,7 @@ namespace Tests.MachO
             {
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<FormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
+                await Assert.ThrowsAsync<FileFormatException>(async () => await detector.ReadFormat(stream, CancellationToken.None));
             }
         }
     }

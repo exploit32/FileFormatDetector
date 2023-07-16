@@ -1,11 +1,6 @@
 ﻿using PEFormat.Structs;
-using System;
-using System.Buffers.Binary;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Tools;
+using FormatApi;
 
 namespace PEFormat
 {
@@ -27,13 +22,13 @@ namespace PEFormat
             byte[] signature = _reader.ReadBytes(DosSignature.Length);
 
             if (!signature.SequenceEqual(DosSignature))
-                throw new FormatException("Expected MZ header was not found");
+                throw new FileFormatException("Expected MZ header was not found");
 
             _reader.Stream.Seek(0x3C, SeekOrigin.Begin);
             uint coffOffset = _reader.ReadUInt32();
 
             if (coffOffset >= _reader.Stream.Length)
-                throw new FormatException("COFF offset points out of file");
+                throw new FileFormatException("COFF offset points outside the file");
 
             return new DosHeader()
             {
@@ -49,7 +44,7 @@ namespace PEFormat
             byte[] signature = _reader.ReadBytes(PESignature.Length);
 
             if (!signature.SequenceEqual(PESignature))
-                throw new FormatException("Expected PE header was not found");
+                throw new FileFormatException("Expected PE header was not found");
 
             return new COFFHeader()
             {

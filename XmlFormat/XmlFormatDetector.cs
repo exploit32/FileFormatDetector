@@ -19,7 +19,7 @@ namespace XmlFormat
         public async Task<FormatSummary?> ReadFormat(Stream stream, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
             if (textFormatSummary.CodePage == 0)
-                throw new FormatException($"Cannot read encoding {textFormatSummary.EncodingName}");
+                throw new NotSupportedException($"Cannot read encoding {textFormatSummary.EncodingName}");
 
             Encoding encoding;
 
@@ -27,9 +27,9 @@ namespace XmlFormat
             {
                 encoding = Encoding.GetEncoding(textFormatSummary.CodePage);
             }
-            catch (NotSupportedException ex)
+            catch (Exception ex)
             {
-                throw new FormatException(ex.Message, ex);
+                throw new NotSupportedException($"Error creating encoding: {ex.Message}", ex);
             }
 
             XmlValidator validator = new XmlValidator();

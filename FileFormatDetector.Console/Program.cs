@@ -9,7 +9,6 @@ namespace FileFormatDetector.Console
         static async Task<int> Main(string[] args)
         {
             FormatPluginsLoader loader = new FormatPluginsLoader(PluginsDirectory);
-
             loader.LoadPlugins();
 
             if (!loader.AnyPluginsLoaded)
@@ -32,7 +31,6 @@ namespace FileFormatDetector.Console
                     foreach (var formatDetector in loader.TextBasedFormatDetectors)
                         System.Console.WriteLine($" - {formatDetector.Description}");
                 }
-
             }
 
             AppConfiguration configuration = new AppConfiguration();
@@ -65,6 +63,7 @@ namespace FileFormatDetector.Console
             {
                 cancellationTokenSource.Cancel();
                 args.Cancel = true;
+                System.Console.WriteLine("Interrupting scan...");
             };
 
             var detectorConfiguration = new FormatDetectorConfiguration()
@@ -77,9 +76,13 @@ namespace FileFormatDetector.Console
                                                          loader.GeneralFormatDetectors.ToArray(),
                                                          loader.TextBasedFormatDetectors.ToArray());
 
+            System.Console.WriteLine();
             System.Console.WriteLine("Scanning files and directories...");
 
             var recognizedFiles = await detector.ScanFiles(configuration.Paths.ToArray(), cancellationTokenSource.Token);
+
+            System.Console.WriteLine();
+            System.Console.WriteLine("Scan result:");
 
             FormatPrinter printer = new FormatPrinter();
 

@@ -10,13 +10,27 @@ namespace FileFormatDetector.Console
 {
     public class FormatPrinter
     {
-        public void PrintRecognizedFiles(IEnumerable<RecognizedFile> files)
+        public void PrintRecognizedFiles(IEnumerable<FileRecognitionResult> files)
         {
             foreach (var file in files)
             {
-                System.Console.WriteLine($"File {file.Path} recognized as {file.FormatSummary.FormatName}");
-
-                PrintFormatSummary(file.FormatSummary, string.Empty);
+                if (file.IsRecognized)
+                {
+                    System.Console.WriteLine($"File {file.Path} recognized as {file.FormatSummary!.FormatName}");
+                    PrintFormatSummary(file.FormatSummary, string.Empty);
+                }
+                else if (file.IsUnknown)
+                {
+                    System.Console.WriteLine($"File {file.Path} has unknown format");
+                }
+                else if (file.IsFaulted)
+                {
+                    System.Console.WriteLine($"Recognition of file {file.Path} threw an exception {file.Exception!.GetType().Name}: {file.Exception!.Message}");
+                }
+                else
+                {
+                    System.Console.WriteLine($"Something went wrong with file {file.Path}. (IsRecognized={file.IsRecognized}, IsUnknown={file.IsUnknown}, IsFaulted={file.IsFaulted})");
+                }
             }
         }
 
@@ -49,24 +63,37 @@ namespace FileFormatDetector.Console
             }
         }
 
-        public void PrintDistinctCount(IEnumerable<RecognizedFile> files)
+        public void PrintDistinctCount(IEnumerable<FileRecognitionResult> files)
         {
-            var distinctFormats = files.GroupBy(f => f.FormatSummary).OrderByDescending(f => f.Count());
+            var distinctRecognizedFormats = files.Where(f => f.IsRecognized).GroupBy(f => f.FormatSummary).OrderByDescending(f => f.Count());
 
-            foreach (var formatGroup in distinctFormats)
+            foreach (var formatGroup in distinctRecognizedFormats)
             {
                 var format = formatGroup.Key;
                 var count = formatGroup.Count();
 
                 System.Console.WriteLine("{0} - {1}", count, format.ToString());
             }
-        }
 
-        private string GetFormatShortSummary(FormatSummary formatSummary)
-        {
-            var keys = formatSummary.GetKeys();
+            var unknownFiles = files.Count(f => f.IsUnknown);
 
-            return string.Format("{0}: {1}", formatSummary.FormatName, string.Join(", ", keys.Select(k => formatSummary[k])));
+            if (unknownFiles > 0)
+                System.Console.WriteLine($"{unknownFiles} - Unknown");
+
+            var faultedFiles = files.Where(f => f.IsFaulted).ToList();
+
+            if (faultedFiles.Any())
+            {
+                var distinctExceptions = faultedFiles.GroupBy(f => f.Exception!.GetType()).OrderByDescending(f => f.Count());
+
+                foreach (var exceptionGroup in distinctExceptions)
+                {
+                    var format = exceptionGroup.Key.Name;
+                    var count = exceptionGroup.Count();
+
+                    System.Console.WriteLine("{0} - thrown exception: {1}", count, format.ToString());
+                }
+            }
         }
     }
 }
