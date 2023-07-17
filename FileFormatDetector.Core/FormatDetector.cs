@@ -141,7 +141,7 @@ namespace FileFormatDetector.Core
             if (_hasFomatsWithSignature)
             {
                 byte[] buffer = new byte[_maxSignatureLength];
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken);
 
                 stream.Seek(0, SeekOrigin.Begin);
                 signature = buffer.AsMemory(0, bytesRead);

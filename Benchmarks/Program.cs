@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
+using System.Text;
 
 namespace Benchmarks
 {
@@ -6,7 +7,8 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<TextDetectionBenchmarks>();
+            var report1 = BenchmarkRunner.Run<EncodingStagesBenchmark>();
+            var report2 = BenchmarkRunner.Run<TextDetectionBenchmarks>();
         }
     }
 }

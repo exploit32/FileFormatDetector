@@ -12,7 +12,7 @@ namespace FileFormatDetector.Core
     /// </summary>
     internal class FilesIterator : IEnumerable<string>
     {
-        private Stack<string> _paths;
+        private readonly Stack<string> _paths;
 
         private readonly bool _recursive;
 
