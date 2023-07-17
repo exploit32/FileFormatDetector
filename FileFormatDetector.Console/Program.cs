@@ -11,26 +11,14 @@ namespace FileFormatDetector.Console
             FormatPluginsLoader loader = new FormatPluginsLoader(PluginsDirectory);
             loader.LoadPlugins();
 
-            if (!loader.AnyPluginsLoaded)
+            if (loader.AnyGeneralFormatDetectorsLoaded)
             {
-                System.Console.WriteLine($"No format pluging were found. Build solution to put them into {PluginsDirectory} directory");
-                return (int)ExitCodes.NoPlugins;
+                PrintLoadedDetectors(loader);
             }
             else
             {
-                if (loader.GeneralFormatDetectors.Any())
-                {
-                    System.Console.WriteLine("Loaded general format detectors:");
-                    foreach (var formatDetector in loader.GeneralFormatDetectors)
-                        System.Console.WriteLine($" - {formatDetector.Description}");
-                }
-
-                if (loader.TextBasedFormatDetectors.Any())
-                {
-                    System.Console.WriteLine("Loaded text-based format detectors:");
-                    foreach (var formatDetector in loader.TextBasedFormatDetectors)
-                        System.Console.WriteLine($" - {formatDetector.Description}");
-                }
+                System.Console.WriteLine($"No general format plugins were found. Build solution to put them into {PluginsDirectory} directory");
+                return (int)ExitCodes.NoPlugins;
             }
 
             AppConfiguration configuration = new AppConfiguration();
@@ -73,8 +61,8 @@ namespace FileFormatDetector.Console
             };
 
             FormatDetector detector = new FormatDetector(detectorConfiguration,
-                                                         loader.GeneralFormatDetectors.ToArray(),
-                                                         loader.TextBasedFormatDetectors.ToArray());
+                                                         loader.GeneralFormatDetectors,
+                                                         loader.TextBasedFormatDetectors);
 
             System.Console.WriteLine();
             System.Console.WriteLine("Scanning files and directories...");
@@ -92,6 +80,23 @@ namespace FileFormatDetector.Console
             printer.PrintDistinctCount(recognizedFiles);
 
             return (int)ExitCodes.OK;
+        }
+
+        private static void PrintLoadedDetectors(FormatPluginsLoader loader)
+        {
+            if (loader.GeneralFormatDetectors.Any())
+            {
+                System.Console.WriteLine("Loaded general format detectors:");
+                foreach (var formatDetector in loader.GeneralFormatDetectors)
+                    System.Console.WriteLine($" - {formatDetector.Description}");
+            }
+
+            if (loader.TextBasedFormatDetectors.Any())
+            {
+                System.Console.WriteLine("Loaded text-based format detectors:");
+                foreach (var formatDetector in loader.TextBasedFormatDetectors)
+                    System.Console.WriteLine($" - {formatDetector.Description}");
+            }
         }
 
         enum ExitCodes

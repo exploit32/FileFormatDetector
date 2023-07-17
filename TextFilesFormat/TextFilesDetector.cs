@@ -48,7 +48,7 @@ namespace TextFilesFormat
 
         public int BytesToReadSignature => MaxBomLength.Value;
 
-        public string Description => "Text files detector. Supports BOM detection. Supported encodings: ASCII, UTF-8, UTF-16 BE/LE, UTF-32 BE/LE";
+        public string Description => "Text files detector. Supported encodings: ASCII, Windows-125x, UTF-8, UTF-16 BE/LE, UTF-32 BE/LE and BOM detection.";
 
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {

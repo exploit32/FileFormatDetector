@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Core
 {
+    /// <summary>
+    /// Detector configuration
+    /// </summary>
     public class FormatDetectorConfiguration
     {
         /// <summary>

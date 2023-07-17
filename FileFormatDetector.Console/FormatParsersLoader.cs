@@ -8,23 +8,48 @@ using System.Threading.Tasks;
 
 namespace FileFormatDetector.Console
 {
+    /// <summary>
+    /// Detector plugins loading class
+    /// </summary>
     internal class FormatPluginsLoader
     {
+        /// <summary>
+        /// Directory to search for pluging
+        /// </summary>
         public string PluginsDirectory { get; }
 
-        public List<IFormatDetector> GeneralFormatDetectors { get; private set; } = new List<IFormatDetector>();
+        /// <summary>
+        /// Loaded general format parsers
+        /// </summary>
+        public IFormatDetector[] GeneralFormatDetectors { get; private set; } = new IFormatDetector[0];
 
-        public List<ITextBasedFormatDetector> TextBasedFormatDetectors { get; private set; } = new List<ITextBasedFormatDetector>();
+        /// <summary>
+        /// Loaded text-based format parsers
+        /// </summary>
+        public ITextBasedFormatDetector[] TextBasedFormatDetectors { get; private set; } = new ITextBasedFormatDetector[0];
 
-        public bool AnyPluginsLoaded => GeneralFormatDetectors.Count + TextBasedFormatDetectors.Count > 0;
+        /// <summary>
+        /// Indicates that any general format parsers were loaded
+        /// </summary>
+        public bool AnyGeneralFormatDetectorsLoaded => GeneralFormatDetectors.Any();
 
+        /// <summary>
+        /// Constructs plugin loader
+        /// </summary>
+        /// <param name="directory">Directory to look for plugins</param>
         public FormatPluginsLoader(string directory)
         {
             PluginsDirectory = directory;
         }
 
+        /// <summary>
+        /// Load plugins from specified directory
+        /// </summary>
         public void LoadPlugins()
         {
+            List<IFormatDetector> generalFormatDetectors = new List<IFormatDetector>();
+            List<ITextBasedFormatDetector> textBasedFormatDetectors = new List<ITextBasedFormatDetector>();
+
             var plugins = GetLibraries();
 
             foreach (var plugin in plugins)
@@ -35,14 +60,17 @@ namespace FileFormatDetector.Console
 
                     var pluginAssembly = context.LoadFromAssemblyPath(plugin);
 
-                    GeneralFormatDetectors.AddRange(TryCreateFormatDetector<IFormatDetector>(pluginAssembly));
-                    TextBasedFormatDetectors.AddRange(TryCreateFormatDetector<ITextBasedFormatDetector>(pluginAssembly));
+                    generalFormatDetectors.AddRange(TryCreateFormatDetector<IFormatDetector>(pluginAssembly));
+                    textBasedFormatDetectors.AddRange(TryCreateFormatDetector<ITextBasedFormatDetector>(pluginAssembly));
                 }
                 catch (Exception ex)
                 {
                     System.Console.WriteLine($"Error loading plugin {plugin}: {ex.Message}");
                 }
             }
+
+            GeneralFormatDetectors = generalFormatDetectors.ToArray();
+            TextBasedFormatDetectors = textBasedFormatDetectors.ToArray();
         }
 
         private IEnumerable<T> TryCreateFormatDetector<T>(Assembly assembly)

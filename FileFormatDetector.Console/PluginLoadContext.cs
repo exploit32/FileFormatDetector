@@ -4,6 +4,9 @@ using System.Runtime.Loader;
 
 namespace FileFormatDetector.Console
 {
+    /// <summary>
+    /// Load context of format detectors plugins
+    /// </summary>
     internal class PluginLoadContext : AssemblyLoadContext
     {
         AssemblyDependencyResolver _resolver;

@@ -3,17 +3,29 @@ using System.Reflection;
 
 namespace FileFormatDetector.Console
 {
+    /// <summary>
+    /// Class that configures provided classes by parsing command line parameters
+    /// </summary>
     internal class CommandLineParser
     {
         private DefaultParameter? _defaultParameter = null;
 
         private List<Parameter> _parameters = new List<Parameter>();
 
+        /// <summary>
+        /// Check for help request in parameters
+        /// </summary>
+        /// <param name="args">Parameters</param>
+        /// <returns>True is help request was found</returns>
         public bool HelpRequested(string[] args)
         {
             return args.Any(a => a.Equals("--help", StringComparison.InvariantCultureIgnoreCase));
         }
 
+        /// <summary>
+        /// Scan provided classes to look for properties, marked with <see cref="ParameterAttribute"/> or <see cref="DefaultParameterAttribute"/>
+        /// </summary>
+        /// <param name="objects">Collection of objects</param>
         public void Configure(IEnumerable<object> objects)
         {
             foreach (var obj in objects)
@@ -22,6 +34,11 @@ namespace FileFormatDetector.Console
             }
         }
 
+        /// <summary>
+        /// Scan provided class to look for properties, marked with <see cref="ParameterAttribute"/> or <see cref="DefaultParameterAttribute"/>
+        /// </summary>
+        /// <param name="obj">Object to scan</param>
+        /// <exception cref="ArgumentException">Exception is thrown if object defines parameter which was already declared by another object</exception>
         public void Configure(object obj)
         {
             var properties = obj.GetType().GetProperties();
@@ -59,6 +76,11 @@ namespace FileFormatDetector.Console
             }
         }
 
+        /// <summary>
+        /// Parse command line arguments and write property values to provided classes
+        /// </summary>
+        /// <param name="args">Command line arguments</param>
+        /// <exception cref="ArgumentException">Exception is thrown if unknown argument is found or argument syntax error</exception>
         public void Parse(string[] args)
         {
             int index = 0;
@@ -108,6 +130,9 @@ namespace FileFormatDetector.Console
             ApplyParameters();
         }
 
+        /// <summary>
+        /// Print help with application parameters description
+        /// </summary>
         public void PrintHelp()
         {
             System.Console.WriteLine("Files format detector");
@@ -132,9 +157,14 @@ namespace FileFormatDetector.Console
             }
         }
 
+        /// <summary>
+        /// Print parameters description
+        /// </summary>
+        /// <param name="parameters">Collection of parameters</param>
+        /// <param name="printClass">Print or skip class name that owns parameter</param>
         private void PrintParameters(IEnumerable<Parameter> parameters, bool printClass)
         {
-            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", Description: p.Description, Detector: p.TargetObject.GetType().Name)).ToList();
+            var paramsDescription = parameters.Select(p => (Name: $"--{p.Key}{(p.IsFlag ? "" : " (value)")}:", p.Description, Detector: p.TargetObject.GetType().Name)).ToList();
 
             int parameterNameLength = paramsDescription.Max(p => p.Name.Length);
             int parameterDescriptionLength = paramsDescription
@@ -170,6 +200,9 @@ namespace FileFormatDetector.Console
 
         private delegate bool TryParseDelegate<T>(string text, out T value);
 
+        /// <summary>
+        /// Write parsed parameters back to owned classes
+        /// </summary>
         private void ApplyParameters()
         {
             foreach (var parameter in _parameters)
@@ -204,6 +237,14 @@ namespace FileFormatDetector.Console
             }
         }
 
+        /// <summary>
+        /// Parse parameter of specified type and assing it's value to owner object's property
+        /// </summary>
+        /// <typeparam name="T">Parameter type</typeparam>
+        /// <param name="parameter">Parameter description</param>
+        /// <param name="tryParse">Try parse delegate</param>
+        /// <exception cref="ArgumentNullException">Thrown if parameter value isn't set</exception>
+        /// <exception cref="ArgumentException">Thrown if parameter isn't parsed correctly</exception>
         private void ParseAndSet<T>(Parameter parameter, TryParseDelegate<T> tryParse)
         {
             if (string.IsNullOrEmpty(parameter.Value))
@@ -215,28 +256,58 @@ namespace FileFormatDetector.Console
             }
             else
             {
-                throw new ArgumentException($"Error parsing property {parameter.Key} for detector {parameter.TargetObject.GetType().Name}");
+                throw new ArgumentException($"Error parsing property {parameter.Key} for object {parameter.TargetObject.GetType().Name}");
             }
         }
 
+        /// <summary>
+        /// Internal representation of parameter
+        /// </summary>
         class Parameter
         {
+            /// <summary>
+            /// Parameter key
+            /// </summary>
             public string Key { get; init; }
 
+            /// <summary>
+            /// Parameter description
+            /// </summary>
             public string Description { get; init; }
 
+            /// <summary>
+            /// Object that owns this parameter
+            /// </summary>
             public object TargetObject { get; init; }
 
+            /// <summary>
+            /// Parameter type
+            /// </summary>
             public Type ParameterType { get; init; }
 
+            /// <summary>
+            /// Owner object property info
+            /// </summary>
             public PropertyInfo Property { get; init; }
 
+            /// <summary>
+            /// Indicates that parameter doesn't have value
+            /// </summary>
             public bool IsFlag { get; init; }
 
+            /// <summary>
+            /// Indicates that flag parameter is inverted. Presence of flag means false value
+            /// </summary>
             public bool IsInverted { get; init; }
 
+            /// <summary>
+            /// Parameter string value
+            /// </summary>
             public string? Value { get; set; }
 
+            /// <summary>
+            /// Indicates that value is set
+            /// </summary>
             public bool ValueSet { get; set; }
 
             public Parameter(string key, string description, object targetObject, PropertyInfo property)
@@ -254,14 +325,29 @@ namespace FileFormatDetector.Console
             }
         }
 
+        /// <summary>
+        /// Internal representation of default parameter
+        /// </summary>
         class DefaultParameter
         {
+            /// <summary>
+            /// Object that owns parameter
+            /// </summary>
             public object TargetObject { get; init; }
 
+            /// <summary>
+            /// Parameter type
+            /// </summary>
             public Type ParameterType { get; init; }
 
+            /// <summary>
+            /// Owner object property info
+            /// </summary>
             public PropertyInfo Property { get; init; }
 
+            /// <summary>
+            /// List of values
+            /// </summary>
             public List<string> Values { get; set; } = new List<string>();
 
             public DefaultParameter(object targetObject, PropertyInfo property)

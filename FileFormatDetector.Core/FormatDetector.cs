@@ -12,26 +12,37 @@ namespace FileFormatDetector.Core
         private readonly IFormatDetector[] _generalFormatDetectors;
         private readonly ITextBasedFormatDetector[] _textBasedFormatDetectors;
         private readonly bool _hasFomatsWithSignature = false;
-        private readonly int _maxHeaderLength = 0;
-        private readonly IFormatDetector[] _formatsWithMandatorySignature;
-        private readonly IFormatDetector[] _formatsWithOptionalOrMissingSignature;
+        private readonly int _maxSignatureLength = 0;
 
         /// <summary>
         /// Format detector's configuration
         /// </summary>
         public FormatDetectorConfiguration Configuration { get; }
 
+        /// <summary>
+        /// Constructs detector with specified configuration and detector pluging
+        /// </summary>
+        /// <param name="configuration">Detector's configuration</param>
+        /// <param name="generalFormats">General format parsers</param>
+        /// <param name="textBasedFormats">Text-based format parsers</param>
+        /// <exception cref="ArgumentNullException">Thrown if null collection is provided</exception>
         public FormatDetector(FormatDetectorConfiguration configuration, IFormatDetector[] generalFormats, ITextBasedFormatDetector[] textBasedFormats)
         {
             Configuration = configuration;
-            _generalFormatDetectors = generalFormats ?? throw new ArgumentNullException(nameof(generalFormats));
+
+            if (generalFormats == null)
+                throw new ArgumentNullException(nameof(generalFormats));
+
             _textBasedFormatDetectors = textBasedFormats ?? throw new ArgumentNullException(nameof(textBasedFormats));
 
-            _formatsWithMandatorySignature = _generalFormatDetectors.Where(f => f.HasSignature && f.SignatureIsMandatory).ToArray();
-            _formatsWithOptionalOrMissingSignature = _generalFormatDetectors.Where(f => !f.HasSignature || f.HasSignature && !f.SignatureIsMandatory).ToArray();
+            var formatsWithMandatorySignature = generalFormats.Where(f => f.HasSignature && f.SignatureIsMandatory);
+            var formatsWithOptionalOrMissingSignature = generalFormats.Where(f => !f.HasSignature || f.HasSignature && !f.SignatureIsMandatory);
 
-            _hasFomatsWithSignature = _formatsWithMandatorySignature.Any();
-            _maxHeaderLength = _hasFomatsWithSignature ? _generalFormatDetectors.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
+            // Reordered collection of format detectors
+            _generalFormatDetectors = formatsWithMandatorySignature.Concat(formatsWithOptionalOrMissingSignature).ToArray();
+
+            _hasFomatsWithSignature = _generalFormatDetectors.Any(f => f.HasSignature);
+            _maxSignatureLength = _hasFomatsWithSignature ? _generalFormatDetectors.Where(f => f.HasSignature).Max(f => f.BytesToReadSignature) : 0;
         }
 
         /// <summary>
@@ -92,7 +103,7 @@ namespace FileFormatDetector.Core
 
                     using (var file = File.Open(path, options))
                     {
-                        recognitionResult = await TryDetectGeneralFormat(file, path, cancellationToken);
+                        recognitionResult = await TryDetectGeneralFormat(path, file, cancellationToken);
 
                         if (recognitionResult != null && recognitionResult.IsTextFile)
                         {
@@ -116,27 +127,48 @@ namespace FileFormatDetector.Core
             return recognitionResult ?? FileRecognitionResult.Unknown(path);
         }
 
-
-        private async Task<FileRecognitionResult?> TryDetectGeneralFormat(Stream stream, string path, CancellationToken cancellationToken)
+        /// <summary>
+        /// Detect format without any knowledge about content of the file
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="stream">Opened file</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Recognized file or null if none of the detectors recognized format</returns>
+        private async Task<FileRecognitionResult?> TryDetectGeneralFormat(string path, Stream stream, CancellationToken cancellationToken)
         {
-            byte[] buffer = new byte[_maxHeaderLength];
-            int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
+            Memory<byte> signature;
 
-            stream.Seek(0, SeekOrigin.Begin);
+            if (_hasFomatsWithSignature)
+            {
+                byte[] buffer = new byte[_maxSignatureLength];
+                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
 
-            Memory<byte> signature = buffer.AsMemory(0, bytesRead);
+                stream.Seek(0, SeekOrigin.Begin);
+                signature = buffer.AsMemory(0, bytesRead);
+            }
+            else
+            {
+                signature = new Memory<byte>();
+            }
 
-            //Trying formats with mandatory signature
-            FileRecognitionResult? recognitionResult = await Detect(path, stream, signature, _formatsWithMandatorySignature, cancellationToken);
-
-            //Trying formats with optional signature
-            recognitionResult ??= await Detect(path, stream, signature, _formatsWithOptionalOrMissingSignature, cancellationToken);
+            FileRecognitionResult? recognitionResult = await Detect(path, stream, signature, _generalFormatDetectors, cancellationToken);
 
             return recognitionResult;
         }
 
+        /// <summary>
+        /// Run specified collection of detectors
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="stream">Opened file</param>
+        /// <param name="signature">First N bytes of the file</param>
+        /// <param name="detectors">Collection of detectors</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Recognized file or null if none of the detectors recognized format</returns>
         private async Task<FileRecognitionResult?> Detect(string path, Stream stream, Memory<byte> signature, IEnumerable<IFormatDetector> detectors, CancellationToken cancellationToken)
         {
+            FileRecognitionException? fileRecognitionException = null;
+
             foreach (var format in detectors)
             {
                 try
@@ -160,18 +192,43 @@ namespace FileFormatDetector.Core
                 {
                     //File is considered unknown
                 }
+                catch (IOException)
+                {
+                    throw; //Cannot handle io problems here
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    throw; //Cannot handle io problems here
+                }
                 catch (FileFormatException ex)
                 {
-                    return FileRecognitionResult.Faulted(path, new FileRecognitionException(ex.Message, format, ex));
+                    fileRecognitionException = new FileRecognitionException(format, FaultType.FileFormatError, ex.Message, ex);
+                }
+                catch (Exception ex)
+                {
+                    fileRecognitionException = new FileRecognitionException(format, FaultType.DetectorInternalError, ex.Message, ex);
                 }
             }
 
-            return null;
+            //File is considered faulted if any detector threw an exception and other detectors haven't parsed file
+            if (fileRecognitionException != null)
+                return FileRecognitionResult.Faulted(path, fileRecognitionException);
+            else
+                return null;
         }
 
-
+        /// <summary>
+        /// Try recognize text-based formats
+        /// </summary>
+        /// <param name="path">File path</param>
+        /// <param name="stream">Opened file</param>
+        /// <param name="textFormatSummary">Information about text encoding</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Recognized text format or null if none of the detectors recognized format</returns>
         private async Task<FileRecognitionResult?> TryDetectTextBasedFormat(string path, Stream stream, TextFormatSummary textFormatSummary, CancellationToken cancellationToken)
         {
+            FileRecognitionException? fileRecognitionException = null;
+
             foreach (var format in _textBasedFormatDetectors)
             {
                 try
@@ -190,13 +247,29 @@ namespace FileFormatDetector.Core
                 {
                     //File is considered unknown
                 }
+                catch (IOException)
+                {
+                    throw; //Cannot handle io problems here
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    throw; //Cannot handle io problems here
+                }
                 catch (FileFormatException ex)
                 {
-                    return FileRecognitionResult.Faulted(path, new FileRecognitionException(ex.Message, format, ex));
+                    fileRecognitionException = new FileRecognitionException(format, FaultType.FileFormatError, ex.Message, ex);
+                }
+                catch (Exception ex)
+                {
+                    fileRecognitionException = new FileRecognitionException(format, FaultType.DetectorInternalError, ex.Message, ex);
                 }
             }
 
-            return null;
+            //File is considered faulted if any detector threw an exception and other detectors haven't parsed file
+            if (fileRecognitionException != null)
+                return FileRecognitionResult.Faulted(path, fileRecognitionException);
+            else
+                return null;
         }
     }
 }
