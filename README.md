@@ -5,7 +5,7 @@
 Tool for file formats detection. Each format is a separate plugin.
 
 App can detect:
-* Text and XML files. Supported encodings: ASCII, Windows-1251, UTF8, UTF16 little endian/big endian, UTF32 little endian/big endian
+* Text and XML files. Supported encodings: ASCII, Windows-125x, UTF8, UTF16 little endian/big endian, UTF32 little endian/big endian
 * PE files. Detected: architecture, 32/64bit, endianness, presence of managed header
 * Elf files. Detected: architecture, 32/64bit, endianness, interpreter
 * Mach-O files. Detected: architecture, 32/64bit, endianness, presence of signature
