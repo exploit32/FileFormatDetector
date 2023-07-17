@@ -11,6 +11,9 @@ using Tools;
 
 namespace MachOFormat
 {
+    /// <summary>
+    /// Class that reads Mach-O format structures
+    /// </summary>
     internal class MachOFormatReader
     {
         public static readonly Signature Magic = new Signature(new byte[] { 0xfe, 0xed, 0xfa, 0xce });
@@ -29,6 +32,11 @@ namespace MachOFormat
             _reader = reader;
         }
 
+        /// <summary>
+        /// Read magic sequnce and determine file type
+        /// </summary>
+        /// <returns>Magic sequece data</returns>
+        /// <exception cref="FileFormatException">Exception is thrown if none of magics were found</exception>
         public MachOMagic ReadMagic()
         {
             byte[] magic = _reader.ReadBytes(4);
@@ -81,6 +89,10 @@ namespace MachOFormat
             };
         }
 
+        /// <summary>
+        /// Read Mach-O data
+        /// </summary>
+        /// <returns>Mach-O structure</returns>
         public MachO ReadMachO()
         {
             MachO result;
@@ -125,6 +137,11 @@ namespace MachOFormat
             return result;
         }
 
+        /// <summary>
+        /// Read app header
+        /// </summary>
+        /// <param name="machOFileSumary">Magic sequence</param>
+        /// <returns>App Header structure</returns>
         private AppHeader ReadAppHeader(MachOMagic machOFileSumary)
         {
             _reader.IsPointers64Bit = machOFileSumary.Bits == 64;
@@ -146,6 +163,11 @@ namespace MachOFormat
             return header;
         }
 
+        /// <summary>
+        /// Read FAT header
+        /// </summary>
+        /// <param name="machOFileSumary">Magic seqyence</param>
+        /// <returns>FAT header</returns>
         private FatHeader ReadFatHeader(MachOMagic machOFileSumary)
         {
             _reader.IsPointers64Bit = machOFileSumary.Bits == 64;
@@ -185,6 +207,12 @@ namespace MachOFormat
             };
         }
 
+        /// <summary>
+        /// Try to find signature
+        /// </summary>
+        /// <param name="appHeader">App header</param>
+        /// <returns>True if signature is found</returns>
+        /// <exception cref="FileFormatException">Exception is thrown if pointer goes outsize of the load commands table</exception>
         private bool FindCodeSignature(AppHeader appHeader)
         {
             bool signatureFound = false;

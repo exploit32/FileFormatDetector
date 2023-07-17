@@ -12,8 +12,39 @@ namespace FormatApi
     /// </summary>
     public class TextFormatSummary : FormatSummary, IEquatable<TextFormatSummary>
     {
-        private static string[] Keys = new[] { nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
+        private static readonly string[] _keys = new[] { nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
 
+        /// <summary>
+        /// Format name
+        /// </summary>
+        public override string FormatName => "Text";
+
+        /// <summary>
+        /// Encoding short name
+        /// </summary>
+        public string EncodingName { get; init; }
+
+        /// <summary>
+        /// Encoding full name
+        /// </summary>
+        public string EncodingFullName { get; init; }
+
+        /// <summary>
+        /// Encoding code page
+        /// </summary>
+        public int CodePage { get; init; }
+
+        /// <summary>
+        /// Indicates that file has byte-order-mark sequence
+        /// </summary>
+        public bool HasBOM { get; init; }
+
+        /// <summary>
+        /// Properties accessor
+        /// </summary>
+        /// <param name="key">Property key</param>
+        /// <returns>Property value</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if key is not found</exception>
         public override dynamic this[string key] => key switch
         {
             nameof(EncodingName) => EncodingName,
@@ -23,17 +54,18 @@ namespace FormatApi
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public override string FormatName => "Text";
-
-        public string EncodingName { get; init; } = string.Empty;
-
-        public string EncodingFullName { get; init; } = string.Empty;
-
-        public int CodePage { get; init; }
-
-        public bool HasBOM { get; init; }
+        public TextFormatSummary(string encodingName, string encodingFullName, int codePage, bool hasBOM)
+        {
+            EncodingName = encodingName;
+            EncodingFullName = encodingFullName;
+            CodePage = codePage;
+            HasBOM = hasBOM;
+        }
+        public override string[] GetKeys() => _keys;
 
         public override bool Equals(object? obj) => this.Equals(obj as TextFormatSummary);
+
+        public override int GetHashCode() => HashCode.Combine(EncodingName, EncodingFullName, CodePage, HasBOM);
 
         public bool Equals(TextFormatSummary? other)
         {
@@ -51,10 +83,6 @@ namespace FormatApi
                 && (CodePage == other.CodePage)
                 && (HasBOM == other.HasBOM);
         }
-
-        public override int GetHashCode() => HashCode.Combine(EncodingName, EncodingFullName, CodePage, HasBOM);
-
-        public override string[] GetKeys() => Keys;
 
         public override string ToString()
         {

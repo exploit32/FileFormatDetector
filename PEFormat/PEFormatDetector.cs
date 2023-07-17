@@ -4,27 +4,54 @@ using Tools;
 
 namespace PEFormat
 {
+    /// <summary>
+    /// PE format files detector
+    /// </summary>
     public class PEFormatDetector : IFormatDetector
     {
-        public static readonly Signature Signature = new Signature(new byte[] { (byte)'M', (byte)'Z' });
+        public static readonly Signature _signature = new Signature(new byte[] { (byte)'M', (byte)'Z' });
 
+        /// <summary>
+        /// Indicates that format has signature
+        /// </summary>
         public bool HasSignature => true;
 
+        /// <summary>
+        /// Indicates that signature is mandatory
+        /// </summary>
         public bool SignatureIsMandatory => true;
 
-        public int BytesToReadSignature => Signature.Offset + Signature.Value.Length;
+        /// <summary>
+        /// Number of bytes to read a signature
+        /// </summary>
+        public int BytesToReadSignature => _signature.Offset + _signature.Value.Length;
 
+        /// <summary>
+        /// Detector description
+        /// </summary>
         public string Description => "PE format detector";
 
+        /// <summary>
+        /// Check if file contains signature
+        /// </summary>
+        /// <param name="fileStart">Beginning of the file</param>
+        /// <returns>True is signature is found, otherwise False</returns>
         public bool CheckSignature(ReadOnlySpan<byte> fileStart)
         {
             if (fileStart.Length < BytesToReadSignature)
                 return false;
 
-            return SignatureTools.CheckSignature(fileStart, Signature);
+            return SignatureTools.CheckSignature(fileStart, _signature);
         }
 
-        public async Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
+        /// <summary>
+        /// Read entire format
+        /// </summary>
+        /// <param name="stream">Opened file</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Elf format summary</returns>
+        /// <exception cref="FileFormatException">Exception is thrown if file is malformed</exception>
+        public Task<FormatSummary?> ReadFormat(Stream stream, CancellationToken cancellationToken)
         {
             EndiannessAwareBinaryReader reader = new EndiannessAwareBinaryReader(stream, true);
 
@@ -39,15 +66,14 @@ namespace PEFormat
             if (bits == 0)
                 bits = coffHeader.GetBitsByMachineType();
 
-            PEFormatSummary? formatSummary = new PEFormatSummary()
-            {
-                Architecture = coffHeader.Machine.ToString(),
-                Bits = bits,
-                Endianness = GetEndianess(coffHeader.Machine),
-                HasClrHeader = HasClrMetadata(optionalHeader),
-            };
+            PEFormatSummary? formatSummary = new PEFormatSummary(            
+                architecture: coffHeader.Machine.ToString(),
+                bits: bits,
+                endianness: GetEndianess(coffHeader.Machine),
+                hasClrHeader: HasClrMetadata(optionalHeader)
+            );
 
-            return formatSummary;
+            return Task.FromResult<FormatSummary?>(formatSummary);
         }
 
         private Endianness GetEndianess(Machine machine)

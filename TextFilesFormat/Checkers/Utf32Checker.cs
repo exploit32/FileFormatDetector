@@ -7,14 +7,32 @@ using System.Threading.Tasks;
 
 namespace TextFilesFormat.Checkers
 {
+    /// <summary>
+    /// Class that checks validity of UTF-32 bytes range
+    /// </summary>
     internal class Utf32Checker
     {
+        /// <summary>
+        /// Indicates that Little Endian representation has valid bytes range
+        /// </summary>
         public bool ValidLittleEndianRange { get; private set; } = true;
 
+        /// <summary>
+        /// Indicates that Big Endian representation has valid bytes range
+        /// </summary>
         public bool ValidBigEndianRange { get; private set; } = true;
 
+        /// <summary>
+        /// Indicates that file has null symbols
+        /// </summary>
         public bool HasNullSumbols { get; set; } = false;
 
+        /// <summary>
+        /// Check provided block of bytes
+        /// </summary>
+        /// <param name="buffer">Block of bytes</param>
+        /// <returns>Block validity</returns>
+        /// <exception cref="ArgumentException">Exception is thrown if block's size is not a multiple of 4</exception>
         public bool CheckValidRange(ReadOnlySpan<byte> buffer)
         {
             if (buffer.Length % 4 != 0)
@@ -43,7 +61,10 @@ namespace TextFilesFormat.Checkers
                     ValidLittleEndianRange = false;
 
                 if (b0 == 0 && b1 == 0 && b2 == 0 && b3 == 0)
+                {
                     HasNullSumbols = true;
+                    return;
+                }
             }
         }
     }

@@ -252,7 +252,14 @@ namespace FileFormatDetector.Console
 
             if (tryParse(parameter.Value, out T parsed))
             {
-                parameter.Property.SetValue(parameter.TargetObject, parsed);
+                try
+                {
+                    parameter.Property.SetValue(parameter.TargetObject, parsed);
+                }
+                catch (TargetInvocationException ex) when(ex.InnerException != null)
+                {
+                    throw ex.InnerException;
+                }
             }
             else
             {

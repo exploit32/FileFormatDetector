@@ -8,10 +8,54 @@ using System.Threading.Tasks;
 
 namespace MachOFormat
 {
+    /// <summary>
+    /// Summary of Mach-O file format
+    /// </summary>
     public class MachOFormatSummary : FormatSummary, IEquatable<MachOFormatSummary>
     {
-        private static string[] Keys = new[] { nameof(Bits), nameof(Architecture), nameof(Endianness), nameof(HasSignature), nameof(IsFat), nameof(InnerApps) };
+        private static readonly string[] _keys = new[] { nameof(Bits), nameof(Architecture), nameof(Endianness), nameof(HasSignature), nameof(IsFat), nameof(InnerApps) };
 
+        /// <summary>
+        /// Format name
+        /// </summary>
+        public override string FormatName => "Mach-O";
+
+        /// <summary>
+        /// Architecture
+        /// </summary>
+        public string Architecture { get; init; }
+
+        /// <summary>
+        /// Bits
+        /// </summary>
+        public int Bits { get; init; }
+
+        /// <summary>
+        /// File endianness
+        /// </summary>
+        public Endianness Endianness { get; init; }
+
+        /// <summary>
+        /// Indicates that file is signed
+        /// </summary>
+        public bool HasSignature { get; init; }
+
+        /// <summary>
+        /// Indicates that file has FAT format
+        /// </summary>
+        public bool IsFat { get; init; }
+
+        /// <summary>
+        /// Inner application for FAT format
+        /// </summary>
+        public MachOFormatSummary[] InnerApps { get; init; }
+
+        /// <summary>
+        /// Properties accessor
+        /// </summary>
+        /// <param name="key">Property key</param>
+        /// <returns>Property value</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if key is not found</exception>
         public override dynamic this[string key] => key switch
         {
             nameof(Bits) => Bits,
@@ -23,21 +67,20 @@ namespace MachOFormat
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public override string FormatName => "Mach-O";
-
-        public int Bits { get; init; }
-
-        public string Architecture { get; init; } = String.Empty;
-
-        public Endianness Endianness { get; init; }
-
-        public bool HasSignature { get; init; }
-
-        public bool IsFat { get; init; }
-
-        public MachOFormatSummary[] InnerApps { get; init; } = Array.Empty<MachOFormatSummary>();
+        internal MachOFormatSummary(string architecture, int bits, Endianness endianness, bool hasSignature, bool isFat, MachOFormatSummary[] innerApps)
+        {
+            Architecture = architecture;
+            Bits = bits;
+            Endianness = endianness;
+            HasSignature = hasSignature;
+            IsFat = isFat;
+            InnerApps = innerApps;            
+        }
+        public override string[] GetKeys() => _keys;
 
         public override bool Equals(object? obj) => this.Equals(obj as MachOFormatSummary);
+
+        public override int GetHashCode() => HashCode.Combine(Bits, Architecture, Endianness, HasSignature, IsFat, InnerApps);
 
         public bool Equals(MachOFormatSummary? other)
         {
@@ -57,10 +100,6 @@ namespace MachOFormat
                 && (IsFat == other.IsFat)
                 && ((InnerApps == null && other.InnerApps == null) || (InnerApps != null && InnerApps.SequenceEqual(other.InnerApps)));
         }
-
-        public override int GetHashCode() => HashCode.Combine(Bits, Architecture, Endianness, HasSignature, IsFat, InnerApps);
-
-        public override string[] GetKeys() => Keys;
 
         public override string ToString()
         {

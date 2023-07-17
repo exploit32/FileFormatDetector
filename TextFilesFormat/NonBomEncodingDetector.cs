@@ -8,18 +8,41 @@ using TextFilesFormat.Checkers;
 
 namespace TextFilesFormat
 {
+    /// <summary>
+    /// Encoding detector for files without BOM
+    /// </summary>
     internal class NonBomEncodingDetector
     {
         private const int DefaultChunkSize = 4096;
 
+        /// <summary>
+        /// Skip checks related to ASCII encoding
+        /// </summary>
         public bool SkipAsciiCheck { get; set; } = false;
 
+        /// <summary>
+        /// Skip checks related to UTF-8 encoding
+        /// </summary>
         public bool SkipUtf8Check { get; set; } = false;
 
+        /// <summary>
+        /// Skip checks related to UTF-16 encodings
+        /// </summary>
         public bool SkipUtf16Check { get; set; } = false;
 
+        /// <summary>
+        /// Skip checks related to UTF-32 encodings
+        /// </summary>
         public bool SkipUtf32Check { get; set; } = false;
 
+        /// <summary>
+        /// Try to detect encoding
+        /// </summary>
+        /// <param name="stream">Opened file</param>
+        /// <param name="maxBytesToRead">Detect encoding by first N bytes of the file. Should be multiple of 4. Null means no limit</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Detecoted encoding or null</returns>
+        /// <exception cref="ArgumentException">Exception is thrown if maxBytesToRead is not a multiple of 4</exception>
         public async Task<DetectableEncoding?> TryDetectEncoding(Stream stream, long? maxBytesToRead, CancellationToken cancellationToken)
         {
             if (maxBytesToRead.HasValue && maxBytesToRead % 4 != 0)
@@ -73,7 +96,7 @@ namespace TextFilesFormat
                 return DetectableEncoding.Utf8;
 
             //Assuming Windown 1251 if there is no nulls and chars lower than 0x20 except tab, carriage return, line feed
-            if (asciiChecker.MayBeWindows1251)
+            if (asciiChecker.MayBeWindows125x)
                 return DetectableEncoding.Windows125x;
 
             if (mayBeUtf32)

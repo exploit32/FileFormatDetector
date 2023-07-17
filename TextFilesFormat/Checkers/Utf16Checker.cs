@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace TextFilesFormat.Checkers
 {
+    /// <summary>
+    /// Class that checks UTF-16 encoding byte ranges
+    /// </summary>
     internal class Utf16Checker
     {
         private int _moreCharsLe = 0;
@@ -21,17 +24,35 @@ namespace TextFilesFormat.Checkers
 
         private byte[] _seenOddBytes = new byte[256];
 
+        /// <summary>
+        /// Indicates that no invalid Little Endian surrogates were found
+        /// </summary>
         public bool LittleEndianSurrogatesValid { get; private set; } = true;
 
+        /// <summary>
+        /// Indicates that no invalid Big Endian surrogates were found
+        /// </summary>
         public bool BigEndianSurrogatesValid { get; private set; } = true;
 
+        /// <summary>
+        /// Indicates that Little Endian surrogates were found
+        /// </summary>
         public bool FoundLittleEndianSurrogates => _foundLittleEndianSurrogates;
 
+        /// <summary>
+        /// Indicates that Big Endian surrogates were found
+        /// </summary>
         public bool FoundBigEndianSurrogates => _foundBigEndianSurrogates;
 
+        /// <summary>
+        /// Indicates that file contains null sumbols (double null bytes)
+        /// </summary>
         public bool HasNullSymbols { get; private set; } = false;
 
-
+        /// <summary>
+        /// Get number of distinct even and odd byte values
+        /// </summary>
+        /// <returns></returns>
         public (int uniqueEvenBytes, int uniqueOddBytes) GetDistinctBytes()
         {
             int uniqueEvenBytes = 0;
@@ -46,6 +67,12 @@ namespace TextFilesFormat.Checkers
             return (uniqueEvenBytes, uniqueOddBytes);
         }
 
+        /// <summary>
+        /// Check provided block
+        /// </summary>
+        /// <param name="buffer">Block of bytes</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Exception is thrown if block's size is not a multiple of 2</exception>
         public bool CheckValidRange(ReadOnlySpan<byte> buffer)
         {
             if (buffer.Length % 2 != 0)

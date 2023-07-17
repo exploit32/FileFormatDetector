@@ -8,9 +8,21 @@ using System.Xml;
 
 namespace XmlFormat
 {
-
+    /// <summary>
+    /// Class that validates xml with XmlReader
+    /// </summary>
     internal class XmlValidator
     {
+        /// <summary>
+        /// Validate file
+        /// </summary>
+        /// <param name="stream">Opened file</param>
+        /// <param name="encoding">File encoding</param>
+        /// <param name="validationMethod">Validation method</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Validation result</returns>
+        /// <exception cref="NotSupportedException">Exception if thrown if xml version is not supported</exception>
+        /// <exception cref="FileFormatException">Exception is thrown if validation method if full and invalid node was found after valid one</exception>
         public async Task<XmlValidationResult> Validate(Stream stream, Encoding encoding, ValidationMethod validationMethod, CancellationToken cancellationToken)
         {
             bool xmlValid = true;

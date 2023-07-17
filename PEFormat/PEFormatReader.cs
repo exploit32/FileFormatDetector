@@ -4,6 +4,9 @@ using FormatApi;
 
 namespace PEFormat
 {
+    /// <summary>
+    /// Class that reads PE format structures
+    /// </summary>
     internal class PEFormatReader
     {
         private readonly byte[] _dosSignature = new byte[] { (byte)'M', (byte)'Z' };

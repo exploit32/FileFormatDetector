@@ -9,6 +9,9 @@ using Tools;
 
 namespace ElfFormat
 {
+    /// <summary>
+    /// Class that reads ELF format structures
+    /// </summary>
     internal class ElfFormatReader
     {
         private readonly byte[] Magic = new byte[] { 0x7F, (byte)'E', (byte)'L', (byte)'F' };
@@ -20,6 +23,11 @@ namespace ElfFormat
             _reader = reader;
         }
 
+        /// <summary>
+        /// Read ELF header
+        /// </summary>
+        /// <returns>ELF header</returns>
+        /// <exception cref="FileFormatException">Exception is thrown if file has invalid format</exception>
         public ElfHeader ReadHeader()
         {
             byte[] magic = _reader.ReadBytes(4);
@@ -84,6 +92,11 @@ namespace ElfFormat
             };
         }
 
+        /// <summary>
+        /// Read program headers
+        /// </summary>
+        /// <param name="elfHeader">ELF header</param>
+        /// <returns>Program headers</returns>
         public Segment[] ReadProgramHeaders(ElfHeader elfHeader)
         {
             _reader.Stream.Seek((long)elfHeader.ProgramHeaderOffset, SeekOrigin.Begin);
@@ -126,6 +139,11 @@ namespace ElfFormat
             return segments;
         }
 
+        /// <summary>
+        /// Read interpreter path from interpreter segment
+        /// </summary>
+        /// <param name="interpreterSegment">Interpreter segment</param>
+        /// <returns>Interpreter path</returns>
         internal string ReadInterpreterSegment(Segment interpreterSegment)
         {
             _reader.Stream.Seek((long)interpreterSegment.Offset, SeekOrigin.Begin);

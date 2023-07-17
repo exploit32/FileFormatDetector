@@ -7,10 +7,44 @@ using System.Threading.Tasks;
 
 namespace ElfFormat
 {
+    /// <summary>
+    /// Summary of ELF file format
+    /// </summary>
     public class ElfFormatSummary : FormatSummary, IEquatable<ElfFormatSummary>
     {
-        private static string[] Keys = new[] { nameof(Architecture), nameof(Bits), nameof(Interpreter), nameof(Endianness) };
+        private static readonly string[] _keys = new[] { nameof(Architecture), nameof(Bits), nameof(Interpreter), nameof(Endianness) };
 
+        /// <summary>
+        /// Format name
+        /// </summary>
+        public override string FormatName => "ELF";
+
+        /// <summary>
+        /// Target architectore
+        /// </summary>
+        public string Architecture { get; init; }
+
+        /// <summary>
+        /// Bits
+        /// </summary>
+        public int Bits { get; init; }
+
+        /// <summary>
+        /// File endianness
+        /// </summary>
+        public Endianness Endianness { get; init; }
+
+        /// <summary>
+        /// Interpreter
+        /// </summary>
+        public string Interpreter { get; init; }
+
+        /// <summary>
+        /// Properties accessor
+        /// </summary>
+        /// <param name="key">Property key</param>
+        /// <returns>Property value</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if key is not found</exception>
         public override dynamic this[string key] => key switch
         {
             nameof(Architecture) => Architecture,
@@ -20,17 +54,18 @@ namespace ElfFormat
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public string Architecture { get; init; } = String.Empty;
-
-        public int Bits { get; init; }
-
-        public Endianness Endianness { get; init; }
-
-        public string Interpreter { get; init; } = String.Empty;
-
-        public override string FormatName => "ELF";
+        internal ElfFormatSummary(string architecture, int bits, Endianness endianness, string interpreter)
+        {
+            Architecture = architecture;
+            Bits = bits;
+            Endianness = endianness;
+            Interpreter = interpreter;
+        }
+        public override string[] GetKeys() => _keys;
 
         public override bool Equals(object? obj) => this.Equals(obj as ElfFormatSummary);
+
+        public override int GetHashCode() => HashCode.Combine(Architecture, Bits, Interpreter, Endianness);
 
         public bool Equals(ElfFormatSummary? other)
         {
@@ -45,10 +80,6 @@ namespace ElfFormat
 
             return (Architecture == other.Architecture) && (Bits == other.Bits) && (Interpreter == other.Interpreter) && (Endianness == other.Endianness);
         }
-
-        public override int GetHashCode() => HashCode.Combine(Architecture, Bits, Interpreter, Endianness);
-
-        public override string[] GetKeys() => Keys;
 
         public override string ToString()
         {

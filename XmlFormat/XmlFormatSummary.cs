@@ -7,10 +7,29 @@ using System.Threading.Tasks;
 
 namespace XmlFormat
 {
+    /// <summary>
+    /// Xml files format summary
+    /// </summary>
     public class XmlFormatSummary : TextFormatSummary,  IEquatable<XmlFormatSummary>
     {
-        private static readonly string[] Keys = new[] { nameof(XmlDeclarationEncoding), nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
+        private static readonly string[] _keys = new[] { nameof(XmlDeclarationEncoding), nameof(EncodingName), nameof(EncodingFullName), nameof(CodePage), nameof(HasBOM) };
 
+        /// <summary>
+        /// Format name
+        /// </summary>
+        public override string FormatName => "Xml";
+
+        /// <summary>
+        /// Encoding in xml declaration or empty string
+        /// </summary>
+        public string XmlDeclarationEncoding { get; init; }
+
+        /// <summary>
+        /// Properties accessor
+        /// </summary>
+        /// <param name="key">Property key</param>
+        /// <returns>Property value</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if key is not found</exception>
         public override dynamic this[string key] => key switch
         {
             nameof(XmlDeclarationEncoding) => XmlDeclarationEncoding,
@@ -21,11 +40,17 @@ namespace XmlFormat
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public override string FormatName => "Xml";
+        internal XmlFormatSummary(string xmlDeclarationEncoding, TextFormatSummary baseTextFormat)
+            : base(baseTextFormat.EncodingName, baseTextFormat.EncodingFullName, baseTextFormat.CodePage, baseTextFormat.HasBOM)
+        {
+            XmlDeclarationEncoding = xmlDeclarationEncoding;
+        }
 
-        public string XmlDeclarationEncoding { get; init; } = String.Empty;
+        public override string[] GetKeys() => _keys;
 
         public override bool Equals(object? obj) => this.Equals(obj as XmlFormatSummary);
+
+        public override int GetHashCode() => HashCode.Combine(XmlDeclarationEncoding, EncodingName, EncodingFullName, CodePage, HasBOM);
 
         public bool Equals(XmlFormatSummary? other)
         {
@@ -44,10 +69,6 @@ namespace XmlFormat
                 && (CodePage == other.CodePage)
                 && (HasBOM == other.HasBOM);
         }
-
-        public override int GetHashCode() => HashCode.Combine(XmlDeclarationEncoding, EncodingName, EncodingFullName, CodePage, HasBOM);
-
-        public override string[] GetKeys() => Keys;
 
         public override string ToString()
         {

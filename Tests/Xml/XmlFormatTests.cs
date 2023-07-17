@@ -272,7 +272,7 @@ No more xml
 
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<NotSupportedException>(async () => await detector.ReadFormat(stream, new FormatApi.TextFormatSummary() { CodePage = 1, EncodingName = "Unknown encoding", HasBOM = true }, CancellationToken.None));
+                await Assert.ThrowsAsync<NotSupportedException>(async () => await detector.ReadFormat(stream, new TextFormatSummary("Unknown", "Unknown encoding", 1, true), CancellationToken.None));
             }
         }
 
@@ -300,7 +300,7 @@ No more xml
 
                 //Act
                 //Assert
-                await Assert.ThrowsAsync<NotSupportedException>(async () => await detector.ReadFormat(stream, new FormatApi.TextFormatSummary() { CodePage = 1, EncodingName = "Unknown encoding", HasBOM = true }, CancellationToken.None));
+                await Assert.ThrowsAsync<NotSupportedException>(async () => await detector.ReadFormat(stream, new TextFormatSummary("Unknown", "Unknown encoding", 1, true), CancellationToken.None));
             }
         }
 
@@ -324,7 +324,7 @@ No more xml
 
                 stream.Seek(0, SeekOrigin.Begin);
 
-                format = await detector.ReadFormat(stream, new FormatApi.TextFormatSummary() { CodePage = encoding.CodePage, EncodingName = encoding.EncodingName, HasBOM = true }, CancellationToken.None);
+                format = await detector.ReadFormat(stream, new TextFormatSummary(encodingName: encoding.EncodingName, encodingFullName: encoding.EncodingName, codePage: encoding.CodePage, hasBOM: true), CancellationToken.None);
             }
 
             return format;

@@ -2,20 +2,44 @@
 
 namespace PEFormat
 {
+    /// <summary>
+    /// PE Format summary
+    /// </summary>
     public class PEFormatSummary : FormatSummary, IEquatable<PEFormatSummary>
     {
-        private static string[] Keys = new[] { nameof(Architecture), nameof(Bits), nameof(HasClrHeader), nameof(Endianness) };
+        private static readonly string[] _keys = new[] { nameof(Architecture), nameof(Bits), nameof(HasClrHeader), nameof(Endianness) };
 
-        public string Architecture { get; init; } = String.Empty;
-
-        public int Bits { get; init; }
-
-        public bool HasClrHeader { get; init; }
-
-        public Endianness Endianness { get; init; }
-
+        /// <summary>
+        /// Format name
+        /// </summary>
         public override string FormatName => "PE";
 
+        /// <summary>
+        /// Architecture
+        /// </summary>
+        public string Architecture { get; init; }
+
+        /// <summary>
+        /// Bits
+        /// </summary>
+        public int Bits { get; init; }
+
+        /// <summary>
+        /// File endianness
+        /// </summary>
+        public Endianness Endianness { get; init; }
+
+        /// <summary>
+        /// Indicates presence of the CLR header
+        /// </summary>
+        public bool HasClrHeader { get; init; }
+
+        /// <summary>
+        /// Properties accessor
+        /// </summary>
+        /// <param name="key">Property key</param>
+        /// <returns>Property value</returns>
+        /// <exception cref="KeyNotFoundException">Thrown if key is not found</exception>
         public override dynamic this[string key] => key switch
         {
             nameof(Architecture) => Architecture,
@@ -25,17 +49,20 @@ namespace PEFormat
             _ => throw new KeyNotFoundException($"Key {key} is not supported"),
         };
 
-        public override bool Equals(object? obj) => this.Equals(obj as PEFormatSummary);
-
-        public override int GetHashCode() => HashCode.Combine(Architecture, Bits, HasClrHeader, Endianness);
-
-        public override string[] GetKeys() => Keys;
-
-        public override string ToString()
+        internal PEFormatSummary(string architecture, int bits, Endianness endianness, bool hasClrHeader)
         {
-            return $"{FormatName}: {Architecture}, {Bits}bit-{(Endianness == Endianness.LittleEndian ? "LE" : "BE")}, {(HasClrHeader ? "Managed" : "Unmanaged")}";
+            Architecture = architecture;
+            Bits = bits;
+            Endianness = endianness;
+            HasClrHeader = hasClrHeader;
         }
 
+        public override string[] GetKeys() => _keys;
+
+        public override bool Equals(object? obj) => this.Equals(obj as PEFormatSummary);
+
+        public override int GetHashCode() => HashCode.Combine(Architecture, Bits, Endianness, HasClrHeader);
+        
         public bool Equals(PEFormatSummary? other)
         {
             if (other is null)
@@ -48,6 +75,10 @@ namespace PEFormat
                 return false;
 
             return (Architecture == other.Architecture) && (Bits == other.Bits) && (HasClrHeader == other.HasClrHeader) && (Endianness == other.Endianness);
+        }
+        public override string ToString()
+        {
+            return $"{FormatName}: {Architecture}, {Bits}bit-{(Endianness == Endianness.LittleEndian ? "LE" : "BE")}, {(HasClrHeader ? "Managed" : "Unmanaged")}";
         }
     }
 }

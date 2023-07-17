@@ -7,14 +7,28 @@ using System.Threading.Tasks;
 
 namespace TextFilesFormat.Checkers
 {
+    /// <summary>
+    /// Class that checks UTF-8 surrogates' validity
+    /// </summary>
     internal class Utf8Checker
     {
         private int _moreChars = 0;
 
+        /// <summary>
+        /// Indicates that no surrogates violations were found
+        /// </summary>
         public bool SurrogatesValid { get; private set; } = true;
 
+        /// <summary>
+        /// Indicates that surrogates were found
+        /// </summary>
         public bool FoundSurrogates { get; private set; } = false;
 
+        /// <summary>
+        /// Check provided block of bytes
+        /// </summary>
+        /// <param name="buffer">Block of bytes</param>
+        /// <returns>Block validity</returns>
         public bool CheckSurrogates(ReadOnlySpan<byte> buffer)
         {
             if (SurrogatesValid)
