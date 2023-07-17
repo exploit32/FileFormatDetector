@@ -16,7 +16,7 @@ namespace XmlFormat
         /// <summary>
         /// Should detector read and validate entire xml or just read until first non-whitespace node is met
         /// </summary>
-        [Parameter("validate-full-xml", "Validate full xml document.\nBy default the file is read up to the first\ncorrect non-whitespace element")]
+        [Parameter("validate-full-xml", "Validate the whole XML document.\nThe file is read up to the first correct\nnon-whitespace element by default")]
         public bool ValidateFullXml { get; set; } = false;
 
         public string Description => "Xml files detector. Supports xml version 1.0.";

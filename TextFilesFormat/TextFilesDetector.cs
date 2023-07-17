@@ -40,7 +40,7 @@ namespace TextFilesFormat
         /// <summary>
         /// Number of bytes to scan for probabilistic format detection. Null means no boundary
         /// </summary>
-        [Parameter("file-scan-size-limit", "Number of bytes to scan for probabilistic format detection.\nMust be greater than 0 and be a multiple of 4.")]
+        [Parameter("file-scan-size-limit", "A number of bytes to scan to detect\nthe encoding of text files without BOM.\nIt must be greater than 0 and be a multiple of 4.")]
         public long? FileScanSizeLimit
         {
             get => _fileScanSizeLimit;

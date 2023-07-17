@@ -19,7 +19,7 @@ namespace FileFormatDetector.Console
         /// <summary>
         /// Print information about each file individually
         /// </summary>
-        [Parameter("verbose", "Print summary about each file individually")]
+        [Parameter("verbose", "Print a summary of each file individually")]
         public bool Verbose { get; set; }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace FileFormatDetector.Console
         /// <summary>
         /// Scan directories recursively
         /// </summary>
-        [Parameter("no-recursion", "Scan directories non recursively", isInverted: true)]
+        [Parameter("no-recursion", "Scan directories non-recursively", isInverted: true)]
         public bool Recursive { get; set; } = true;
     }
 }
