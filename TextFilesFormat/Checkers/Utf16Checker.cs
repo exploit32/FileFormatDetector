@@ -116,10 +116,13 @@ namespace TextFilesFormat.Checkers
                 byte currentByte = buffer[pos];
                 pos += 2;
 
-                if (currentByte >= 0xD8 && currentByte < 0xE0)
-                {
+                //High surrogate range
+                if (currentByte >= 0xD8 && currentByte <= 0xDB)
                     moreChars = 1;
-                }
+
+                //Low surrogates in the range DC00 to DFFF should be preceded by a value in the range D800 to DBFF
+                if (currentByte >= 0xDC && currentByte <= 0xDF)
+                    return false;
 
                 while (moreChars > 0 && pos < size)
                 {

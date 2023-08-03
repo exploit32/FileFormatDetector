@@ -80,7 +80,18 @@ namespace MachOFormat
 
         public override bool Equals(object? obj) => this.Equals(obj as MachOFormatSummary);
 
-        public override int GetHashCode() => HashCode.Combine(Bits, Architecture, Endianness, HasSignature, IsFat, InnerApps);
+        public override int GetHashCode()
+        {
+            var hashcode = HashCode.Combine(Bits, Architecture, Endianness, HasSignature, IsFat);
+
+            if (InnerApps != null)
+            {
+                for (var i = 0; i < InnerApps.Length; i++)
+                    hashcode ^= HashCode.Combine(i, InnerApps[i].GetHashCode());
+            }
+
+            return hashcode;
+        }
 
         public bool Equals(MachOFormatSummary? other)
         {

@@ -78,7 +78,7 @@ namespace PEFormat
 
         private Endianness GetEndianess(Machine machine)
         {
-            return (ushort)machine == 0x01F2 ? Endianness.BigEndian : Endianness.LittleEndian; // IBM PowerPC Big-Endian (XBOX 360)
+            return machine == Machine.POWERPCBE ? Endianness.BigEndian : Endianness.LittleEndian; // IBM PowerPC Big-Endian (XBOX 360)
         }
 
         private bool HasClrMetadata(OptionalHeader? optionalHeader)

@@ -131,5 +131,39 @@ namespace Tests.TextFiles
             Assert.Equal(1, distinctBytes.uniqueEvenBytes);
             Assert.Equal(3, distinctBytes.uniqueOddBytes);
         }
+
+        [Fact]
+        public void BigEndianUnmatchedLowSurrogateShouldNotBeValid()
+        {
+            //Arrange
+            Utf16Checker checker = new Utf16Checker();
+
+            //Act
+            bool correct = checker.CheckValidRange(new byte[] { 0xDC, 0x00, 0x20, 0x00 });
+
+            //Assert
+            Assert.True(correct);
+            Assert.False(checker.BigEndianSurrogatesValid);
+            Assert.True(checker.LittleEndianSurrogatesValid);
+            Assert.False(checker.FoundBigEndianSurrogates);
+            Assert.False(checker.FoundLittleEndianSurrogates);
+        }
+
+        [Fact]
+        public void LittleEndianUnmatchedLowSurrogateShouldNotBeValid()
+        {
+            //Arrange
+            Utf16Checker checker = new Utf16Checker();
+
+            //Act
+            bool correct = checker.CheckValidRange(new byte[] { 0x00, 0xDC, 0x00, 0x20 });
+
+            //Assert
+            Assert.True(correct);
+            Assert.True(checker.BigEndianSurrogatesValid);
+            Assert.False(checker.LittleEndianSurrogatesValid);
+            Assert.False(checker.FoundBigEndianSurrogates);
+            Assert.False(checker.FoundLittleEndianSurrogates);
+        }
     }
 }

@@ -49,10 +49,12 @@ namespace XmlFormat
 
             var validationResult = await validator.Validate(stream, encoding, ValidateFullXml ? ValidationMethod.Full : ValidationMethod.UntilFirstNode, cancellationToken);
 
+            var xmlDeclarationsEncoding = string.IsNullOrEmpty(validationResult.XmlDeclarationEncoding) ? string.Empty : validationResult.XmlDeclarationEncoding.ToUpper();
+
             if (validationResult.Valid)
             {
                 return new XmlFormatSummary(
-                    xmlDeclarationEncoding: validationResult.XmlDeclarationEncoding ?? string.Empty,
+                    xmlDeclarationEncoding: xmlDeclarationsEncoding,
                     baseTextFormat: textFormatSummary
                 );
             }

@@ -111,7 +111,7 @@ namespace MachOFormat
 
                     _reader.Stream.Seek((long)arch.Offset, SeekOrigin.Begin);
 
-                    innerMachOs[i] = ReadMachO();
+                    innerMachOs[i] = ReadNotFatMachO(ReadMagic());
                 }
 
                 result = new MachO()
@@ -123,6 +123,22 @@ namespace MachOFormat
             }
             else
             {
+                result = ReadNotFatMachO(magic);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Read Mach-O data
+        /// </summary>
+        /// <returns>Mach-O structure</returns>
+        private MachO ReadNotFatMachO(MachOMagic magic)
+        {
+            MachO result;
+
+            if (!magic.IsFat)
+            {
                 var appHeader = ReadAppHeader(magic);
                 var hasSignature = FindCodeSignature(appHeader);
 
@@ -132,6 +148,10 @@ namespace MachOFormat
                     IsSigned = hasSignature,
                     Architecture = appHeader.CpuType.ToString(),
                 };
+            }
+            else
+            {
+                throw new FileFormatException($"FAT format cannot contain inner FAT formats");
             }
 
             return result;

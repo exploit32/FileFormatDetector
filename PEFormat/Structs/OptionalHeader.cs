@@ -12,7 +12,6 @@ namespace PEFormat.Structs
         public enum PEFormat : ushort
         {
             PE32 = 0x10b,
-            ROM = 0x107,
             PE32Plus = 0x20b,
         }
 

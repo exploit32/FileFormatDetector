@@ -104,6 +104,11 @@ namespace PEFormat.Structs
         POWERPCFP = 0x1f1,
 
         /// <summary>
+        /// Power PC Big Endian
+        /// </summary>
+        POWERPCBE = 0x01f2,
+
+        /// <summary>
         /// MIPS little endian
         /// </summary>
         R4000 = 0x166,

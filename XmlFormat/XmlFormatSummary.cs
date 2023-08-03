@@ -72,8 +72,13 @@ namespace XmlFormat
 
         public override string ToString()
         {
-            if (!string.IsNullOrEmpty(XmlDeclarationEncoding) && !XmlDeclarationEncoding.Equals(EncodingName, StringComparison.InvariantCultureIgnoreCase))
-                return $"{FormatName}: {(HasBOM ? "BOM" : "no-BOM")}, {XmlDeclarationEncoding} (detected as {EncodingName})";
+            if (!string.IsNullOrEmpty(XmlDeclarationEncoding))
+            {
+                if (!XmlDeclarationEncoding.Equals(EncodingName, StringComparison.InvariantCultureIgnoreCase))
+                    return $"{FormatName}: {(HasBOM ? "BOM" : "no-BOM")}, {XmlDeclarationEncoding} (detected as {EncodingName})";
+                else
+                    return $"{FormatName}: {(HasBOM ? "BOM" : "no-BOM")}, {XmlDeclarationEncoding}, has xml declaration";
+            }
             else
                 return $"{FormatName}: {(HasBOM ? "BOM" : "no-BOM")}, {EncodingName}";
         }

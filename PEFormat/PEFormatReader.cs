@@ -79,8 +79,18 @@ namespace PEFormat
                 SizeOfUninitializedData = _reader.ReadUInt32(),
                 AddressOfEntryPoint = _reader.ReadUInt32(),
                 BaseOfCode = _reader.ReadUInt32(),
-                BaseOfData = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : 0,
-                ImageBase = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : _reader.ReadUInt64(),
+                BaseOfData = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => 0,
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
+                ImageBase = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => _reader.ReadUInt64(),
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
                 SectionAlignment = _reader.ReadUInt32(),
                 FileAlignment = _reader.ReadUInt32(),
                 MajorOperatingSystemVersion = _reader.ReadUInt16(),
@@ -95,10 +105,30 @@ namespace PEFormat
                 CheckSum = _reader.ReadUInt32(),
                 Subsystem = _reader.ReadUInt16(),
                 DllCharacteristics = _reader.ReadUInt16(),
-                SizeOfStackReserve = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : _reader.ReadUInt64(),
-                SizeOfStackCommit = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : _reader.ReadUInt64(),
-                SizeOfHeapReserve = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : _reader.ReadUInt64(),
-                SizeOfHeapCommit = format == OptionalHeader.PEFormat.PE32 ? _reader.ReadUInt32() : _reader.ReadUInt64(),
+                SizeOfStackReserve = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => _reader.ReadUInt64(),
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
+                SizeOfStackCommit = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => _reader.ReadUInt64(),
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
+                SizeOfHeapReserve = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => _reader.ReadUInt64(),
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
+                SizeOfHeapCommit = format switch
+                {
+                    OptionalHeader.PEFormat.PE32 => _reader.ReadUInt32(),
+                    OptionalHeader.PEFormat.PE32Plus => _reader.ReadUInt64(),
+                    _ => throw new NotSupportedException($"Format type {format} is not supported"),
+                },
                 LoaderFlags = _reader.ReadUInt32(),
                 NumberOfRvaAndSizes = _reader.ReadUInt32(),                
             };
